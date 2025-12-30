@@ -1,0 +1,18 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appIDs": [
+                    "4SV2KJ77WU.com.drifto.app"
+                ],
+                "components": [
+                    {
+                        "/": "*",
+                        "comment": "Matches any URL on your site"
+                    }
+                ]
+            }
+        ]
+    }
+}
