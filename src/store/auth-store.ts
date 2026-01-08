@@ -1,15 +1,15 @@
-import {persist} from "zustand/middleware";
-import {create} from "zustand";
-import {api, authApi} from "@/lib/axios";
-import {showTopToast} from "@/components/toast/toast-util";
+import { persist } from "zustand/middleware";
+import { create } from "zustand";
+import { api, authApi } from "@/lib/axios";
+import { showTopToast } from "@/components/toast/toast-util";
 
 interface LocationPublic {
-  city: string | null;
-  state: string | null;
+    city: string | null;
+    state: string | null;
 }
 
 interface AuthState {
-    user: {[key: string]: any} | null;
+    user: { [key: string]: any } | null;
     accessToken: string | null;
     refreshToken: string | null;
     isAuthenticated: boolean;
@@ -18,14 +18,14 @@ interface AuthState {
     locationPublic: LocationPublic
 }
 
- export interface LoginCredentials {
-     username?: string;
-     email?: string;
-     password: string;
- }
+export interface LoginCredentials {
+    username?: string;
+    email?: string;
+    password: string;
+}
 
 export interface AuthResponse {
-    user: {[key: string]: any};
+    user: { [key: string]: any };
     accessToken: string;
     refreshToken: string;
     message: string | null;
@@ -35,10 +35,11 @@ export interface AuthResponse {
 interface AuthStore extends AuthState {
     login: (credentials: LoginCredentials) => Promise<void>;
     googleLogin: (credentials: string) => Promise<void>;
+    appleLogin: (credentials: any) => Promise<void>;
     logout: () => Promise<void>;
     refreshAccessToken: () => Promise<boolean>;
     getUser: () => Promise<void>;
-    setUser: (user: {[key: string]: any}) => void;
+    setUser: (user: { [key: string]: any }) => void;
     setTokens: (accessToken: string, refreshToken: string) => void;
     clearAuth: () => void;
     setLoading: (loading: boolean) => void;
@@ -55,12 +56,12 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false,
             hasTriedRefresh: false,
             locationPublic: {
-              state: null, city: null,
+                state: null, city: null,
             },
 
             login: async (credentials: LoginCredentials) => {
-                try{
-                    set({isLoading: true});
+                try {
+                    set({ isLoading: true });
 
                     const request: {
                         username?: string;
@@ -69,14 +70,14 @@ export const useAuthStore = create<AuthStore>()(
                     } = {
                         password: credentials.password,
                     }
-                    if(credentials.username) {
+                    if (credentials.username) {
                         request.username = credentials.username;
-                    }else {
+                    } else {
                         request.email = credentials.email;
                     }
 
                     const response = await api.post('/auth/login', request);
-                    const {user, accessToken, refreshToken} = response.data.data
+                    const { user, accessToken, refreshToken } = response.data.data
 
                     set({
                         user,
@@ -86,19 +87,19 @@ export const useAuthStore = create<AuthStore>()(
                         isLoading: false,
                     })
                 } catch (error) {
-                    set({isLoading: false});
+                    set({ isLoading: false });
                     throw error;
                 }
             },
 
             googleLogin: async (credentials: string) => {
-                try{
-                    set({isLoading: true});
+                try {
+                    set({ isLoading: true });
 
                     const response = await api.post('/auth/google', {
                         googleIdToken: credentials,
                     });
-                    const {user, accessToken, refreshToken} = response.data.data
+                    const { user, accessToken, refreshToken } = response.data.data
 
                     set({
                         user,
@@ -108,7 +109,31 @@ export const useAuthStore = create<AuthStore>()(
                         isLoading: false,
                     })
                 } catch (error) {
-                    set({isLoading: false});
+                    set({ isLoading: false });
+                    throw error;
+                }
+            },
+
+            appleLogin: async (credentials: any) => {
+                try {
+                    set({ isLoading: true });
+
+                    const response = await api.post('/auth/apple', {
+                        idToken: credentials.identityToken,
+                        firstName: credentials.givenName,
+                        lastName: credentials.familyName
+                    });
+                    const { user, accessToken, refreshToken } = response.data.data
+
+                    set({
+                        user,
+                        accessToken,
+                        refreshToken,
+                        isAuthenticated: true,
+                        isLoading: false,
+                    })
+                } catch (error) {
+                    set({ isLoading: false });
                     throw error;
                 }
             },
@@ -154,13 +179,13 @@ export const useAuthStore = create<AuthStore>()(
                     const response = await authApi.get('/user/current');
 
                     set({ user: response.data.data })
-                }catch(error: any) {
-                    set({isLoading: false});
+                } catch (error: any) {
+                    set({ isLoading: false });
                     throw error
                 }
             },
 
-            setUser: (user: {[key: string]: any}) => set({ user }),
+            setUser: (user: { [key: string]: any }) => set({ user }),
 
             setTokens: (accessToken: string, refreshToken: string) =>
                 set({ accessToken, refreshToken, isAuthenticated: true }),
