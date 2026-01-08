@@ -13,6 +13,7 @@ import { authApi } from "@/lib/axios";
 import { toast } from "react-toastify";
 import { showTopToast } from "@/components/toast/toast-util";
 import { AspectRatio } from "../ui/aspect-ratio";
+import { useSoundStore } from "@/store/sound-store";
 
 interface EventCardProps extends React.ComponentProps<"div"> {
   event: { [key: string]: any };
@@ -32,7 +33,6 @@ export const EventCard = ({
   const [price, setPrice] = useState<string>("");
   const [isLiked, setIsLiked] = useState<boolean>(event.isLikedByUser);
   const [isLikedLoading, setIsLikedLoading] = useState<boolean>(false);
-  const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -56,6 +56,13 @@ export const EventCard = ({
     }
   }, [event.tickets]);
 
+  // Global sound state - all videos share the same mute state
+  const { isGlobalMuted, toggleGlobalMute, setActiveVideo, activeVideoId } = useSoundStore();
+  const isActive = activeVideoId === event.id;
+
+  // Track if video is currently in viewport
+  const isInViewRef = useRef(false);
+
   // INTERSECTION OBSERVER FOR VIDEO PLAYBACK CONTROL
   useEffect(() => {
     const video = videoRef.current;
@@ -68,6 +75,8 @@ export const EventCard = ({
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
+        const wasInView = isInViewRef.current;
+        isInViewRef.current = entry.isIntersecting;
 
         if (entry.isIntersecting) {
           // Load video if not loaded yet
@@ -76,35 +85,55 @@ export const EventCard = ({
             video.load();
           }
 
-          // Play video when it's in view (center 50% of viewport)
-          video.play().then(() => {
-            setIsPlaying(true);
-          }).catch(err => {
-            console.log("Video play failed:", err);
-          });
-        } else {
-          // Pause video when out of view
-          video.pause();
-          setIsPlaying(false);
+          // Set this video as active (will pause others via the isActive effect)
+          setActiveVideo(event.id);
+        } else if (wasInView) {
+          // Only clear if this video was previously in view and is now leaving
+          // Use the store's current state directly
+          const currentActiveId = useSoundStore.getState().activeVideoId;
+          if (currentActiveId === event.id) {
+            setActiveVideo(null);
+          }
         }
       },
       {
-        threshold: 0.5, // Play when 50% visible
+        threshold: [0, 0.5, 1], // Multiple thresholds for more frequent updates
         rootMargin: "-25% 0px -25% 0px" // Focus on center of viewport
       }
     );
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, [event.coverVideo]);
+  }, [event.coverVideo, event.id, setActiveVideo]);
 
-  // Handle mute/unmute
-  const toggleMute = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
+  // Play/pause based on active state - this is the key effect that synchronizes all videos
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isActive) {
+      video.play().then(() => {
+        setIsPlaying(true);
+      }).catch(err => {
+        console.log("Video play failed:", err);
+      });
+    } else {
+      video.pause();
+      setIsPlaying(false);
     }
+  }, [isActive]);
+
+  // Sync video muted state with global store
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isGlobalMuted;
+    }
+  }, [isGlobalMuted]);
+
+  // Handle mute/unmute using global store
+  const handleToggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleGlobalMute();
   };
 
   // DATE FORMAT
@@ -150,7 +179,7 @@ export const EventCard = ({
               ref={videoRef}
               className="w-full h-full object-cover rounded-lg"
               preload="none"
-              muted={isMuted}
+              muted={isGlobalMuted}
               playsInline
               loop
               controls={false}
@@ -193,9 +222,9 @@ export const EventCard = ({
             <div className="absolute bottom-0 left-0 pr-6 pl-2 pt-6 pb-4 ">
               <button
                 className="text-white rounded-full bg-neutral-800 p-2 opacity-90 z-90"
-                onClick={toggleMute}
+                onClick={handleToggleMute}
               >
-                {isMuted ? (
+                {isGlobalMuted ? (
                   <HiVolumeOff size={16} />
                 ) : (
                   <HiVolumeUp size={16} />

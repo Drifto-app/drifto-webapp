@@ -1,14 +1,14 @@
 "use client"
 
 import * as React from "react";
-import {cn} from "@/lib/utils";
-import {ComponentProps, forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState} from "react";
-import {authApi} from "@/lib/axios";
-import {EventCard} from "@/components/event-display/event-card";
-import {Loader} from "@/components/ui/loader";
-import {Button} from "@/components/ui/button";
-import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {Tabs} from "@/components/event-display/tabs";
+import { cn } from "@/lib/utils";
+import { ComponentProps, forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { authApi } from "@/lib/axios";
+import { EventCard } from "@/components/event-display/event-card";
+import { Loader } from "@/components/ui/loader";
+import { Button } from "@/components/ui/button";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Tabs } from "@/components/event-display/tabs";
 import { useAuthStore } from '@/store/auth-store';
 import { BiCalendarAlt } from 'react-icons/bi';
 import { PiFireSimpleBold } from 'react-icons/pi';
@@ -55,22 +55,22 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
         try {
             const currentPage = resetData ? 1 : pageRef.current;
 
-            const params: {[key: string]: string | number} = {
+            const params: { [key: string]: string | number } = {
                 pageSize: 10,
                 pageNumber: currentPage,
             }
 
-            if(activeEventItem) {
+            if (activeEventItem) {
                 params.eventTag = activeEventItem;
             }
 
-            if(location) {
+            if (location) {
                 params.location = location;
             }
 
             let response;
 
-            if(isAuthenticated) {
+            if (isAuthenticated) {
                 response = await authApi.get("/feed/event", {
                     params
                 });
@@ -175,7 +175,7 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
                 <Tabs active={activeEventItem} />
 
                 <div className="flex justify-center py-8">
-                    <Loader className="h-10 w-10"/>
+                    <Loader className="h-10 w-10" />
                 </div>
             </div>
         );
@@ -218,17 +218,17 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
 
             <div className="flex flex-col gap-10 px-4 mt-4 w-full max-w-7xl ">
                 {events.map((evt, index) => (
-                    <EventCard key={evt.id} isAuthenticated={isAuthenticated} event={evt} currentPathUrl={pathname + "?" + searchParams}/>
+                    <EventCard key={evt.id} isAuthenticated={isAuthenticated} event={evt} currentPathUrl={pathname + "?" + searchParams} />
                 ))}
             </div>
 
             <Button
-              size="lg"
-              className={cn(
-                'fixed rounded-full z-1000 bg-blue-800',
-                isAuthenticated ? "bottom-20" : "bottom-8"
-              )}
-              onClick={() => router.push(`/m/event-create?prev=${encodeURIComponent(pathname + "?" + searchParams)}`)}
+                size="lg"
+                className={cn(
+                    'fixed rounded-full z-1000 bg-blue-800',
+                    isAuthenticated ? "bottom-20" : "bottom-8"
+                )}
+                onClick={() => router.push(`/m/event-create?prev=${encodeURIComponent(pathname + "?" + searchParams)}`)}
             >
                 Create Experience
             </Button>
@@ -236,7 +236,7 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
             {/* Loading indicator for pagination */}
             {loading && !initialLoading && (
                 <div className="flex justify-center py-4">
-                    <Loader className="h-8 w-8"/>
+                    <Loader className="h-8 w-8" />
                 </div>
             )}
 
@@ -266,7 +266,7 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
             {!loading && !initialLoading && events.length === 0 && !error && (
                 <div className="w-full flex flex-col items-center justify-center pt-15">
                     <div className="flex flex-col items-center gap-3 text-center max-w-md px-4">
-                        <PiFireSimpleBold size={40} className="text-blue-800"/>
+                        <PiFireSimpleBold size={40} className="text-blue-800" />
                         <p className="text-neutral-500 mb-4 text-sm">
                             {activeEventItem
                                 ? `No events found for ${activeEventItem.toUpperCase() || 'this category'}`

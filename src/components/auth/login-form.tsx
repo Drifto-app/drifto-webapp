@@ -12,8 +12,9 @@ import { LoaderSmall } from "@/components/ui/loader";
 import { toast } from "react-toastify";
 import * as React from "react";
 import { emailRegex } from "@/lib/utils";
-import { GoogleLogin } from "@react-oauth/google";
+
 import GoogleButton from "@/components/ui/google-button";
+import AppleButton from "@/components/ui/apple-button";
 import { showTopToast } from "@/components/toast/toast-util";
 
 interface LoginFormProps extends React.ComponentProps<"form"> {
@@ -31,7 +32,7 @@ export function LoginForm({
   nextUrl,
   ...props
 }: LoginFormProps) {
-  const { login, googleLogin, isLoading } = useAuthStore();
+  const { login, googleLogin, appleLogin, isLoading } = useAuthStore();
   const router = useRouter();
 
   const [isPasswordShow, setIsPasswordShow] = useState<boolean>(false)
@@ -120,7 +121,7 @@ export function LoginForm({
             Or
           </span>
         </div>
-        <div className="w-full flex justify-center items-center">
+        <div className="w-full flex justify-center items-center flex-col gap-3">
           <GoogleButton onSuccess={async (credentialResponse) => {
             try {
               const idToken = credentialResponse.credential;
@@ -129,6 +130,15 @@ export function LoginForm({
             } catch (err: any) {
               setError(err.response?.data?.description || 'Google Auth failed');
               showTopToast("error", err.response?.data?.description || 'Google Auth failed')
+            }
+          }} />
+          <AppleButton onSuccess={async (response) => {
+            try {
+              await appleLogin(response);
+              router.push(nextUrl ?? '/');
+            } catch (err: any) {
+              setError(err.response?.data?.description || 'Apple Auth failed');
+              showTopToast("error", err.response?.data?.description || 'Apple Auth failed')
             }
           }} />
         </div>
