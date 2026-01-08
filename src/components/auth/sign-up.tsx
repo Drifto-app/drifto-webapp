@@ -16,6 +16,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Calendar28 } from "@/components/ui/date-input";
 import { Autocomplete, useLoadScript } from "@react-google-maps/api";
 import GoogleButton from "@/components/ui/google-button";
+import AppleButton from "@/components/ui/apple-button";
 import { showTopToast } from "@/components/toast/toast-util";
 import { FaArrowLeftLong } from 'react-icons/fa6';
 
@@ -30,7 +31,7 @@ export const SignUpForm = ({
     className,
     ...props
 }: SignUpFormProps) => {
-    const { googleLogin, setUser, setTokens } = useAuthStore();
+    const { googleLogin, appleLogin, setUser, setTokens } = useAuthStore();
     const router = useRouter();
 
     const [isLoading, setLoading] = React.useState<boolean>(false);
@@ -532,7 +533,7 @@ export const SignUpForm = ({
                     Or
                 </span>
             </div>
-            <div className="w-full flex justify-center items-center">
+            <div className="w-full flex justify-center items-center flex-col gap-3">
                 <GoogleButton onSuccess={async (credentialResponse) => {
                     try {
                         const idToken = credentialResponse.credential;
@@ -541,6 +542,14 @@ export const SignUpForm = ({
                         router.push("/");
                     } catch (err: any) {
                         showTopToast("error", err.response?.data?.description || 'Google Auth failed');
+                    }
+                }} />
+                <AppleButton onSuccess={async (response) => {
+                    try {
+                        await appleLogin(response);
+                        router.push("/");
+                    } catch (err: any) {
+                        showTopToast("error", err.response?.data?.description || 'Apple Auth failed');
                     }
                 }} />
             </div>
