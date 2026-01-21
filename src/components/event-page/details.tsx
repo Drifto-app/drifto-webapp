@@ -6,6 +6,7 @@ import Image from "next/image";
 import { FaHeart, FaHotjar, FaRegCalendar } from "react-icons/fa";
 import { IoMdHeartEmpty, IoMdSearch } from "react-icons/io";
 import { IoLocationOutline, IoPizzaOutline, IoShareSocialOutline } from "react-icons/io5";
+import { Download, QrCode, Pencil, Trash2, Share2 } from "lucide-react";
 import { EventSingleContent, EventSingleContentText } from "@/components/ui/content";
 import { TbTicketOff } from "react-icons/tb";
 import { HiMiniUsers } from "react-icons/hi2";
@@ -15,7 +16,18 @@ import { toast } from "react-toastify";
 import { useState } from "react";
 import { UserEventSinglePlaceholder } from "@/components/ui/user-placeholder";
 import { MdCancel } from "react-icons/md";
-import { Dialog } from "@headlessui/react";
+import { Dialog as HeadlessDialog } from "@headlessui/react";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { router } from "next/client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -44,6 +56,53 @@ export const SingleEventDetails = ({
     const [isOpen, setIsOpen] = React.useState(false);
     const [activeSrc, setActiveSrc] = React.useState<string | null>(null);
     const [isReportDrawerOpen, setIsReportDrawerOpen] = useState<boolean>(false);
+    const [isExporting, setIsExporting] = useState<boolean>(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+    // Export event bookings as CSV
+    const handleExportCSV = async () => {
+        if (isExporting) return;
+
+        setIsExporting(true);
+        try {
+            const response = await authApi.post(`/userTicket/event/${event.id}/export`, {}, {
+                responseType: 'blob'
+            });
+
+            // Create a blob and download it
+            const blob = new Blob([response.data], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${event.title.replace(/[^a-z0-9]/gi, '_')}_bookings.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            showTopToast("success", "Booking data exported successfully!");
+        } catch (err: any) {
+            showTopToast("error", err.response?.data?.message || err.message || "Failed to export booking data");
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    // Delete event handler
+    const handleEventDelete = async () => {
+        setIsDeleting(true);
+        try {
+            await authApi.delete(`/event/${event.id}`);
+            showTopToast("success", "Event deleted successfully!");
+            router.push("/?screen=plans");
+        } catch (err: any) {
+            showTopToast("error", err.response?.data?.message || err.message || "Failed to delete event");
+        } finally {
+            setIsDeleting(false);
+            setShowDeleteDialog(false);
+        }
+    };
 
     const startDate = new Date(event.startTime);
     const stopDate = new Date(event.stopTime);
@@ -148,24 +207,7 @@ export const SingleEventDetails = ({
                     className,
                 )} {...props}>
                     <div className="w-full flex flex-col items-center gap-6 pt-5 pb-25">
-                        <div className="flex w-full gap-2 items-center">
-                            <div className="w-full max-w-xl h-12 flex flex-row items-center border rounded-full px-4 shadow-md cursor-pointer" onClick={() => setActiveScreen!("tickets")} >
-                                <IoMdSearch size={16} className="text-blue-800" />
-                                <Input
-                                    className="h-full w-full shadow-none border-none placeholder:font-black placeholder:text-base placeholder:text-blue-800"
-                                    placeholder="Find people who booked"
-                                    disabled
-                                />
-                            </div>
-                            <div className="flex flex-row gap-3">
-                                <button
-                                    className="text-white rounded-full bg-neutral-800 p-2 opacity-90"
-                                    onClick={handleQuickShare}
-                                >
-                                    <IoShareSocialOutline size={20} />
-                                </button>
-                            </div>
-                        </div>
+                        {/* Event Image */}
                         <div className="relative w-full max-h-[40vh] overflow-hidden rounded-lg" onClick={() => openModal(event.titleImage)}>
                             <Image
                                 src={event.titleImage}
@@ -183,6 +225,92 @@ export const SingleEventDetails = ({
                                 </div>
                             )}
                         </div>
+
+                        {/* Horizontal Action Buttons */}
+                        <div className="w-full overflow-x-auto no-scrollbar">
+                            <div className="flex flex-row gap-3 pb-2">
+                                {/* Scan Tickets Button */}
+                                <button
+                                    className="flex items-center gap-2 px-4 py-2.5 border border-neutral-300 rounded-full text-sm font-medium text-neutral-800 bg-white hover:bg-neutral-50 transition-colors whitespace-nowrap"
+                                    onClick={() => setActiveScreen!("tickets")}
+                                >
+                                    <QrCode size={18} />
+                                    Scan tickets
+                                </button>
+
+                                {/* Share Event Button */}
+                                <button
+                                    className="flex items-center gap-2 px-4 py-2.5 border border-neutral-300 rounded-full text-sm font-medium text-neutral-800 bg-white hover:bg-neutral-50 transition-colors whitespace-nowrap"
+                                    onClick={handleQuickShare}
+                                >
+                                    <Share2 size={18} />
+                                    Share event
+                                </button>
+
+                                {/* Edit Event Button */}
+                                <button
+                                    className="flex items-center gap-2 px-4 py-2.5 border border-neutral-300 rounded-full text-sm font-medium text-neutral-800 bg-white hover:bg-neutral-50 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={() => setActiveScreen!("edit")}
+                                    disabled={new Date(event.stopTime) < new Date(Date.now())}
+                                >
+                                    <Pencil size={18} />
+                                    Edit event
+                                </button>
+
+                                {/* Export CSV Button */}
+                                <button
+                                    className="flex items-center gap-2 px-4 py-2.5 border border-neutral-300 rounded-full text-sm font-medium text-neutral-800 bg-white hover:bg-neutral-50 transition-colors whitespace-nowrap disabled:opacity-50"
+                                    onClick={handleExportCSV}
+                                    disabled={isExporting}
+                                >
+                                    <Download size={18} className={isExporting ? "animate-pulse" : ""} />
+                                    {isExporting ? "Exporting..." : "Export CSV"}
+                                </button>
+
+                                {/* Delete Event Button - Only show for HOST */}
+                                {new Date(event.stopTime) > new Date(Date.now()) && event.hostCollaborationStatus === "HOST" && (
+                                    <button
+                                        className="flex items-center gap-2 px-4 py-2.5 border border-red-300 rounded-full text-sm font-medium text-red-600 bg-white hover:bg-red-50 transition-colors whitespace-nowrap"
+                                        onClick={() => setShowDeleteDialog(true)}
+                                    >
+                                        <Trash2 size={18} />
+                                        Delete
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Delete Confirmation Dialog */}
+                        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                            <DialogContent className="w-full max-w-sm sm:rounded-lg">
+                                <DialogHeader>
+                                    <DialogTitle className="text-lg">Delete Event</DialogTitle>
+                                    <DialogDescription className="text-sm">
+                                        Are you sure you want to delete this event? This action cannot be undone.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter className="w-full flex flex-row sm:justify-between justify-between gap-3">
+                                    <DialogClose asChild>
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            disabled={isDeleting}
+                                            className="flex-1 text-base py-6 bg-neutral-300 font-semibold"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </DialogClose>
+                                    <Button
+                                        type="button"
+                                        onClick={handleEventDelete}
+                                        disabled={isDeleting}
+                                        className="flex-1 text-base py-6 bg-red-500 hover:bg-red-600 text-white font-semibold"
+                                    >
+                                        {isDeleting ? "Deleting..." : "Delete"}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                         <EventSingleContentText isLine={false} headText={"Event Title:"} className="shadow-xl">
                             <h1 className="capitalize font-black text-3xl w-full text-neutral-400">{event.title}</h1>
                         </EventSingleContentText>
@@ -315,7 +443,7 @@ export const SingleEventDetails = ({
                     description={event.description}
                 />
 
-                <Dialog
+                <HeadlessDialog
                     open={isOpen}
                     onClose={closeModal}
                     className="fixed inset-0 z-100 flex items-center justify-center bg-black bg-opacity-50"
@@ -323,7 +451,7 @@ export const SingleEventDetails = ({
                     <div className="absolute top-4 right-4" onClick={closeModal}>
                         <MdCancel size={24} className="text-white" />
                     </div>
-                    <Dialog.Panel className="bg-white overflow-hidden w-full max-h-[95%]">
+                    <HeadlessDialog.Panel className="bg-white overflow-hidden w-full max-h-[95%]">
                         {activeSrc && (
                             <Image
                                 src={activeSrc}
@@ -334,8 +462,8 @@ export const SingleEventDetails = ({
                             // style={{ maxHeight: "95vh" }}
                             />
                         )}
-                    </Dialog.Panel>
-                </Dialog>
+                    </HeadlessDialog.Panel>
+                </HeadlessDialog>
             </>
         )
     }

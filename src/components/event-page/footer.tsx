@@ -3,22 +3,8 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from "next/navigation";
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label";
-import { toast } from "react-toastify";
-import { authApi } from "@/lib/axios";
-import { showTopToast } from "@/components/toast/toast-util";
 
 interface SingleEventFooterProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
@@ -50,24 +36,11 @@ export const SingleEventFooter = ({
         return "₦ " + minPrice.toFixed(2);
     }, [event.tickets]);
 
-    const handleEventDelete = async () => {
-        setLoading!(true);
-
-        try {
-            await authApi.delete(`/event/${event.id}`);
-
-            setLoading!(false);
-
-            router.push("/?screen=plans");
-        } catch (err: any) {
-            showTopToast("error", err.message || "Error deleting event");
-            setLoading!(false);
-        }
-    }
-
 
 
     if (isCoHost) {
+        // Edit and Delete buttons are now in the details action bar
+        // This footer section is kept minimal for bottom spacing
         return (
             <div className={cn(
                 "fixed inset-x-0 bottom-0 z-60 border-t border-neutral-200",
@@ -83,47 +56,10 @@ export const SingleEventFooter = ({
                         : undefined
                 }
                 {...props}>
-                <div className="w-[80%] flex flex-row items-center justify-between sm:px-6 py-3">
-                    <Button
-                        className="border-neutral-950 rounded-full px-12 py-7 text-sm font-semibold cursor-pointer"
-                        onClick={() => setActiveScreen!("edit")}
-                        disabled={new Date(event.stopTime) < new Date(Date.now())}
-                    >
-                        Edit
-                    </Button>
-                    {new Date(event.stopTime) > new Date(Date.now()) && event.hostCollaborationStatus === "HOST"
-                        ? <Dialog>
-                            <DialogTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className="border-neutral-950 rounded-full px-12 py-7 text-sm font-semibold cursor-pointer"
-                                >
-                                    Delete
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="w-full flex flex-col gap-6">
-                                <DialogHeader>
-                                    <DialogTitle className="text-lg">Delete Event</DialogTitle>
-                                    <DialogDescription className="text-sm">
-                                        Are you sure you want to delete this event? This action cannot be undone.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter className="w-full flex flex-row sm:justify-between justify-between px-4 sm:px-20">
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="secondary" className="text-lg bg-neutral-300 py-6 px-8 font-semibold">
-                                            Cancel
-                                        </Button>
-                                    </DialogClose>
-                                    <Button type="button" variant="secondary" className="text-lg py-6 px-8 bg-red-500 text-white font-semibold" onClick={handleEventDelete}>
-                                        Confirm
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog> :
-                        null
-                    }
-
-
+                <div className="w-full py-3 px-6">
+                    <p className="text-center text-xs text-neutral-500">
+                        Swipe for more actions
+                    </p>
                 </div>
             </div>
         )
