@@ -59,9 +59,9 @@ export const LogoutButton = ({
                 </Button>
             </DialogTrigger>
             <DialogContent>
-                <DialogTitle className="text-xl text-center">Delete Event</DialogTitle>
+                <DialogTitle className="text-xl text-center">Logout</DialogTitle>
                 <DialogDescription className="text-md text-center">
-                    Are you sure you want to sign out?
+                    Are you sure you want to logout?
                 </DialogDescription>
                 <DialogFooter className="w-full flex flex-row sm:justify-between justify-between px-4 sm:px-20">
                     <DialogClose asChild>
