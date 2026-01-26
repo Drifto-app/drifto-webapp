@@ -13,7 +13,9 @@ import { HiMiniUsers } from "react-icons/hi2";
 import { SnapshotCarousel } from "@/components/event-page/image-silder";
 import { authApi } from "@/lib/axios";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import QRCode from "react-qr-code";
+import { toPng } from "html-to-image";
 import { UserEventSinglePlaceholder } from "@/components/ui/user-placeholder";
 import { MdCancel } from "react-icons/md";
 import { Dialog as HeadlessDialog } from "@headlessui/react";
@@ -59,6 +61,8 @@ export const SingleEventDetails = ({
     const [isExporting, setIsExporting] = useState<boolean>(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
+    const [isDownloadingQR, setIsDownloadingQR] = useState<boolean>(false);
+    const qrCodeRef = useRef<HTMLDivElement>(null);
 
     // Export event bookings as CSV
     const handleExportCSV = async () => {
@@ -101,6 +105,28 @@ export const SingleEventDetails = ({
         } finally {
             setIsDeleting(false);
             setShowDeleteDialog(false);
+        }
+    };
+
+    // Download QR code as PNG
+    const handleDownloadQR = async () => {
+        if (!qrCodeRef.current || isDownloadingQR) return;
+        setIsDownloadingQR(true);
+
+        try {
+            const dataUrl = await toPng(qrCodeRef.current, {
+                cacheBust: true,
+                pixelRatio: 2,
+            });
+            const link = document.createElement("a");
+            link.download = `${event.title.replace(/[^a-z0-9]/gi, '_')}_qrcode.png`;
+            link.href = dataUrl;
+            link.click();
+            showTopToast("success", "QR code downloaded!");
+        } catch (err) {
+            showTopToast("error", "Failed to download QR code");
+        } finally {
+            setIsDownloadingQR(false);
         }
     };
 
@@ -277,6 +303,23 @@ export const SingleEventDetails = ({
                                         Delete
                                     </button>
                                 )}
+
+                                {/* Download QR Button */}
+                                <button
+                                    className="flex items-center gap-2 px-4 py-2.5 border border-neutral-300 rounded-full text-sm font-medium text-neutral-800 bg-white hover:bg-neutral-50 transition-colors whitespace-nowrap disabled:opacity-50"
+                                    onClick={handleDownloadQR}
+                                    disabled={isDownloadingQR}
+                                >
+                                    <QrCode size={18} className={isDownloadingQR ? "animate-pulse" : ""} />
+                                    {isDownloadingQR ? "Generating..." : "Download QR"}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Hidden QR Code for download */}
+                        <div style={{ position: 'absolute', left: '-9999px' }}>
+                            <div ref={qrCodeRef} className="bg-white p-4">
+                                <QRCode size={256} value={eventUrl} />
                             </div>
                         </div>
 
@@ -357,8 +400,8 @@ export const SingleEventDetails = ({
                                 </div>
                                 <div className="w-full flex flex-col gap-1 items-center cursor-pointer" onClick={() => setActiveScreen!("event-earnings")}>
                                     <p className="font-semibold text-neutral-800 text-2xl">
-                                        {event.tickets.reduce((min: number, ticket: { purchasedQuantity: number }) => {
-                                            return ticket.purchasedQuantity
+                                        {event.tickets.reduce((sum: number, ticket: { purchasedQuantity: number }) => {
+                                            return sum + ticket.purchasedQuantity
                                         }, 0)}
                                     </p>
                                     <p className="text-md text-neutral-400">
