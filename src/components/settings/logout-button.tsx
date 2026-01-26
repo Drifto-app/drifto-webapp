@@ -1,8 +1,8 @@
 "use client"
 
-import {ComponentProps, useState} from "react";
-import {Button} from "@/components/ui/button";
-import {useAuthStore} from "@/store/auth-store";
+import { ComponentProps, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/auth-store";
 import {
     Dialog,
     DialogClose,
@@ -11,11 +11,12 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {cn} from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import * as React from "react";
-import {showTopToast} from "@/components/toast/toast-util";
-import {api} from "@/lib/axios";
-import {LoaderSmall} from "@/components/ui/loader";
+import { showTopToast } from "@/components/toast/toast-util";
+import { api } from "@/lib/axios";
+import { LoaderSmall } from "@/components/ui/loader";
+import { useRouter } from "next/navigation";
 
 interface LogoutButtonProps extends ComponentProps<"button"> {
 
@@ -24,7 +25,8 @@ interface LogoutButtonProps extends ComponentProps<"button"> {
 export const LogoutButton = ({
     className, ...props
 }: LogoutButtonProps) => {
-    const {logout} = useAuthStore()
+    const { logout } = useAuthStore()
+    const router = useRouter()
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -33,9 +35,12 @@ export const LogoutButton = ({
 
         try {
             await logout()
+            // Redirect to login page without 'next' parameter to prevent
+            // redirecting back to settings page after login
+            router.replace('/login')
         } catch (error: any) {
             showTopToast("error", "Error logging out")
-        }finally {
+        } finally {
             setIsLoading(false)
         }
     }
