@@ -18,12 +18,12 @@ const DoughnutChart = ({ total, used }: DoughnutChartProps) => {
     ];
 
     const COLORS: Record<SegmentName, string> = {
-        Used: '#1f2937',
+        Used: '#1d4ed8',
         Available: '#f3f4f6',
     };
 
     return (
-        <div className="relative w-10 h-10">
+        <div className="relative w-12 h-12">
             <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                     <Pie
