@@ -74,6 +74,9 @@ interface TicketDataType {
   price: string;
   quantity: string;
   isPaid: boolean;
+  nameError: boolean;
+  descriptionError: boolean;
+  priceError: boolean;
   quantityError: boolean;
 }
 
@@ -99,6 +102,9 @@ export const CreateEventContent = ({
     price: "",
     quantity: "",
     isPaid: false,
+    nameError: false,
+    descriptionError: false,
+    priceError: false,
     quantityError: false,
   });
 
@@ -260,6 +266,57 @@ export const CreateEventContent = ({
   };
 
   const handleTicketAdd = (newTicket: TicketDataType) => {
+    let hasErrors = false;
+    const errors: string[] = [];
+    let updatedTicket = { ...newTicket };
+
+    // Validate name
+    if (!newTicket.name.trim()) {
+      updatedTicket.nameError = true;
+      errors.push("Ticket name is required");
+      hasErrors = true;
+    } else {
+      updatedTicket.nameError = false;
+    }
+
+    // Validate description
+    if (!newTicket.description.trim()) {
+      updatedTicket.descriptionError = true;
+      errors.push("Ticket description is required");
+      hasErrors = true;
+    } else {
+      updatedTicket.descriptionError = false;
+    }
+
+    // Validate price for paid tickets
+    if (isSelectedTicketPaid) {
+      const priceValue = parseFloat(newTicket.price);
+      if (isNaN(priceValue) || priceValue <= 0) {
+        updatedTicket.priceError = true;
+        errors.push("Paid tickets must have a price greater than 0");
+        hasErrors = true;
+      } else {
+        updatedTicket.priceError = false;
+      }
+    }
+
+    // Validate quantity (always required > 0)
+    const quantityValue = parseInt(newTicket.quantity);
+    if (isNaN(quantityValue) || quantityValue <= 0) {
+      updatedTicket.quantityError = true;
+      errors.push("Ticket quantity must be greater than 0");
+      hasErrors = true;
+    } else {
+      updatedTicket.quantityError = false;
+    }
+
+    // If there are errors, update state with errors and show toasts
+    if (hasErrors) {
+      setCurrentTicketData(updatedTicket);
+      errors.forEach(error => showTopToast("error", error));
+      return;
+    }
+
     const newTicketData: TicketDataType = { ...newTicket, id: uuidv4() };
 
     setTickets([...tickets, newTicketData]);
@@ -270,6 +327,9 @@ export const CreateEventContent = ({
       price: "",
       quantity: "",
       isPaid: false,
+      nameError: false,
+      descriptionError: false,
+      priceError: false,
       quantityError: false,
     });
   };
@@ -299,6 +359,7 @@ export const CreateEventContent = ({
       ...currentTicketData,
       price: cleaned,
       isPaid: !isNaN(numValue) && numValue > 0,
+      priceError: false, // Clear error when price changes
     });
   };
 
@@ -585,7 +646,10 @@ export const CreateEventContent = ({
                       ? "text-black border-black"
                       : "text-neutral-400 border-transparent"
                       }`}
-                    onClick={() => setIsSelectedTicketPaid(true)}
+                    onClick={() => {
+                      setIsSelectedTicketPaid(true);
+                      setCurrentTicketData(prev => ({ ...prev, priceError: false }));
+                    }}
                   >
                     Paid
                   </span>
@@ -594,7 +658,10 @@ export const CreateEventContent = ({
                       ? "text-black border-black"
                       : "text-neutral-400 border-transparent"
                       }`}
-                    onClick={() => setIsSelectedTicketPaid(false)}
+                    onClick={() => {
+                      setIsSelectedTicketPaid(false);
+                      setCurrentTicketData(prev => ({ ...prev, price: "", priceError: false }));
+                    }}
                   >
                     Free
                   </span>
@@ -613,11 +680,17 @@ export const CreateEventContent = ({
                         setCurrentTicketData({
                           ...currentTicketData,
                           name: e.target.value,
+                          nameError: false,
                         })
                       }
                       className="py-6 "
                       required
                     />
+                    {currentTicketData.nameError && (
+                      <span className="text-xs text-red-600">
+                        Ticket name is required
+                      </span>
+                    )}
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="title" className="text-neutral-500">
@@ -631,12 +704,18 @@ export const CreateEventContent = ({
                         setCurrentTicketData({
                           ...currentTicketData,
                           description: e.target.value,
+                          descriptionError: false,
                         })
                       }
                       rows={5}
                       className="py-2 px-3 bg-white rounded-md border-1 border-neutral-200 focus:border-blue-600 focus:border-1 focus:outline-hidden"
                       required
                     />
+                    {currentTicketData.descriptionError && (
+                      <span className="text-xs text-red-600">
+                        Ticket description is required
+                      </span>
+                    )}
                   </div>
                   <div className="flex gap-3 items-start">
                     {isSelectedTicketPaid && (
@@ -655,6 +734,11 @@ export const CreateEventContent = ({
                           className="py-6 "
                           required
                         />
+                        {currentTicketData.priceError && (
+                          <span className="text-xs text-red-600">
+                            Paid tickets must have a price greater than 0
+                          </span>
+                        )}
                       </div>
                     )}
                     <div className="grid gap-2 w-full">
@@ -680,9 +764,16 @@ export const CreateEventContent = ({
                     </div>
                   </div>
                   <Button
-                    className="py-7 text-md font-semibold bg-blue-800 hover:bg-blue-800"
+                    className="py-7 text-md font-semibold bg-blue-800 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => handleTicketAdd(currentTicketData)}
                     type="button"
+                    disabled={
+                      !currentTicketData.name.trim() ||
+                      !currentTicketData.description.trim() ||
+                      !currentTicketData.quantity.trim() ||
+                      parseInt(currentTicketData.quantity) <= 0 ||
+                      (isSelectedTicketPaid && (!currentTicketData.price.trim() || parseFloat(currentTicketData.price) <= 0))
+                    }
                   >
                     + Create Ticket
                   </Button>

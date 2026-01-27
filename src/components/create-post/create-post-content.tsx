@@ -302,6 +302,28 @@ export const CreatePostContent = ({
         }, 0);
     };
 
+    // Handle removing a tagged user
+    const handleRemoveTagUser = (tagToRemove: { name: string, id: string }) => {
+        // Remove from tagUsers array
+        setTagUsers(prev => prev.filter(tag => tag.id !== tagToRemove.id));
+
+        // Remove the @mention from the post text
+        // Match the @username with optional trailing space
+        const mentionPattern = new RegExp(tagToRemove.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s?', 'g');
+        setPostText(prev => prev.replace(mentionPattern, ''));
+    };
+
+    // Handle removing a tagged event
+    const handleRemoveTagEvent = (tagToRemove: { name: string, id: string }) => {
+        // Remove from tagEvents array
+        setTagEvents(prev => prev.filter(tag => tag.id !== tagToRemove.id));
+
+        // Remove the #eventname from the post text
+        // Match the #eventname with optional trailing space
+        const mentionPattern = new RegExp(tagToRemove.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s?', 'g');
+        setPostText(prev => prev.replace(mentionPattern, ''));
+    };
+
     // Handle keyboard navigation in dropdown
     // const handleKeyDown = (e: React.KeyboardEvent) => {
     //     if (!mentionState.isActive || mentionState.results.length === 0) return;
@@ -507,16 +529,38 @@ export const CreatePostContent = ({
                         <div className="w-full flex flex-col gap-2">
                             <span className="text-blue-600 flex flex-wrap gap-2">
                                 {tagEvents.map((item, index) => (
-                                    <p key={index} className="relative">
+                                    <span
+                                        key={index}
+                                        className="inline-flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-full text-sm"
+                                    >
                                         {item.name}
-                                    </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveTagEvent(item)}
+                                            className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                                            aria-label={`Remove ${item.name}`}
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </span>
                                 ))}
                             </span>
                             <span className="text-blue-600 flex flex-wrap gap-2">
                                 {tagUsers.map((item, index) => (
-                                    <p key={index} className="relative">
+                                    <span
+                                        key={index}
+                                        className="inline-flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-full text-sm"
+                                    >
                                         {item.name}
-                                    </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveTagUser(item)}
+                                            className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                                            aria-label={`Remove ${item.name}`}
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </span>
                                 ))}
                             </span>
                         </div>

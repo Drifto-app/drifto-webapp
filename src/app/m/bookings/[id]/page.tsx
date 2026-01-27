@@ -3,6 +3,7 @@
 import { authApi } from "@/lib/axios";
 import { ArrowLeft, Download, Inbox, Loader2 } from "lucide-react";
 import Image from "next/image";
+import driftoLogo from "@/assests/logo.png";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
@@ -247,7 +248,22 @@ function TicketCard({
             <div className="border-t border-black w-full"></div>
           </div>
           <div className="flex justify-center py-8">
-            <QRCode size={128} value={ticketReference.toString()} />
+            <div className="relative inline-block">
+              <QRCode size={128} value={ticketReference.toString()} />
+              {/* Logo overlay */}
+              <div
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white pl-1.5 pr-2"
+                style={{ width: '19%', height: '19%', minWidth: 30, minHeight: 30 }}
+              >
+                <Image
+                  src={driftoLogo}
+                  alt="Drifto"
+                  width={32}
+                  height={32}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
