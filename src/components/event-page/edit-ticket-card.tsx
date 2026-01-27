@@ -12,32 +12,34 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {useState} from "react";
-import {authApi} from "@/lib/axios";
-import {toast} from "react-toastify";
-import {LoaderSmall} from "@/components/ui/loader";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {showTopToast} from "@/components/toast/toast-util";
+import { useState } from "react";
+import { authApi } from "@/lib/axios";
+import { toast } from "react-toastify";
+import { LoaderSmall } from "@/components/ui/loader";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { showTopToast } from "@/components/toast/toast-util";
+import { Switch } from "@/components/ui/switch";
 
 interface TicketCardProps {
-    ticket: {[key:string]: any};
+    ticket: { [key: string]: any };
     removeTicket: (ticketId: string) => void;
     onChange: (updated: { [key: string]: any }) => void;
 }
 
 export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) => {
     const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
-    const[isDeleteLoading, setIsDeleteLoading] = useState<boolean>(false);
-    const[isLoading, setIsLoading] = useState<boolean>(false);
+    const [isDeleteLoading, setIsDeleteLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [ticketName, setTicketName] = useState<string>(ticket.title);
     const [description, setDescription] = useState<string>(ticket.description);
     const [price, setPrice] = useState<string>(String(ticket.basePrice ?? "")); // keep as string in the input
-    const [isPaid , setIsPaid] = useState<boolean>((ticket.basePrice ?? 0) > 0);
+    const [isPaid, setIsPaid] = useState<boolean>((ticket.basePrice ?? 0) > 0);
 
     const [quantity, setQuantity] = useState<string>(String(ticket.totalQuantity ?? ""));
     const [quantityError, setQuantityError] = useState<boolean>(false);
+    const [priceError, setPriceError] = useState<boolean>(false);
 
     const handlePriceChange = (raw: string) => {
         // Allow only digits and a single decimal point
@@ -55,10 +57,17 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
         }
 
         setPrice(cleaned);
+        setPriceError(false); // Clear error when price changes
+    };
 
-        // Convert to number for isPaid flag
-        const numValue = parseFloat(cleaned);
-        setIsPaid(!isNaN(numValue) && numValue > 0);
+    // Handle toggle change
+    const handleToggleChange = (checked: boolean) => {
+        setIsPaid(checked);
+        if (!checked) {
+            // If switching to Free, clear price
+            setPrice("");
+            setPriceError(false);
+        }
     };
 
     const handleQuantityChange = (raw: string) => {
@@ -87,7 +96,7 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
             removeTicket(ticket.id);
         } catch (err: any) {
             showTopToast("error", err.response?.data?.description || "Deletion failed");
-        }finally {
+        } finally {
             setIsDeleteLoading(false);
         }
     }
@@ -99,11 +108,21 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
         const priceNumber = price === "" ? 0 : parseFloat(price);
         const quantityNumber = quantity === "" ? 0 : parseInt(quantity, 10);
 
+        // Validate price for paid tickets
+        if (isPaid) {
+            if (priceNumber <= 0) {
+                setPriceError(true);
+                showTopToast("error", "Paid tickets must have a price greater than 0");
+                setIsLoading(false);
+                return;
+            }
+        }
+
         const param = {
             title: ticketName.trim(),
             description: description.trim(),
-            isPaid: priceNumber > 0,
-            price: priceNumber,
+            isPaid: isPaid && priceNumber > 0,
+            price: isPaid ? priceNumber : 0,
             totalQuantity: quantityNumber,
         };
 
@@ -165,55 +184,77 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
                             <DialogHeader>
                                 <DialogTitle className="text-xl">Edit Ticket</DialogTitle>
                             </DialogHeader>
-                                <div className="grid gap-3">
-                                    <Label htmlFor="title" className="text-neutral-500">Ticket Title</Label>
-                                    <Input
-                                        id="title"
-                                        type="text"
-                                        placeholder="Ticket Title"
-                                        value={ticketName}
-                                        onChange={(e) => setTicketName(e.target.value)}
-                                    />
+                            <div className="grid gap-3">
+                                <Label htmlFor="title" className="text-neutral-500">Ticket Title</Label>
+                                <Input
+                                    id="title"
+                                    type="text"
+                                    placeholder="Ticket Title"
+                                    value={ticketName}
+                                    onChange={(e) => setTicketName(e.target.value)}
+                                />
+                            </div>
+                            <div className="grid gap-3">
+                                <Label htmlFor="description" className="text-neutral-500">Description</Label>
+                                <textarea
+                                    id="description"
+                                    placeholder="Description"
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    className="border border-neutral-300 focus:border-blue-600 focus:outline-hidden rounded-md py-2 px-3"
+                                />
+                            </div>
+                            {/* Paid/Free Toggle */}
+                            <div className="flex items-center justify-between py-2">
+                                <div className="flex flex-col">
+                                    <Label className="text-neutral-700 font-medium">
+                                        {isPaid ? "Paid Ticket" : "Free Ticket"}
+                                    </Label>
+                                    <span className="text-xs text-neutral-500">
+                                        {isPaid ? "Ticket requires payment" : "Ticket is free"}
+                                    </span>
                                 </div>
+                                <Switch
+                                    checked={isPaid}
+                                    onCheckedChange={handleToggleChange}
+                                />
+                            </div>
+                            {isPaid && (
                                 <div className="grid gap-3">
-                                    <Label htmlFor="description" className="text-neutral-500">Description</Label>
-                                    <textarea
-                                        id="description"
-                                        placeholder="Description"
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        className="border border-neutral-300 focus:border-blue-600 focus:outline-hidden rounded-md py-2 px-3"
-                                    />
-                                </div>
-                                <div className="grid gap-3">
-                                    <Label htmlFor="price" className="text-neutral-500">Price (Optional)</Label>
+                                    <Label htmlFor="price" className="text-neutral-500">Price</Label>
                                     <Input
                                         id="price"
                                         type="text"
                                         inputMode="numeric"
                                         pattern="\d*"
-                                        placeholder="Price (Optional)"
+                                        placeholder="Enter ticket price"
                                         value={price}
                                         onChange={(e) => handlePriceChange(e.target.value)}
                                     />
+                                    {priceError && (
+                                        <span className="text-xs text-red-600">
+                                            Paid tickets must have a price greater than 0
+                                        </span>
+                                    )}
                                 </div>
-                                <div className="grid gap-3">
-                                    <Label htmlFor="price" className="text-neutral-500">Quantity</Label>
-                                    <Input
-                                        id="quantity"
-                                        type="text"
-                                        inputMode="numeric"
-                                        pattern="\d*"
-                                        placeholder="Quantity"
-                                        value={quantity}
-                                        onChange={(e) => handleQuantityChange(e.target.value)}
-                                    />
-                                    {
-                                        quantityError && (
-                                            <span className="text-xs text-red-600">Quantity cannot be lower that the purchased quantity of: {ticket.purchasedQuantity}</span>
-                                        )
-                                    }
-                                </div>
+                            )}
+                            <div className="grid gap-3">
+                                <Label htmlFor="price" className="text-neutral-500">Quantity</Label>
+                                <Input
+                                    id="quantity"
+                                    type="text"
+                                    inputMode="numeric"
+                                    pattern="\d*"
+                                    placeholder="Quantity"
+                                    value={quantity}
+                                    onChange={(e) => handleQuantityChange(e.target.value)}
+                                />
+                                {
+                                    quantityError && (
+                                        <span className="text-xs text-red-600">Quantity cannot be lower that the purchased quantity of: {ticket.purchasedQuantity}</span>
+                                    )
+                                }
+                            </div>
                             <DialogFooter className="w-full flex flex-row sm:justify-between justify-between px-4 sm:px-20">
                                 <DialogClose asChild>
                                     <Button

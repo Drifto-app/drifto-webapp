@@ -11,13 +11,13 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {useState} from "react";
-import {authApi} from "@/lib/axios";
-import {toast} from "react-toastify";
-import {LoaderSmall} from "@/components/ui/loader";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {showTopToast} from "@/components/toast/toast-util";
+import { useState } from "react";
+import { authApi } from "@/lib/axios";
+import { toast } from "react-toastify";
+import { LoaderSmall } from "@/components/ui/loader";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { showTopToast } from "@/components/toast/toast-util";
 
 interface NewTicketCardProps {
     addTicket: (updated: { [key: string]: any }) => void;
@@ -26,14 +26,15 @@ interface NewTicketCardProps {
 
 export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
     const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
-    const[isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [ticketName, setTicketName] = useState<string>("");
     const [description, setDescription] = useState<string>("");
-    const [price, setPrice] = useState<string>(String("0")); // keep as string in the input
-    const [isPaid , setIsPaid] = useState<boolean>(false);
+    const [price, setPrice] = useState<string>(""); // keep as string in the input
+    const [isSelectedPaid, setIsSelectedPaid] = useState<boolean>(true); // tabs control
+    const [priceError, setPriceError] = useState<boolean>(false);
 
-    const [quantity, setQuantity] = useState<string>("0");
+    const [quantity, setQuantity] = useState<string>("");
 
     const handlePriceChange = (raw: string) => {
         // Allow only digits and a single decimal point
@@ -51,10 +52,17 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
         }
 
         setPrice(cleaned);
+        setPriceError(false); // Clear error when price changes
+    };
 
-        // Convert to number for isPaid flag
-        const numValue = parseFloat(cleaned);
-        setIsPaid(!isNaN(numValue) && numValue > 0);
+    // Handle tab selection
+    const handleTabChange = (paid: boolean) => {
+        setIsSelectedPaid(paid);
+        if (!paid) {
+            // If switching to Free, clear price
+            setPrice("");
+            setPriceError(false);
+        }
     };
 
     const handleQuantityChange = (raw: string) => {
@@ -74,11 +82,21 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
         const priceNumber = price === "" ? 0 : parseFloat(price);
         const quantityNumber = quantity === "" ? 0 : parseInt(quantity, 10);
 
+        // Validate price for paid tickets
+        if (isSelectedPaid) {
+            if (priceNumber <= 0) {
+                setPriceError(true);
+                showTopToast("error", "Paid tickets must have a price greater than 0");
+                setIsLoading(false);
+                return;
+            }
+        }
+
         const param = {
             title: ticketName.trim(),
             description: description.trim(),
-            paid: priceNumber > 0,
-            price: priceNumber,
+            paid: isSelectedPaid && priceNumber > 0,
+            price: isSelectedPaid ? priceNumber : 0,
             totalQuantity: quantityNumber,
         };
 
@@ -139,18 +157,46 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
                                 className="border border-neutral-300 focus:border-blue-600 focus:outline-hidden rounded-md py-2 px-3"
                             />
                         </div>
-                        <div className="grid gap-3">
-                            <Label htmlFor="price" className="text-neutral-500">Price (Optional)</Label>
-                            <Input
-                                id="price"
-                                type="text"
-                                inputMode="numeric"
-                                pattern="\d*"
-                                placeholder="Price (Optional)"
-                                value={price}
-                                onChange={(e) => handlePriceChange(e.target.value)}
-                            />
+                        {/* Paid/Free Tabs */}
+                        <div className="flex justify-between w-full items-center rounded-md border border-neutral-200">
+                            <span
+                                className={`w-[50%] text-center font-semibold cursor-pointer py-3 border-b-2 ${isSelectedPaid
+                                    ? "text-black border-black"
+                                    : "text-neutral-400 border-transparent"
+                                    }`}
+                                onClick={() => handleTabChange(true)}
+                            >
+                                Paid
+                            </span>
+                            <span
+                                className={`w-[50%] text-center font-semibold cursor-pointer py-3 border-b-2 ${!isSelectedPaid
+                                    ? "text-black border-black"
+                                    : "text-neutral-400 border-transparent"
+                                    }`}
+                                onClick={() => handleTabChange(false)}
+                            >
+                                Free
+                            </span>
                         </div>
+                        {isSelectedPaid && (
+                            <div className="grid gap-3">
+                                <Label htmlFor="price" className="text-neutral-500">Price</Label>
+                                <Input
+                                    id="price"
+                                    type="text"
+                                    inputMode="numeric"
+                                    pattern="\d*"
+                                    placeholder="Enter ticket price"
+                                    value={price}
+                                    onChange={(e) => handlePriceChange(e.target.value)}
+                                />
+                                {priceError && (
+                                    <span className="text-xs text-red-600">
+                                        Paid tickets must have a price greater than 0
+                                    </span>
+                                )}
+                            </div>
+                        )}
                         <div className="grid gap-3">
                             <Label htmlFor="price" className="text-neutral-500">Quantity</Label>
                             <Input
