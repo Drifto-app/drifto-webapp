@@ -3,6 +3,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import driftoLogo from "@/assests/logo.png";
 import { FaHeart, FaHotjar, FaRegCalendar } from "react-icons/fa";
 import { IoMdHeartEmpty, IoMdSearch } from "react-icons/io";
 import { IoLocationOutline, IoPizzaOutline, IoShareSocialOutline } from "react-icons/io5";
@@ -319,7 +320,22 @@ export const SingleEventDetails = ({
                         {/* Hidden QR Code for download */}
                         <div style={{ position: 'absolute', left: '-9999px' }}>
                             <div ref={qrCodeRef} className="bg-white p-4">
-                                <QRCode size={256} value={eventUrl} />
+                                <div className="relative inline-block">
+                                    <QRCode size={256} value={eventUrl} />
+                                    {/* Logo overlay */}
+                                    <div
+                                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white pl-1.5 pr-2"
+                                        style={{ width: '19%', height: '19%', minWidth: 48, minHeight: 48 }}
+                                    >
+                                        <Image
+                                            src={driftoLogo}
+                                            alt="Drifto"
+                                            width={44}
+                                            height={44}
+                                            className="w-full h-full object-contain"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
