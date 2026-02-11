@@ -34,13 +34,13 @@ const ALLOWED_VIDEO_TYPES = [
 ];
 
 export function CoverVideoUploader({
-                                     videoValue,
-                                     setSubmitDisabled,
-                                     onVideoValueChange,
-                                     mediaFileType,
-                                     className,
-                                     ...props
-                                   }: CoverVideoUploaderProps) {
+  videoValue,
+  setSubmitDisabled,
+  onVideoValueChange,
+  mediaFileType,
+  className,
+  ...props
+}: CoverVideoUploaderProps) {
   const [localPreview, setLocalPreview] = useState<string>();
   const [uploading, setUploading] = useState(false);
   const [videoDuration, setVideoDuration] = useState<number>(0);
@@ -100,7 +100,6 @@ export function CoverVideoUploader({
           URL.revokeObjectURL(previewUrl);
         }
       } catch (error: any) {
-        console.log("error : " + error.response?.data?.description);
         showTopToast("error", "Upload failed. Please try again.");
         // Reset local preview on error
         setLocalPreview(undefined);

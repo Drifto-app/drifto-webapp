@@ -29,7 +29,7 @@ export default function Page() {
 
     const data = response.data.data.data;
     setTickets(data);
-    console.log(data);
+
   };
   const fetchEventDetails = async () => {
     const response = await authApi.get("/event/" + id, {
@@ -38,7 +38,7 @@ export default function Page() {
 
     const data = response.data.data;
     setEventDetails(data);
-    console.log(data);
+
   };
   useEffect(() => {
     fetchTickets();

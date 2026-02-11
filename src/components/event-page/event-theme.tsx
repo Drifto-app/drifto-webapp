@@ -1,7 +1,7 @@
-import {ComponentProps, useEffect} from "react";
-import {cn} from "@/lib/utils";
+import { ComponentProps, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
-interface EventThemeSelectorProps extends ComponentProps<"div">{
+interface EventThemeSelectorProps extends ComponentProps<"div"> {
     currentEventTheme: [string, string];
     setEventTheme: (newEventTheme: [string, string]) => void
 }
@@ -111,7 +111,6 @@ export const EventThemeSelector = ({
 
     useEffect(() => {
         const colorIndex = eventThemes.findIndex((item) => {
-            console.log(item)
             return eqArrValue(item.colors, currentEventTheme)
         });
         eventThemes = [eventThemes[colorIndex], ...eventThemes.slice(0, colorIndex), ...eventThemes.slice(colorIndex + 1)];
@@ -133,8 +132,8 @@ export const EventThemeSelector = ({
     return (
         <div
             className={cn(
-            "w-full overflow-x-auto flex gap-4 no-scrollbar",
-            className
+                "w-full overflow-x-auto flex gap-4 no-scrollbar",
+                className
             )}
             {...props}
         >

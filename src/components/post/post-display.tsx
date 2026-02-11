@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 interface PostDisplayProps extends ComponentProps<"div"> { }
 
 export const PostDisplay = ({ className, ...props }: PostDisplayProps) => {
-    console.log('post display render');
 
     const router = useRouter();
 

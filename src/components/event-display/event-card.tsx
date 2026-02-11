@@ -115,7 +115,7 @@ export const EventCard = ({
       video.play().then(() => {
         setIsPlaying(true);
       }).catch(err => {
-        console.log("Video play failed:", err);
+        console.log("Video play failed");
       });
     } else {
       video.pause();
