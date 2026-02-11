@@ -1,19 +1,19 @@
 "use client"
 
-import {ProtectedRoute} from "@/components/auth/ProtectedRoutes";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoutes";
 import { ScreenProvider } from "../screen/screen-provider";
-import {useRouter, useSearchParams} from "next/navigation";
-import {ComponentProps, useState} from "react";
-import {cn} from "@/lib/utils";
-import {FaArrowLeft, FaCheckSquare, FaLock} from "react-icons/fa";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ComponentProps, useState } from "react";
+import { cn } from "@/lib/utils";
+import { FaArrowLeft, FaCheckSquare, FaLock } from "react-icons/fa";
 import * as React from "react";
 import { IoIosCheckboxOutline } from "react-icons/io";
-import {IoLockClosed} from "react-icons/io5";
-import {Button} from "@/components/ui/button";
-import {showTopToast} from "@/components/toast/toast-util";
-import {authApi} from "@/lib/axios";
-import {useAuthStore} from "@/store/auth-store";
-import {LoaderSmall} from "@/components/ui/loader";
+import { IoLockClosed } from "react-icons/io5";
+import { Button } from "@/components/ui/button";
+import { showTopToast } from "@/components/toast/toast-util";
+import { authApi } from "@/lib/axios";
+import { useAuthStore } from "@/store/auth-store";
+import { LoaderSmall } from "@/components/ui/loader";
 import {
     Dialog,
     DialogClose,
@@ -57,12 +57,12 @@ const lockText: string[] = [
 ]
 
 export const DeleteAccountContent = ({
-                                         prev,
-                                         className,
-                                         ...props
-                                     }: DeleteAccountContentProps) => {
+    prev,
+    className,
+    ...props
+}: DeleteAccountContentProps) => {
     const router = useRouter();
-    const {clearAuth} = useAuthStore()
+    const { clearAuth } = useAuthStore()
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -78,7 +78,6 @@ export const DeleteAccountContent = ({
             clearAuth()
             router.push("/login");
         } catch (error: any) {
-            console.log(error)
             showTopToast("error", error.response?.data?.description);
         } finally {
             setIsLoading(false);

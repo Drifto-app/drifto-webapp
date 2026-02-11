@@ -306,7 +306,7 @@ function BookingsList({
         </div>
       ) : !bookings.length ? (
         <div className="flex flex-col items-center gap-4 text-center max-w-md px-4 mt-20">
-          <BiCalendarAlt size={40} className="text-blue-800"/>
+          <BiCalendarAlt size={40} className="text-blue-800" />
           <span className="flex flex-col gap-2">
             <p className="text-neutral-500 text-sm font-semibold">
               No upcoming or in-progress booking found!
@@ -486,7 +486,6 @@ function useEvents() {
         // Check if there are more pages
         setHasMore(eventsData.length === EVENT_API_CONFIG.pageSize);
         setCurrentPage(page);
-        console.log("events:", eventsData);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to load events";
@@ -556,12 +555,12 @@ function EventsContent({
   if (events.length <= 0) {
     return (
       <div className="flex flex-col items-center gap-4 text-center max-w-md px-4 mt-20">
-        <PiFireSimpleBold size={40} className="text-blue-800"/>
+        <PiFireSimpleBold size={40} className="text-blue-800" />
         <span className="flex flex-col gap-2">
-            <p className="text-neutral-500 text-sm font-semibold">
-              {"Looks like you haven't set up events yet"}
-            </p>
-          </span>
+          <p className="text-neutral-500 text-sm font-semibold">
+            {"Looks like you haven't set up events yet"}
+          </p>
+        </span>
         <Button
           onClick={() => router.push(
             `/m/event-create?prev=${encodeURIComponent("/?screen=plans")}`
@@ -678,13 +677,13 @@ function EventsCard({ event }: EventsCardProp) {
   );
 }
 
-interface PlanningDisplayProps  {
+interface PlanningDisplayProps {
   handleScreenChange: (value: string) => void;
 }
 
 
 // Main Component
-export default function PlanningDisplay({handleScreenChange}: PlanningDisplayProps) {
+export default function PlanningDisplay({ handleScreenChange }: PlanningDisplayProps) {
   const [activeTab, setActiveTab] = useState<TabType>("bookings");
   const {
     bookings,

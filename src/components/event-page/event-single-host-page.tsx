@@ -1,28 +1,28 @@
 "use client"
 
 import * as React from "react";
-import {cn} from "@/lib/utils";
-import {SingleEventHeader} from "@/components/event-page/header";
-import {SingleEventDetails} from "@/components/event-page/details";
-import {SingleEventFooter} from "@/components/event-page/footer";
-import {EventEarnings} from "@/components/event-page/event-earnings";
-import {EventEdit} from "@/components/event-page/event-edit";
-import {FindAttendees} from "@/components/event-page/find-attendees";
-import {HostInvites} from "@/components/event-page/host-invites";
-import {CoHostManage} from "@/components/event-page/co-host-manage";
-import {useRouter, useSearchParams} from "next/navigation";
-import {useEffect, useMemo, useState} from "react";
+import { cn } from "@/lib/utils";
+import { SingleEventHeader } from "@/components/event-page/header";
+import { SingleEventDetails } from "@/components/event-page/details";
+import { SingleEventFooter } from "@/components/event-page/footer";
+import { EventEarnings } from "@/components/event-page/event-earnings";
+import { EventEdit } from "@/components/event-page/event-edit";
+import { FindAttendees } from "@/components/event-page/find-attendees";
+import { HostInvites } from "@/components/event-page/host-invites";
+import { CoHostManage } from "@/components/event-page/co-host-manage";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { EventReferral } from '@/components/event-page/event-referral';
 
-interface SingleEventHostPageProps extends React.ComponentProps<"div">{
-    event: {[key: string]: any};
+interface SingleEventHostPageProps extends React.ComponentProps<"div"> {
+    event: { [key: string]: any };
     prev: string | null;
     setLoading: (state: boolean) => void;
-    setEvent: (event: {[key: string]: any}) => void;
+    setEvent: (event: { [key: string]: any }) => void;
 }
 
 export default function SingleEventHostPage(
-    {event, prev, setEvent, setLoading, className, ...props}: SingleEventHostPageProps
+    { event, prev, setEvent, setLoading, className, ...props }: SingleEventHostPageProps
 ) {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -30,6 +30,7 @@ export default function SingleEventHostPage(
     const urlScreen = searchParams.get("screen");
     const [activeScreen, setActiveScreen] = useState<string>(urlScreen ?? "details");
     const [screenTitle, setScreenTitle] = useState<string>("Manage Event");
+    const [editedTheme, setEditedTheme] = useState<[string, string] | null>(null);
 
     useEffect(() => {
         const changeTitle = () => {
@@ -58,16 +59,18 @@ export default function SingleEventHostPage(
 
     // const gradient = useSpotGradient(event.eventTheme);
     const containerStyle = useMemo(() => {
-        const t = event?.eventTheme as [string, string] | undefined;
+        const themeToUse = activeScreen === "edit" && editedTheme ? editedTheme : event?.eventTheme;
+        const t = themeToUse as [string, string] | undefined;
         if (!t) return undefined;
         const [c1, c2] = t;
         return { background: `linear-gradient(to bottom, ${c1}, ${c2})` } as const;
-    }, [event]);
+    }, [event, editedTheme, activeScreen]);
 
 
     const handleBackClick = () => {
 
-        if(activeScreen !== "details") {
+        if (activeScreen !== "details") {
+            setEditedTheme(null);
             setActiveScreen("details");
         } else {
             router.push(prev ? prev : "/");
@@ -79,10 +82,14 @@ export default function SingleEventHostPage(
         params.set("screen", value);
         router.replace(`?${params.toString()}`);
 
-        if(title) {
+        if (title) {
             setScreenTitle(title);
-        }else {
+        } else {
             setScreenTitle("");
+        }
+
+        if (value !== "edit") {
+            setEditedTheme(null);
         }
 
         setActiveScreen(value);
@@ -104,7 +111,7 @@ export default function SingleEventHostPage(
 
             case 'edit':
                 return (
-                    <EventEdit event={event} setEvent={setEvent} setMainActiveScreen={handleScreen} />
+                    <EventEdit event={event} setEvent={setEvent} setMainActiveScreen={handleScreen} onThemeChange={setEditedTheme} />
                 );
 
             case 'co-host-manage':
@@ -119,7 +126,7 @@ export default function SingleEventHostPage(
 
             case 'referral-manage':
                 return (
-                  <EventReferral event={event}/>
+                    <EventReferral event={event} />
                 )
 
             default:

@@ -103,7 +103,6 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
             // }
 
             setError(errorMessage);
-            console.log(err);
         } finally {
             setLoading(false);
             setInitialLoading(false);

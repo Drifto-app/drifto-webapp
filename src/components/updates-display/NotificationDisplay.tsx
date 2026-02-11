@@ -91,12 +91,10 @@ function useNotifications() {
           notificationsData.length === NOTIFICATION_API_CONFIG.pageSize
         );
         setCurrentPage(page);
-        console.log("notifications:", notificationsData);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to load notifications";
         setError(errorMessage);
-        console.error("Error loading notifications:", err);
       } finally {
         setIsLoading(false);
         setIsLoadingMore(false);
