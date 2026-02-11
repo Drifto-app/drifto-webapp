@@ -33,10 +33,6 @@ export default function AppleButton({ onSuccess }: AppleButtonProps) {
         usePopup: true,
     };
 
-    useEffect(() => {
-        console.log("Apple Auth Options:", authOptions);
-    }, []);
-
     return (
         <div
             className="w-full flex justify-center items-center"

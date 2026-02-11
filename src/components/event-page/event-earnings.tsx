@@ -41,9 +41,6 @@ export const EventEarnings = ({
                 `/event/${event.id}/earnings`
             )
 
-            console.log(response.data.data)
-            console.log(event)
-
             setError(null);
             setEventEarnings(response.data.data);
         } catch (err: any) {

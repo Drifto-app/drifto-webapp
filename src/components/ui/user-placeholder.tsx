@@ -60,7 +60,7 @@ function UserVerificationBadge({ user, isClickable = false }: { user: { [key: st
                             </DrawerHeader>
                             <div className="flex items-center gap-4">
                                 <MdVerified size={25} className={cn(
-                                  verificationStyle
+                                    verificationStyle
                                 )} />
                                 <span className="font-bold leading-tight">
                                     {description}
@@ -97,7 +97,7 @@ function UserEventSinglePlaceholder({ user, isHost, removeClick, prev, className
         try {
             await removeClick!(username);
         } catch (error: any) {
-            console.log(error);
+
         } finally {
             setLoading(false);
         }

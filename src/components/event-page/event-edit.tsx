@@ -1,27 +1,28 @@
 import * as React from "react";
-import {cn} from "@/lib/utils";
-import {CoverImageUploader} from "@/components/ui/cover-image";
-import {useCallback, useEffect, useState} from "react";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {LocationSearchDialog} from "@/components/event-page/location-search-dialog";
-import {Switch} from "@/components/ui/switch";
-import {DateTimePicker} from "@/components/event-page/date-time-input";
-import {ImageSnapshots} from "@/components/ui/image-snapshot";
-import {EventTagDialog} from "@/components/event-page/event-tag-edit";
-import {Button} from "@/components/ui/button";
-import {TicketCard} from "@/components/event-page/edit-ticket-card";
-import {NewTicketCard} from "@/components/event-page/new-ticket-card";
-import {authApi} from "@/lib/axios";
-import {LoaderSmall} from "@/components/ui/loader";
-import {showTopToast} from "@/components/toast/toast-util";
-import {EventThemeSelector} from "@/components/event-page/event-theme";
+import { cn } from "@/lib/utils";
+import { CoverImageUploader } from "@/components/ui/cover-image";
+import { useCallback, useEffect, useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { LocationSearchDialog } from "@/components/event-page/location-search-dialog";
+import { Switch } from "@/components/ui/switch";
+import { DateTimePicker } from "@/components/event-page/date-time-input";
+import { ImageSnapshots } from "@/components/ui/image-snapshot";
+import { EventTagDialog } from "@/components/event-page/event-tag-edit";
+import { Button } from "@/components/ui/button";
+import { TicketCard } from "@/components/event-page/edit-ticket-card";
+import { NewTicketCard } from "@/components/event-page/new-ticket-card";
+import { authApi } from "@/lib/axios";
+import { LoaderSmall } from "@/components/ui/loader";
+import { showTopToast } from "@/components/toast/toast-util";
+import { EventThemeSelector } from "@/components/event-page/event-theme";
 import { CoverVideoUploader } from '@/components/ui/cover-video';
 
-interface EventEditProps extends React.ComponentProps<"div">{
-    event: {[key: string]: any};
-    setEvent: (event: {[key: string]: any}) => void;
+interface EventEditProps extends React.ComponentProps<"div"> {
+    event: { [key: string]: any };
+    setEvent: (event: { [key: string]: any }) => void;
     setMainActiveScreen: (activeScreen: string, title?: string) => void;
+    onThemeChange?: (theme: [string, string]) => void;
 }
 
 interface HeaderItem {
@@ -30,14 +31,14 @@ interface HeaderItem {
 }
 
 const headerItems: HeaderItem[] = [
-    {value: 'details', label: "Details" },
-    {value: 'tickets', label: "Tickets" }
+    { value: 'details', label: "Details" },
+    { value: 'tickets', label: "Tickets" }
 ]
 
 export const EventEdit = ({
-    event, className, setEvent, setMainActiveScreen, ...props
+    event, className, setEvent, setMainActiveScreen, onThemeChange, ...props
 }: EventEditProps) => {
-    const[activeScreen, setActiveScreen] = useState<string>("details");
+    const [activeScreen, setActiveScreen] = useState<string>("details");
 
 
     const [loading, setLoading] = useState<boolean>(false);
@@ -52,7 +53,7 @@ export const EventEdit = ({
     const [address, setAddress] = useState<string>(event.address);
     const [city, setCity] = useState<string>(event.city);
     const [state, setState] = useState<string>(event.state);
-    const [coordinates, setCoordinates] = useState<{[key: string]: number}>(event.location);
+    const [coordinates, setCoordinates] = useState<{ [key: string]: number }>(event.location);
     const [locationSecure, setLocationSecure] = useState<boolean>(event.locationSecure);
     const [isPublic, setIsPublic] = useState<boolean>(event.public);
     const [isFeeOnUser, setFeeOnUser] = useState<boolean>(event.feeOnUser);
@@ -66,9 +67,20 @@ export const EventEdit = ({
     const [coverVideo, setCoverVideo] = useState<string | undefined>(event.coverVideo);
     const [eventTheme, setEventTheme] = useState<[string, string]>(event.eventTheme === null ? ["#fff", "#fff"] : event.eventTheme);
 
+    const handleThemeChange = React.useCallback((theme: [string, string]) => {
+        setEventTheme(theme);
+        onThemeChange?.(theme);
+    }, [onThemeChange]);
+
+    const detailsContainerStyle = React.useMemo(() => {
+        if (!eventTheme || eventTheme.length !== 2) return undefined;
+        const [c1, c2] = eventTheme;
+        return { background: `linear-gradient(to bottom, ${c1}, ${c2})` } as const;
+    }, [eventTheme]);
+
 
     const handleCoverVideoChange = useCallback((newUrl: string | null) => {
-        if(!newUrl) {
+        if (!newUrl) {
             setCoverVideo(undefined);
             return;
         }
@@ -84,7 +96,7 @@ export const EventEdit = ({
         setEvent((prev: any) => ({ ...prev, tickets }));
     }, [tickets, setEvent]);
 
-    const handleLocationChange = (locationData: {[key: string]: any}) => {
+    const handleLocationChange = (locationData: { [key: string]: any }) => {
         setCoordinates({
             latitude: locationData.coordinates.lat,
             longitude: locationData.coordinates.lng
@@ -184,7 +196,7 @@ export const EventEdit = ({
             address,
             isAgeRestricted,
             coverVideo: coverVideo ? coverVideo : "",
-            minimumAge:  minimumAge === "" || minimumAge === "0" ? null : parseInt(minimumAge, 10),
+            minimumAge: minimumAge === "" || minimumAge === "0" ? null : parseInt(minimumAge, 10),
             tags: eventTags,
             eventTheme: eventTheme,
         }
@@ -196,7 +208,7 @@ export const EventEdit = ({
             setMainActiveScreen("details")
         } catch (error: any) {
             showTopToast("error", error.response?.data?.description);
-        }finally {
+        } finally {
             setLoading(false);
         }
     }
@@ -212,14 +224,14 @@ export const EventEdit = ({
                                 ticket={ticket}
                                 onChange={handleTicketsChange}
                                 removeTicket={(ticketId: string) => {
-                                setTickets((tickets) => {
-                                    return tickets.filter((i) => i.id !== ticketId)
-                                });
-                            }} />
+                                    setTickets((tickets) => {
+                                        return tickets.filter((i) => i.id !== ticketId)
+                                    });
+                                }} />
                         ))}
                         <NewTicketCard
                             eventId={event.id}
-                            addTicket={(newTicket: {[key: string]: any}) => {
+                            addTicket={(newTicket: { [key: string]: any }) => {
                                 setTickets([...tickets, newTicket]);
                             }}
                         />
@@ -228,7 +240,7 @@ export const EventEdit = ({
 
             case "details":
                 return (
-                    <>
+                    <div className="w-full">
                         <CoverImageUploader
                             imageValue={titleImage}
                             onImageValueChange={handleTitleImageChange}
@@ -261,7 +273,7 @@ export const EventEdit = ({
                             <div className="grid gap-2">
                                 <div className="text-neutral-500">Location</div>
                                 <LocationSearchDialog
-                                    currentLocation={{coordinates, address, city, state }}
+                                    currentLocation={{ coordinates, address, city, state }}
                                     onLocationUpdate={handleLocationChange}
                                     googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
                                 />
@@ -273,7 +285,7 @@ export const EventEdit = ({
                                         <h3 className="font-bold">Hide Exact Location</h3>
                                         <p className="text-sm text-neutral-500">Enable to hide the exact location fromm attendees until necessary</p>
                                     </div>
-                                    <Switch id="secure-location" size="medium" checked={locationSecure} onCheckedChange={() => {setLocationSecure(!locationSecure)}} />
+                                    <Switch id="secure-location" size="medium" checked={locationSecure} onCheckedChange={() => { setLocationSecure(!locationSecure) }} />
                                 </div>
                             </div>
                             <div className="grid gap-2 w-full">
@@ -283,7 +295,7 @@ export const EventEdit = ({
                                         <h3 className="font-bold">Public Event</h3>
                                         <p className="text-sm text-neutral-500">Enable to make the event visible to all users.</p>
                                     </div>
-                                    <Switch id="event-visible" size="medium" checked={isPublic} onCheckedChange={() => {setIsPublic(!isPublic)}} />
+                                    <Switch id="event-visible" size="medium" checked={isPublic} onCheckedChange={() => { setIsPublic(!isPublic) }} />
                                 </div>
                             </div>
                             <div className="grid gap-2 w-full">
@@ -294,10 +306,10 @@ export const EventEdit = ({
                                         <p className="text-sm text-neutral-500">Enable to charge ticket fees directly to the buyer.</p>
                                     </div>
                                     <Switch
-                                      id="fee-bearer"
-                                      size="medium"
-                                      checked={isFeeOnUser}
-                                      onCheckedChange={() => setFeeOnUser(!isFeeOnUser)}
+                                        id="fee-bearer"
+                                        size="medium"
+                                        checked={isFeeOnUser}
+                                        onCheckedChange={() => setFeeOnUser(!isFeeOnUser)}
                                     />
                                 </div>
                             </div>
@@ -332,9 +344,9 @@ export const EventEdit = ({
                                 <EventTagDialog
                                     currentEventTags={eventTags}
                                     onTagAdd={
-                                    (tag: string) => setEventTags([...eventTags, tag])
+                                        (tag: string) => setEventTags([...eventTags, tag])
                                     }
-                                    onTagRemove={(tag: string) => setEventTags((value) => value.filter((i) => i !== tag)) }
+                                    onTagRemove={(tag: string) => setEventTags((value) => value.filter((i) => i !== tag))}
                                 />
                             </div>
                             <div className="grid gap-2">
@@ -342,20 +354,20 @@ export const EventEdit = ({
                                     <div className="font-bold">Event Theme</div>
                                     <p className="text-neutral-400 text-xs font-semibold">Select a theme that sets the vibe for your event</p>
                                 </div>
-                                <EventThemeSelector currentEventTheme={eventTheme} setEventTheme={setEventTheme} />
+                                <EventThemeSelector currentEventTheme={eventTheme} setEventTheme={handleThemeChange} />
                             </div>
                             <div className="grid gap-2 w-full">
                                 <Label htmlFor="m-age" className="text-neutral-500">Snapshots</Label>
-                                <ImageSnapshots setSubmitDisabled={setSubmitDisabled} initialImages={screenshots} maxImages={50} onImageAdd={setScreenshots} onImageRemove={setScreenshots}/>
+                                <ImageSnapshots setSubmitDisabled={setSubmitDisabled} initialImages={screenshots} maxImages={50} onImageAdd={setScreenshots} onImageRemove={setScreenshots} />
                             </div>
                             <CoverVideoUploader
-                              videoValue={coverVideo}
-                              onVideoValueChange={handleCoverVideoChange}
-                              mediaFileType={"EVENT_COVER_VIDEO"}
-                              setSubmitDisabled={setSubmitDisabled}
-                              className="mb-10"
+                                videoValue={coverVideo}
+                                onVideoValueChange={handleCoverVideoChange}
+                                mediaFileType={"EVENT_COVER_VIDEO"}
+                                setSubmitDisabled={setSubmitDisabled}
+                                className="mb-10"
                             />
-                            <div className="bg-white pt-2 border-none border-t border-white w-full fixed inset-x-0 bottom-0 z-60 pb-4 flex items-center justify-center safe-area-inset-bottom">
+                            <div className="pt-2 border-none w-full fixed inset-x-0 bottom-0 z-60 pb-4 flex items-center justify-center safe-area-inset-bottom">
                                 <Button
                                     type="submit"
                                     className="w-[90%] text-md py-6 font-bold"
@@ -365,7 +377,7 @@ export const EventEdit = ({
                                 </Button>
                             </div>
                         </div>
-                    </>
+                    </div>
                 )
         }
     }
@@ -374,7 +386,7 @@ export const EventEdit = ({
         <div className={cn(
             "w-full min-h-[85vh]",
             className
-        )} {...props}>
+        )} style={activeScreen === "details" ? detailsContainerStyle : undefined} {...props}>
             <ul className="w-full flex flex-row justify-between pt-2">
                 {headerItems.map((item) => (
                     <li key={item.value} className="w-full">

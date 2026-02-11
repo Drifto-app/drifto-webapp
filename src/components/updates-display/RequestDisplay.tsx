@@ -52,11 +52,9 @@ const RequestDisplay = () => {
       setError(null);
       const response = await authApi.get("/invite/user");
       const data: Invitations = response.data.data;
-      console.log(data);
       setRequests(data);
     } catch (err) {
       setError("Failed to load requests");
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -77,7 +75,6 @@ const RequestDisplay = () => {
   ) => {
     try {
       setActionLoading(inviteId);
-      console.log("Approved:", inviteId);
       // Add your approve API logic here
       // await authApi.post(`/invite/${inviteId}/approve`);
 
@@ -104,7 +101,6 @@ const RequestDisplay = () => {
   ) => {
     try {
       setActionLoading(inviteId);
-      console.log("Blocked:", inviteId);
 
       await authApi.post(`/invite/${inviteId}/respond`, {
         eventId,
@@ -124,12 +120,10 @@ const RequestDisplay = () => {
 
   const handleViewProfile = (userId: string) => {
     router.push(`/m/user/${userId}?prev=/?screen=updates`);
-    console.log("View profile:", userId);
     // Add your view profile logic here
   };
   const handleViewEvent = (eventId: string) => {
     router.push(`/m/events/${eventId}?prev=/?screen=updates`);
-    console.log("View profile:", eventId);
     // Add your view profile logic here
   };
 
@@ -231,9 +225,8 @@ const RequestDisplay = () => {
 
               {/* Dropdown Menu */}
               <div
-                className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                  isOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
-                }`}
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
+                  }`}
               >
                 <div className="flex items-center gap-3 border-t border-gray-200 p-3 overflow-x-scroll bg-neutral-100">
                   {/* Approve Button */}
@@ -266,8 +259,7 @@ const RequestDisplay = () => {
                     }
                     disabled={isActionLoading}
                     className={`w-fit  items-center gap-2 px-4 py-2 whitespace-nowrap border border-black rounded-full bg-white hover:bg-neutral-100 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed 
-                      ${
-                        isInviteExpired(invite.expireAt) ? " hidden" : " flex"
+                      ${isInviteExpired(invite.expireAt) ? " hidden" : " flex"
                       }`}
                   >
                     {isActionLoading ? (

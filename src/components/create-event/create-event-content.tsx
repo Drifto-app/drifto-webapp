@@ -158,7 +158,14 @@ export const CreateEventContent = ({
     !coordinates ||
     !eventTags ||
     eventTags.length === 0 ||
-    !eventTheme;
+    !eventTheme ||
+    !titleImage;
+
+  const detailsContainerStyle = React.useMemo(() => {
+    if (!eventTheme || eventTheme.length !== 2) return undefined;
+    const [c1, c2] = eventTheme;
+    return { background: `linear-gradient(to bottom, ${c1}, ${c2})` } as const;
+  }, [eventTheme]);
 
   const handleBackClick = () => {
     if (activeScreen === "details") {
@@ -391,7 +398,7 @@ export const CreateEventContent = ({
 
     setLoading(true);
 
-    const isSubmitDataValid: boolean =
+    const isSubmitDataInvalid: boolean =
       !title ||
       !description ||
       !startTime ||
@@ -404,9 +411,14 @@ export const CreateEventContent = ({
       !coordinates?.longitude ||
       (isAgeRestricted && !minimumAge) ||
       eventTags.length <= 0 ||
-      eventTheme.length !== 2;
+      eventTheme.length !== 2 ||
+      tickets.length === 0;
 
-    if (isSubmitDataValid) return;
+    if (isSubmitDataInvalid) {
+      setLoading(false);
+      showTopToast("error", "Please fill in all required fields before submitting");
+      return;
+    }
 
     const paramTickets: {
       title: string;
@@ -482,7 +494,7 @@ export const CreateEventContent = ({
     switch (activeScreen) {
       case "details":
         return (
-          <>
+          <div className="w-full">
             <CoverImageUploader
               imageValue={titleImage}
               onImageValueChange={handleTitleImageChange}
@@ -630,7 +642,7 @@ export const CreateEventContent = ({
                 Continue
               </Button>
             </div>
-          </>
+          </div>
         );
       case "ticket":
         return (
@@ -829,6 +841,22 @@ export const CreateEventContent = ({
           </div>
         );
       case "preview":
+        const isPreviewDataInvalid =
+          !title ||
+          !description ||
+          !startTime ||
+          !stopTime ||
+          !titleImage ||
+          !address ||
+          !city ||
+          !state ||
+          !coordinates?.latitude ||
+          !coordinates?.longitude ||
+          (isAgeRestricted && !minimumAge) ||
+          eventTags.length <= 0 ||
+          eventTheme.length !== 2 ||
+          tickets.length === 0;
+
         return (
           <div className="w-full flex-1">
             <div className="w-full flex flex-col gap-3 px-4 pt-6 pb-15">
@@ -950,7 +978,7 @@ export const CreateEventContent = ({
                 type="submit"
                 className="py-7 text-lg font-bold bg-blue-800 hover:bg-blue-800 mt-6"
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || isPreviewDataInvalid}
               >
                 {loading ? <LoaderSmall /> : "Create"}
               </Button>
@@ -993,6 +1021,7 @@ export const CreateEventContent = ({
   return (
     <div
       className={cn("w-full min-h-[100dvh] flex flex-col", className)}
+      style={activeScreen === "details" ? detailsContainerStyle : undefined}
       {...props}
     >
       {activeScreen !== "success" ? (
