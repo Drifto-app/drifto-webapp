@@ -248,7 +248,7 @@ function TicketCard({
             <div className="border-t border-black w-full"></div>
           </div>
           <div className="flex justify-center py-8">
-            <div className="relative inline-block">
+            <div className="relative inline-block select-none pointer-events-none [-webkit-touch-callout:none] [-webkit-tap-highlight-color:transparent]">
               <QRCode size={128} value={ticketReference.toString()} />
               {/* Logo overlay */}
               <div
