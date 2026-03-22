@@ -44,7 +44,7 @@ interface BookingsResponse {
 }
 
 type TabType = "bookings" | "events" | null;
-type UserPlanType = "SCHEDULED" | "COMPLETED" | "CANCELLED";
+type UserPlanType = "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 
 // Constants
 const BOOKING_API_CONFIG = {
@@ -66,6 +66,7 @@ const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
 
 const FILTER_OPTIONS = [
   { value: "SCHEDULED", label: "Upcoming" },
+  { value: "IN_PROGRESS", label: "In Progress" },
   { value: "COMPLETED", label: "Completed" },
   { value: "CANCELLED", label: "Cancelled" },
 ] as const;
