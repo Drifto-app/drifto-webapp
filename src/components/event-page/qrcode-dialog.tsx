@@ -4,10 +4,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { LoaderSmall } from "@/components/ui/loader";
 import { BrowserMultiFormatReader } from "@zxing/browser";
-import {CheckCircle2, X, XCircle} from "lucide-react";
-import {authApi} from "@/lib/axios";
+import { CheckCircle2, X, XCircle } from "lucide-react";
+import { authApi } from "@/lib/axios";
 import { toast } from "sonner"
-import {showTopToast} from "@/components/toast/toast-util";
+import { showTopToast } from "@/components/toast/toast-util";
 
 interface Props {
     open: boolean;
@@ -82,13 +82,10 @@ export default function QrScannerDialog({ open, onOpenChange, onResult }: Props)
 
             if (status === "NOT_FOUND") {
                 showBanner("error", "User Ticket Not Found");
-            } else if (status === "BAD_REQUEST") {
-                showBanner("error", "User ticket already marked as used");
             } else {
                 showBanner("error", desc || e?.message || "Something went wrong");
             }
         } finally {
-            // small cooldown so ZXing callback doesn't re-enter immediately
             window.setTimeout(() => {
                 handlingRef.current = false;
             }, 200);
