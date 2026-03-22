@@ -22,6 +22,7 @@ export default function QrScannerDialog({ open, onOpenChange, onResult }: Props)
     const readerRef = useRef<BrowserMultiFormatReader | null>(null);
     const controlsRef = useRef<{ stop: () => void } | null>(null);
     const [starting, setStarting] = useState(false);
+    const [marking, setMarking] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     // request/scan guards
@@ -65,6 +66,7 @@ export default function QrScannerDialog({ open, onOpenChange, onResult }: Props)
         try {
             // prevent re-entrancy while this request is in-flight
             handlingRef.current = true;
+            setMarking(true);
 
             const response = await authApi.post(`/userTicket/mark/${encodeURIComponent(ref)}`);
 
@@ -86,6 +88,7 @@ export default function QrScannerDialog({ open, onOpenChange, onResult }: Props)
                 showBanner("error", desc || e?.message || "Something went wrong");
             }
         } finally {
+            setMarking(false);
             window.setTimeout(() => {
                 handlingRef.current = false;
             }, 200);
@@ -244,6 +247,13 @@ export default function QrScannerDialog({ open, onOpenChange, onResult }: Props)
                                 <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-white/90 rounded-br-xl" />
                             </div>
                         </div>
+
+                        {marking && (
+                            <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center z-10">
+                                <LoaderSmall />
+                                <span className="text-white/95 mt-3 text-sm">Marking ticket…</span>
+                            </div>
+                        )}
 
                         {starting && (
                             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-white/95 bg-black/50 px-3 py-1 rounded-lg flex items-center gap-2">
