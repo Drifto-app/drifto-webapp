@@ -208,7 +208,7 @@ export const CoHostManage = ({
                     <h3 className="font-semibold text-lg">Hosts</h3>
                     <ul className="flex flex-col gap-3">
                         {coHosts.map((coHost: { [key: string]: any }, i: number) => {
-                            if ((i + 1) === event.coHosts.length) {
+                            if ((i + 1) === coHosts.length) {
                                 coHost.username = "You"
                             }
 
@@ -217,7 +217,7 @@ export const CoHostManage = ({
                                     <UserEventSinglePlaceholder
                                         user={coHost}
                                         key={coHost.id}
-                                        isHost={(i + 1) === event.coHosts.length || event.coHosts.length > 1}
+                                        isHost={(i + 1) === coHosts.length}
                                         removeClick={handleCohostRemove}
                                         prev={`${pathname}?${searchParams}`}
                                     />
