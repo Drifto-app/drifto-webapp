@@ -1,15 +1,11 @@
 import { RefundHistoryPageContent } from "@/components/refund/refund-history";
-import {Loader} from "@/components/ui/loader";
 import {Suspense} from "react";
+import { RefundHistoryPageSkeleton } from "@/components/ui/page-skeletons";
 
 export default function RefundHistoryPage() {
 
     return (
-        <Suspense fallback={
-            <div className="w-full h-screen flex items-center justify-center">
-                <Loader />
-            </div>
-        }>
+        <Suspense fallback={<RefundHistoryPageSkeleton />}>
             <RefundHistoryPageContent />
         </Suspense>
     )

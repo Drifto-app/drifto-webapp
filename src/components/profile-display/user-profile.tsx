@@ -105,39 +105,39 @@ export const UserProfile = ({
                             <div className="w-full flex gap-3 px-2">
                                 <Button
                                     variant="outline"
-                                    className="flex-1 min-w-0 shadow-none font-semibold border-neutral-300 rounded-2xl h-12"
+                                    className="flex-1 min-w-0 shadow-none font-semibold border-border rounded-2xl h-12"
                                     onClick={() => router.push(`/m/settings/edit-profile?prev=${encodeURIComponent(`/?screen=profile`)}`)}
                                 >
                                     Edit profile
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="flex-1 min-w-0 shadow-none font-semibold border-neutral-300 rounded-2xl h-12"
+                                    className="flex-1 min-w-0 shadow-none font-semibold border-border rounded-2xl h-12"
                                     onClick={handleQuickShare}
                                 >
                                     Share Profile
                                 </Button>
                             </div>
                             <div className="w-full flex flex-col px-2 mt-4">
-                                <div className="flex flex-row gap-5 items-center justify-start border-b border-neutral-300 py-5 cursor-pointer" onClick={() => router.push(
+                                <div className="flex flex-row gap-5 items-center justify-start border-b border-border py-5 cursor-pointer" onClick={() => router.push(
                                     `/m/user-events?id=${user?.id}&prev=${encodeURIComponent("/?screen=profile")}`
                                 )}>
-                                    <PiFireSimpleBold size={24} className="text-neutral-800" />
+                                    <PiFireSimpleBold size={24} className="text-foreground" />
                                     <span className="font-normal text-[17px]">Experiences</span>
                                 </div>
 
-                                <div className="flex flex-row gap-5 items-center justify-start border-b border-neutral-300 py-5 cursor-pointer" onClick={() => setActiveScreen("posts")}>
-                                    <FaHashtag size={24} className="text-neutral-800" />
+                                <div className="flex flex-row gap-5 items-center justify-start border-b border-border py-5 cursor-pointer" onClick={() => setActiveScreen("posts")}>
+                                    <FaHashtag size={24} className="text-foreground" />
                                     <span className="font-normal text-[17px]">Posts</span>
                                 </div>
-                                <div className="flex flex-row gap-5 items-center justify-start border-b border-neutral-300 py-5 cursor-pointer" onClick={() => setActiveScreen("orders")}>
-                                    <FaRegClock size={24} className="text-neutral-800" />
+                                <div className="flex flex-row gap-5 items-center justify-start border-b border-border py-5 cursor-pointer" onClick={() => setActiveScreen("orders")}>
+                                    <FaRegClock size={24} className="text-foreground" />
                                     <span className="font-normal text-[17px]">Orders</span>
                                 </div>
                                 <div
-                                    className="flex flex-row gap-5 items-center justify-start border-b border-neutral-300 py-5 cursor-pointer"
+                                    className="flex flex-row gap-5 items-center justify-start border-b border-border py-5 cursor-pointer"
                                     onClick={() => handleScreenChange("plans")}>
-                                    <BiCalendarAlt size={24} className="text-neutral-800" />
+                                    <BiCalendarAlt size={24} className="text-foreground" />
                                     <span className="font-normal text-[17px]">Plans</span>
                                 </div>
                             </div>

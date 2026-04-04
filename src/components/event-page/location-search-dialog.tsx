@@ -230,7 +230,7 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
                     onClick={onToggleFullscreen}
                     variant="secondary"
                     size="sm"
-                    className="absolute top-2 right-2 z-10 bg-white/90 hover:bg-white border border-gray-300 shadow-sm"
+                    className="absolute top-2 right-2 z-10 bg-background/90 hover:bg-background border border-border shadow-sm"
                 >
                     {isFullscreen ? (
                         <Minimize className="h-4 w-4" />
@@ -242,7 +242,7 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
 
             <div
                 ref={mapRef}
-                className={`w-full rounded-lg border-2 border-gray-300 transition-all duration-300 ${
+                className={`w-full rounded-lg border-2 border-border transition-all duration-300 ${
                     isFullscreen
                         ? 'fixed inset-0 z-50 h-screen rounded-none border-0'
                         : 'h-64'
@@ -490,7 +490,7 @@ export const LocationSearchDialog: React.FC<LocationSearchDialogProps> = ({
         return (
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
-                    <div className="py-3 px-4 bg-white rounded-md text-wrap flex flex-row justify-between items-center cursor-pointer hover:bg-neutral-300 transition-colors border-1 border-neutral-200">
+                    <div className="py-3 px-4 bg-background rounded-md text-wrap flex flex-row justify-between items-center cursor-pointer hover:bg-muted transition-colors border-1 border-border">
                         <span className="text-sm">
                             {currentLocation.address && currentLocation.city && currentLocation.state
                                 ? `${currentLocation.address}, ${currentLocation.city}, ${currentLocation.state}`
@@ -517,7 +517,7 @@ export const LocationSearchDialog: React.FC<LocationSearchDialogProps> = ({
         return (
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
-                    <div className="py-3 px-4 bg-white rounded-md text-wrap flex flex-row justify-between items-center cursor-pointer hover:bg-neutral-300 transition-colors border-1 border-neutral-200">
+                    <div className="py-3 px-4 bg-background rounded-md text-wrap flex flex-row justify-between items-center cursor-pointer hover:bg-muted transition-colors border-1 border-border">
                         <span className="text-sm">
                             {currentLocation.address && currentLocation.city && currentLocation.state
                                 ? `${currentLocation.address}, ${currentLocation.city}, ${currentLocation.state}`
@@ -544,7 +544,7 @@ export const LocationSearchDialog: React.FC<LocationSearchDialogProps> = ({
                 {/* Original dialog trigger for when not fullscreen */}
                 <Dialog open={isOpen} onOpenChange={setIsOpen}>
                     <DialogTrigger asChild>
-                        <div className="py-3 px-4 bg-white rounded-md text-wrap flex flex-row justify-between items-center cursor-pointer hover:bg-neutral-300 transition-colors border-1 border-neutral-200">
+                        <div className="py-3 px-4 bg-background rounded-md text-wrap flex flex-row justify-between items-center cursor-pointer hover:bg-muted transition-colors border-1 border-border">
                             <span className="text-sm">
                                 {currentLocation.address && currentLocation.city && currentLocation.state
                                     ? `${currentLocation.address}, ${currentLocation.city}, ${currentLocation.state}`
@@ -557,9 +557,9 @@ export const LocationSearchDialog: React.FC<LocationSearchDialogProps> = ({
                 </Dialog>
 
                 {/* Fullscreen Map Overlay */}
-                <div className="fixed inset-0 z-[9999] bg-white">
+                <div className="fixed inset-0 z-[9999] bg-background">
                     {/* Fullscreen Header */}
-                    <div className="absolute top-0 left-0 right-0 z-[10000] bg-white/95 backdrop-blur-sm border-b border-gray-200 p-4">
+                    <div className="absolute top-0 left-0 right-0 z-[10000] bg-background/95 backdrop-blur-sm border-b border-border p-4">
                         <div className="flex items-center justify-between">
                             <h3 className="text-lg font-semibold">Select Location</h3>
                             <div className="flex items-center gap-2">
@@ -605,7 +605,7 @@ export const LocationSearchDialog: React.FC<LocationSearchDialogProps> = ({
                     </div>
 
                     {/* Fullscreen Footer with selected location and actions */}
-                    <div className="absolute bottom-0 left-0 right-0 z-[10000] bg-white/95 backdrop-blur-sm border-t border-gray-200 p-4">
+                    <div className="absolute bottom-0 left-0 right-0 z-[10000] bg-background/95 backdrop-blur-sm border-t border-border p-4">
                         <div className="mb-3">
                             <p className="text-sm font-medium text-gray-800">
                                 {[addressField, cityField, stateField].filter(Boolean).join(', ') ||
@@ -640,7 +640,7 @@ export const LocationSearchDialog: React.FC<LocationSearchDialogProps> = ({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <div className="py-3 px-4 bg-white rounded-md text-wrap flex flex-row justify-between items-center cursor-pointer hover:bg-neutral-300 transition-colors border-1 border-neutral-200">
+                <div className="py-3 px-4 bg-background rounded-md text-wrap flex flex-row justify-between items-center cursor-pointer hover:bg-muted transition-colors border-1 border-border">
                     <span className="text-sm">
                         {currentLocation.address && currentLocation.city && currentLocation.state
                             ? `${currentLocation.address}, ${currentLocation.city}, ${currentLocation.state}`
@@ -664,7 +664,7 @@ export const LocationSearchDialog: React.FC<LocationSearchDialogProps> = ({
                 <div className="space-y-4">
                     {/* Search Input with Autocomplete */}
                     <div className="grid gap-2">
-                        <Label htmlFor="location-search" className="text-sm font-medium text-gray-700">
+                        <Label htmlFor="location-search" className="text-sm font-medium text-muted-foreground">
                             Search Location
                         </Label>
                         <Autocomplete
@@ -688,7 +688,7 @@ export const LocationSearchDialog: React.FC<LocationSearchDialogProps> = ({
 
                     {/* Map */}
                     <div>
-                        <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                        <Label className="text-sm font-medium text-muted-foreground mb-2 block">
                             Map Location <span className="text-red-600">*</span>
                         </Label>
                         <GoogleMapComponent
@@ -784,7 +784,7 @@ export const LocationSearchDialog: React.FC<LocationSearchDialogProps> = ({
                         <Button
                             type="button"
                             variant="secondary"
-                            className="text-lg bg-neutral-300 py-6 px-8 font-semibold hover:bg-neutral-400"
+                            className="text-lg bg-muted py-6 px-8 font-semibold hover:bg-neutral-400"
                         >
                             Cancel
                         </Button>

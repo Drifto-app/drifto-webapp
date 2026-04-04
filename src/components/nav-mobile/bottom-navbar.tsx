@@ -85,7 +85,7 @@ export const BottomNavbar = ({
         <nav
             {...props}
             className={cn(
-                "fixed inset-x-0 bottom-0 z-9999 bg-white border-t border-neutral-200",
+                "fixed inset-x-0 bottom-0 z-9999 bg-background border-t border-border",
                 "safe-area-inset-bottom",
                 className
             )}

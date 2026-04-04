@@ -1,15 +1,11 @@
-import {Loader} from "@/components/ui/loader";
 import {Suspense} from "react";
 import {UpdatePhonePageContent} from "@/components/settings/change-phone";
+import { SettingsDetailSkeleton } from "@/components/ui/page-skeletons";
 
 export default function ChangePhonePage() {
 
     return (
-        <Suspense fallback={
-            <div className="w-full h-screen flex items-center justify-center">
-                <Loader />
-            </div>
-        }>
+        <Suspense fallback={<SettingsDetailSkeleton />}>
             <UpdatePhonePageContent />
         </Suspense>
     )

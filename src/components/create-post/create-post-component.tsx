@@ -7,7 +7,7 @@ import {CreatePostContent} from "@/components/create-post/create-post-content";
 
 export const CreatePostComponent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev");
+    const prev = searchParams?.get("prev") ?? null;
 
     return (
         <ProtectedRoute>

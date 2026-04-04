@@ -35,7 +35,7 @@ export const CoverVideoSection = ({
             playsInline
           />
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg">
-            <button className="h-14 w-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+            <button className="h-14 w-14 rounded-full bg-background/90 flex items-center justify-center shadow-lg">
               <FaPlay className="ml-1" />
             </button>
           </div>

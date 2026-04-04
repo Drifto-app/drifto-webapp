@@ -92,23 +92,23 @@ export const AddToCalendar = ({ event }: AddToCalendarProps) => {
     <div className="relative" ref={dropdownRef}>
       <Button
         onClick={toggleDropdown}
-        className="bg-white/95 hover:bg-white text-black text-xs font-semibold py-2 px-3 rounded-xl shadow-lg border border-neutral-200 flex items-center gap-2 backdrop-blur-md transition-colors h-auto m-0"
+        className="bg-background/95 hover:bg-background text-foreground text-xs font-semibold py-2 px-3 rounded-xl shadow-lg border border-border flex items-center gap-2 backdrop-blur-md transition-colors h-auto m-0"
       >
-        <CalendarPlus size={16} className="text-neutral-700" />
+        <CalendarPlus size={16} className="text-muted-foreground" />
         Add to Calendar
       </Button>
 
       {isOpen && (
-        <div className="absolute bottom-full right-0 mb-2 w-52 bg-white rounded-xl shadow-xl border border-neutral-200 py-1 z-20 overflow-hidden transform origin-bottom-right transition-all">
+        <div className="absolute bottom-full right-0 mb-2 w-52 bg-background rounded-xl shadow-xl border border-border py-1 z-20 overflow-hidden transform origin-bottom-right transition-all">
           <button
             onClick={handleDownloadICS}
-            className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-neutral-50 transition-colors border-b border-neutral-100"
+            className="w-full text-left px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-background transition-colors border-b border-neutral-100"
           >
             Apple / Outlook Calendar
           </button>
           <button
             onClick={handleOpenGoogle}
-            className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-neutral-50 transition-colors"
+            className="w-full text-left px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-background transition-colors"
           >
             Google Calendar
           </button>

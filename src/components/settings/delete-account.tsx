@@ -26,7 +26,7 @@ import {
 
 export const DeleteAccountPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
 
     return (
         <ProtectedRoute>
@@ -86,17 +86,17 @@ export const DeleteAccountContent = ({
 
     return (
         <div className={cn("w-full", className)} {...props}>
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         Delete Account
                     </p>
                 </div>
@@ -104,17 +104,17 @@ export const DeleteAccountContent = ({
 
             <div className="w-full flex flex-col p-6 gap-6">
                 <div>
-                    <h2 className="text-xl font-semibold text-neutral-900">
+                    <h2 className="text-xl font-semibold text-foreground">
                         Thinking about deleting your account?
                     </h2>
-                    <p className="text-sm text-neutral-600 mt-1 leading-5">
+                    <p className="text-sm text-muted-foreground mt-1 leading-5">
                         You can close your Drifto account if a few conditions are met. These
                         steps help us keep your account secure and your data safe.
                     </p>
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    <p className="text-xl font-semibold text-neutral-900">
+                    <p className="text-xl font-semibold text-foreground">
                         Before deleting, please make sure:
                     </p>
                     <ul className="flex flex-col gap-2">
@@ -135,7 +135,7 @@ export const DeleteAccountContent = ({
                     </ul>
                 </div>
 
-                <p className="text-sm text-neutral-800 font-medium mt-2">
+                <p className="text-sm text-foreground font-medium mt-2">
                     Once your account is deleted, it cannot be restored.
                 </p>
             </div>
@@ -157,7 +157,7 @@ export const DeleteAccountContent = ({
                         </DialogDescription>
                         <DialogFooter className="w-full flex flex-row sm:justify-between justify-between px-4 sm:px-20">
                             <DialogClose asChild>
-                                <Button type="button" variant="secondary" className="text-xl bg-neutral-300 py-6 px-8 font-semibold">
+                                <Button type="button" variant="secondary" className="text-xl bg-muted py-6 px-8 font-semibold">
                                     Cancel
                                 </Button>
                             </DialogClose>

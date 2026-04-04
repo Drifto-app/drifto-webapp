@@ -128,7 +128,7 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
                     onClick={onToggleFullscreen}
                     variant="secondary"
                     size="sm"
-                    className="absolute top-3 right-3 z-10 bg-white/90 hover:bg-white border border-gray-300 shadow-lg"
+                    className="absolute top-3 right-3 z-10 bg-background/90 hover:bg-background border border-border shadow-lg"
                 >
                     {isFullscreen ? (
                         <Minimize className="h-4 w-4" />
@@ -214,11 +214,11 @@ export const SingleEventMap = ({
                 className={cn(
                     "w-full min-h-[85vh] flex items-start",
                     className,
-                    event.eventTheme !== null ? "" : "bg-neutral-100",
+                    event.eventTheme !== null ? "" : "bg-muted/40",
                 )}
                 {...props}
             >
-                <div className="flex gap-2 w-full bg-white px-4 py-4 items-center">
+                <div className="flex gap-2 w-full bg-background px-4 py-4 items-center">
                     <MdLockOutline size={25} />
                     <p className="font-semibold text-md">
                         Address shared after ticket purchase.
@@ -235,7 +235,7 @@ export const SingleEventMap = ({
                 className={cn(
                     "w-full min-h-[85vh] flex items-center justify-center",
                     className,
-                    event.eventTheme !== null ? "" : "bg-neutral-100",
+                    event.eventTheme !== null ? "" : "bg-muted/40",
                 )}
                 {...props}
             >
@@ -255,7 +255,7 @@ export const SingleEventMap = ({
                 className={cn(
                     "w-full min-h-[85vh] flex items-center justify-center",
                     className,
-                    event.eventTheme !== null ? "" : "bg-neutral-100",
+                    event.eventTheme !== null ? "" : "bg-muted/40",
                 )}
                 {...props}
             >
@@ -269,7 +269,7 @@ export const SingleEventMap = ({
         return (
             <div className="z-[9999]">
                  {/*Fullscreen Header*/}
-                {/*<div className="absolute bottom-0 left-0 right-0 z-[10000] bg-white/95 backdrop-blur-sm border-b border-gray-200 p-4">*/}
+                {/*<div className="absolute bottom-0 left-0 right-0 z-[10000] bg-background/95 backdrop-blur-sm border-b border-border p-4">*/}
                 {/*    <div className="flex items-center justify-between">*/}
                 {/*        <div className="flex items-center gap-3">*/}
                 {/*            <MapPin className="h-5 w-5 text-red-600" />*/}
@@ -311,7 +311,7 @@ export const SingleEventMap = ({
             className={cn(
                 "w-full min-h-[87vh] relative flex justify-center",
                 className,
-                event.eventTheme !== null ? "" : "bg-neutral-100",
+                event.eventTheme !== null ? "" : "bg-muted/40",
             )}
             {...props}
         >

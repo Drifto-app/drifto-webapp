@@ -18,7 +18,7 @@ type View = "login" | "signup" | "forgot";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
-  const next = searchParams.get("next")
+  const next = searchParams?.get("next") ?? null
 
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();

@@ -42,7 +42,7 @@ export const PaymentInfoCard = ({
                 </span>
                 <span className="flex flex-col font-semibold">
                     <p className={cn(
-                        isSelected ? "text-blue-800" : "text-neutral-600 line-clamp-3"
+                        isSelected ? "text-blue-800" : "text-muted-foreground line-clamp-3"
                     )}>
                         {`${info.accountNumber} (${info.bankName})`}
                     </p>

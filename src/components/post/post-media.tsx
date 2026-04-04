@@ -54,7 +54,7 @@ export const MediaCarousel = ({
         <div className="relative w-full">
             <div
                 className={cn(
-                    "relative overflow-hidden rounded-md bg-gray-100",
+                    "relative overflow-hidden rounded-md bg-muted",
                     isMulti ? "h-80" : "" // fixed height only when multiple
                 )}
                 onTouchStart={handleTouchStart}
@@ -284,7 +284,7 @@ export const MediaDialog = ({
         >
             {/* Close button with proper event handling */}
             <button
-                className="absolute top-4 right-4 text-white z-50 rounded-full p-2 hover:bg-white/10 transition-colors"
+                className="absolute top-4 right-4 text-white z-50 rounded-full p-2 hover:bg-background/10 transition-colors"
                 onClick={handleCloseClick}
                 aria-label="Close"
                 type="button"
@@ -368,7 +368,7 @@ export const MediaDialog = ({
                                 onClick={(e) => handleDotClick(e, index)}
                                 className={cn(
                                     "w-2 h-2 rounded-full transition-colors",
-                                    index === currentIndex ? "bg-white" : "bg-white/50 hover:bg-white/75"
+                                    index === currentIndex ? "bg-background" : "bg-background/50 hover:bg-background/75"
                                 )}
                                 aria-label={`Go to slide ${index + 1}`}
                                 type="button"

@@ -152,7 +152,7 @@ export function CoverVideoUploader({
         <div
           className={cn(
             "relative w-full h-64 rounded-lg overflow-hidden border-2 border-dashed",
-            preview ? "border-transparent" : "border-gray-300 bg-white"
+            preview ? "border-transparent" : "border-border bg-background"
           )}
         >
           {preview ? (
@@ -169,7 +169,7 @@ export function CoverVideoUploader({
                 />
                 {/* Play overlay */}
                 <div className="absolute inset-0 bg-black/20 flex items-center justify-center  transition-opacity">
-                  <div className="bg-white bg-opacity-90 rounded-full p-4">
+                  <div className="bg-background bg-opacity-90 rounded-full p-4">
                     <Play size={20} fill="currentColor" />
                   </div>
                 </div>

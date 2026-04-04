@@ -78,7 +78,7 @@ export const UserSubscriberCard = ({
             {user.followed
                 ? <Button
                     variant="outline"
-                    className="shadow-none font-semibold border-black py-2"
+                    className="shadow-none font-semibold border-foreground py-2"
                     onClick={handleUnsubscribeClick}
                     disabled={isSubscribeLoading}
                 >

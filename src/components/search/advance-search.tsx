@@ -20,6 +20,7 @@ import {authApi} from "@/lib/axios";
 import {showTopToast} from "@/components/toast/toast-util";
 import {SearchType} from "@/components/search/search-component";
 import {GrLocation} from "react-icons/gr";
+import { EventCardSkeleton, UserListSkeleton } from "@/components/ui/page-skeletons";
 
 interface AdvanceSearchProps extends ComponentProps<"div">{
     setActiveScreen: (activeScreen: ActiveScreenType) => void;
@@ -187,17 +188,17 @@ export const AdvanceSearch = ({
     return (
         <>
             <div className={cn("w-full min-h-[100dvh] flex flex-col", className)} {...props}>
-                <div className="w-full border-b border-b-neutral-300 flex flex-col gap-6 justify-center pt-6 pb-4 flex-shrink-0">
+                <div className="w-full border-b border-border flex flex-col gap-6 justify-center pt-6 pb-4 flex-shrink-0">
                     <div className="flex flex-row items-center px-8">
                         <FaArrowLeft
                             size={20}
                             onClick={handleBackClick}
-                            className="cursor-pointer hover:text-neutral-700 transition-colors"
+                            className="cursor-pointer hover:text-muted-foreground transition-colors"
                             aria-label="Go back"
                             role="button"
                             tabIndex={0}
                         />
-                        <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                        <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                             Customize Search
                         </p>
                     </div>
@@ -226,7 +227,7 @@ export const AdvanceSearch = ({
 
                 {!isSearched ? (
                     <div className="flex-1 flex items-center justify-center">
-                        <p className="text-neutral-600 text-center font-semibold text-md">
+                        <p className="text-muted-foreground text-center font-semibold text-md">
                             Looking for something specific? Use filter above to narrow it down!
                         </p>
                     </div>
@@ -237,9 +238,15 @@ export const AdvanceSearch = ({
                         style={{ maxHeight: "calc(100dvh - 200px)" }}
                     >
                         {resultsLoading && users.length === 0 && events.length === 0 ? (
-                            <div className="flex justify-center py-10">
-                                <Loader className="h-8 w-8" />
-                            </div>
+                            searchType === "USER" ? (
+                                <UserListSkeleton count={4} />
+                            ) : (
+                                <div className="space-y-5">
+                                    {Array.from({ length: 3 }).map((_, index) => (
+                                        <EventCardSkeleton key={index} />
+                                    ))}
+                                </div>
+                            )
                         ) : searchType === "USER" ? (
                             users.length ? (
                                 <ul className="flex flex-col gap-4">

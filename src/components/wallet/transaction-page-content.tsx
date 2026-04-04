@@ -11,10 +11,11 @@ import { authApi } from "@/lib/axios";
 import { showTopToast } from "@/components/toast/toast-util";
 import { Loader } from "@/components/ui/loader";
 import { TransactionCard } from "./transaction-card";
+import { TransactionListSkeleton } from "@/components/ui/page-skeletons";
 
 export const WalletTransactionsPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
 
     return (
         <ProtectedRoute>
@@ -138,17 +139,17 @@ export const WalletTransactionsContent = ({
             )}
             {...props}
         >
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={16}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-sm w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-sm w-full text-center capitalize truncate ml-4">
                         Wallet Transactions
                     </p>
                     <div className="w-5" /> {/* Spacer for centering */}
@@ -164,20 +165,24 @@ export const WalletTransactionsContent = ({
                     Transaction History ({totalTransactions})
                 </h3>
 
-                <div className="flex flex-col gap-4">
-                    {transactions.map((item) => (
-                        <TransactionCard
-                            key={item.id}
-                            transactionContent={item}
-                        />
-                    ))}
-                </div>
+                {loading && transactions.length === 0 ? (
+                    <TransactionListSkeleton />
+                ) : (
+                    <div className="flex flex-col gap-4">
+                        {transactions.map((item) => (
+                            <TransactionCard
+                                key={item.id}
+                                transactionContent={item}
+                            />
+                        ))}
+                    </div>
+                )}
 
                 {transactions.length < 0 && !hasMore && <div className="w-full text-center text-neutral-500">No Transaction History Found</div>}
 
                 <div ref={sentinelRef} aria-hidden className="h-1" />
 
-                {loading && (
+                {loading && transactions.length > 0 && (
                     <div className="flex justify-center py-4">
                         <Loader className="h-8 w-8" />
                     </div>
@@ -187,4 +192,3 @@ export const WalletTransactionsContent = ({
         </div>
     )
 }
-

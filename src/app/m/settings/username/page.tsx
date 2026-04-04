@@ -1,15 +1,11 @@
 import {Suspense} from "react";
-import {Loader} from "@/components/ui/loader";
 import {UsernamePageContent} from "@/components/settings/username";
+import { SettingsDetailSkeleton } from "@/components/ui/page-skeletons";
 
 export default function UsernamePage() {
 
     return (
-        <Suspense fallback={
-            <div className="w-full h-screen flex items-center justify-center">
-                <Loader />
-            </div>
-        }>
+        <Suspense fallback={<SettingsDetailSkeleton />}>
             <UsernamePageContent />
         </Suspense>
     )

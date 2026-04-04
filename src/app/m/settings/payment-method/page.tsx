@@ -1,15 +1,11 @@
-import {Loader} from "@/components/ui/loader";
 import { Suspense } from "react";
 import {PaymentSettingsPageContent} from "@/components/settings/payment-method";
+import { SettingsDetailSkeleton } from "@/components/ui/page-skeletons";
 
 export default function PaymentMethodPage() {
 
     return (
-        <Suspense fallback={
-            <div className="w-full h-screen flex items-center justify-center">
-                <Loader />
-            </div>
-        }>
+        <Suspense fallback={<SettingsDetailSkeleton />}>
             <PaymentSettingsPageContent />
         </Suspense>
     )

@@ -21,7 +21,7 @@ import {Input} from "@/components/ui/input";
 
 export const BioPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
     const pathname = usePathname();
 
     return (
@@ -117,13 +117,13 @@ export const BioContent = ({
         return (
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
-                    <div className="flex items-center gap-3 p-4 border border-neutral-300 rounded-lg cursor-pointer hover:bg-neutral-50">
-                        <MdOutlineDateRange size={20} className="text-neutral-600" />
+                    <div className="flex items-center gap-3 p-4 border border-border rounded-lg cursor-pointer hover:bg-background">
+                        <MdOutlineDateRange size={20} className="text-muted-foreground" />
                         <span className="text-base">{displayDate(dob)}</span>
                     </div>
                 </DialogTrigger>
                 <DialogContent className="px-0">
-                    <DialogHeader className="text-left w-full border-b-1 border-neutral-200 pb-4 px-4">
+                    <DialogHeader className="text-left w-full border-b-1 border-border pb-4 px-4">
                         <DialogTitle className="text-xl">Select Date of Birth</DialogTitle>
                         <p className="text-neutral-400 text-sm font-semibold">Choose your date of birth</p>
                     </DialogHeader>
@@ -136,7 +136,7 @@ export const BioContent = ({
                                 year: "numeric",
                             })}
                         </div>
-                        <div className="border-2 border-neutral-300 rounded-md p-2">
+                        <div className="border-2 border-border rounded-md p-2">
                             <Calendar
                                 mode="single"
                                 selected={selectedDate}
@@ -216,17 +216,17 @@ export const BioContent = ({
             )}
             {...props}
         >
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         Bio & Socials
                     </p>
                     <div className="w-5" /> {/* Spacer for centering */}
@@ -235,27 +235,27 @@ export const BioContent = ({
             <div className="w-full flex-1 flex flex-col py-8 px-8 justify-between">
                 <div className="flex flex-col gap-8">
                     <div className="flex flex-col gap-4">
-                        <h2 className="text-lg font-semibold text-neutral-800">About You</h2>
+                        <h2 className="text-lg font-semibold text-foreground">About You</h2>
                         <textarea
                             placeholder="Describe something about you"
                             value={bio}
                             onChange={handleBioChange}
                             rows={7}
-                            className="py-2 px-3 bg-white rounded-md border-1 border-neutral-300 focus:border-blue-600 focus:border-1 focus:outline-hidden"
+                            className="py-2 px-3 bg-background rounded-md border-1 border-border focus:border-blue-600 focus:border-1 focus:outline-hidden"
                         />
                     </div>
 
                     <div className="flex flex-col gap-4">
-                        <h2 className="text-lg font-semibold text-neutral-800">Date of Birth</h2>
+                        <h2 className="text-lg font-semibold text-foreground">Date of Birth</h2>
                         <DatePickerDialog />
                     </div>
 
                     <div className="flex flex-col gap-4">
-                        <h2 className="text-lg font-semibold text-neutral-800">Social Links</h2>
+                        <h2 className="text-lg font-semibold text-foreground">Social Links</h2>
                         <div className="flex flex-col gap-3">
                             {/* Website */}
-                            <div className="flex items-center gap-3 px-4 py-2 border border-neutral-300 rounded-lg focus-within:border-blue-600">
-                                <AiOutlineGlobal size={20} className="text-neutral-600" />
+                            <div className="flex items-center gap-3 px-4 py-2 border border-border rounded-lg focus-within:border-blue-600">
+                                <AiOutlineGlobal size={20} className="text-muted-foreground" />
                                 <Input
                                     placeholder="Website"
                                     value={website}
@@ -265,8 +265,8 @@ export const BioContent = ({
                             </div>
 
                             {/* Instagram */}
-                            <div className="flex items-center gap-3 px-4 py-2 border border-neutral-300 rounded-lg focus-within:border-blue-600">
-                                <FiInstagram size={20} className="text-neutral-600" />
+                            <div className="flex items-center gap-3 px-4 py-2 border border-border rounded-lg focus-within:border-blue-600">
+                                <FiInstagram size={20} className="text-muted-foreground" />
                                 <Input
                                     placeholder="Instagram"
                                     value={instagramHandle}
@@ -276,8 +276,8 @@ export const BioContent = ({
                             </div>
 
                             {/* Twitter */}
-                            <div className="flex items-center gap-3 px-4 py-2 border border-neutral-300 rounded-lg focus-within:border-blue-600">
-                                <FiTwitter size={20} className="text-neutral-600" />
+                            <div className="flex items-center gap-3 px-4 py-2 border border-border rounded-lg focus-within:border-blue-600">
+                                <FiTwitter size={20} className="text-muted-foreground" />
                                 <Input
                                     placeholder="Twitter"
                                     value={twitterHandle}
@@ -287,8 +287,8 @@ export const BioContent = ({
                             </div>
 
                             {/* Facebook */}
-                            <div className="flex items-center gap-3 px-4 py-2 border border-neutral-300 rounded-lg focus-within:border-blue-600">
-                                <FiFacebook size={20} className="text-neutral-600" />
+                            <div className="flex items-center gap-3 px-4 py-2 border border-border rounded-lg focus-within:border-blue-600">
+                                <FiFacebook size={20} className="text-muted-foreground" />
                                 <Input
                                     placeholder="Facebook"
                                     value={facebookHandle}

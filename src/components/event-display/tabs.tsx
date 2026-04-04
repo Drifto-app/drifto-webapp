@@ -132,7 +132,9 @@ export function Tabs({
                                 className={cn(
                                     "flex flex-col items-center border-b-3 cursor-pointer px-4 gap-1",
                                     "transition-all duration-200 ease-out",
-                                    isActive ? "pb-2 border-b-neutral-800" : "pb-0 opacity-50 border-transparent"
+                                    isActive
+                                        ? "pb-2 border-b-neutral-800 dark:border-b-blue-500 opacity-100"
+                                        : "pb-0 opacity-60 border-transparent"
                                 )}
                                 style={{
                                     color: isActive ? colors.active : colors.inactive
@@ -147,7 +149,14 @@ export function Tabs({
                                 >
                                     {item.icon}
                                 </span>
-                                <span className={cn(" mt-1 whitespace-nowrap", isActive ? "text-sm font-bold text-neutral-700" : "text-[14px] text-neutral-500")}>
+                                <span
+                                    className={cn(
+                                        "mt-1 whitespace-nowrap transition-colors",
+                                        isActive
+                                            ? "text-sm font-bold text-foreground dark:text-white"
+                                            : "text-[14px] text-muted-foreground dark:text-neutral-400",
+                                    )}
+                                >
                                     {item.label}
                                 </span>
                             </div>

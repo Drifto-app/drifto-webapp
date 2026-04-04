@@ -55,16 +55,16 @@ function Tab({ label, value, isActive, onClick }: TabProps) {
         className={cn(
           "flex flex-col items-center border-b-3 cursor-pointer px-4 transition-all gap-1",
           isActive
-            ? "pb-2 border-b-neutral-800"
-            : "pb-0 opacity-50 border-transparent"
+            ? "pb-2 border-b-neutral-800 dark:border-b-blue-500 opacity-100"
+            : "pb-0 opacity-60 border-transparent"
         )}
       >
         <span
           className={cn(
             "mt-1 whitespace-nowrap",
             isActive
-              ? "text-md font-bold text-neutral-700"
-              : "text-[15px] text-neutral-500"
+              ? "text-md font-bold text-foreground dark:text-white"
+              : "text-[15px] text-muted-foreground dark:text-neutral-400"
           )}
         >
           {label}

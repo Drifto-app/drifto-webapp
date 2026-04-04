@@ -187,17 +187,17 @@ export const ReportDrawer = ({
                                 key={reason.value}
                                 className={cn(
                                     "flex items-center justify-between py-4 cursor-pointer",
-                                    index !== reasons.length - 1 && "border-b border-neutral-200"
+                                    index !== reasons.length - 1 && "border-b border-border"
                                 )}
                                 onClick={() => handleReasonChange(reason.value)}
                             >
-                                <span className="text-sm text-neutral-800">{reason.label}</span>
+                                <span className="text-sm text-foreground">{reason.label}</span>
                                 <div
                                     className={cn(
                                         "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
                                         selectedReason === reason.value
                                             ? "border-blue-600 bg-blue-600"
-                                            : "border-neutral-300"
+                                            : "border-border"
                                     )}
                                 >
                                     {selectedReason === reason.value && (
@@ -217,7 +217,7 @@ export const ReportDrawer = ({
                                 value={description}
                                 onChange={handleDescriptionChange}
                                 placeholder="Describe the issue..."
-                                className="w-full min-h-[100px] p-3 border border-neutral-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full min-h-[100px] p-3 border border-border rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 maxLength={500}
                             />
                             <div className="text-right text-xs text-neutral-400">

@@ -63,7 +63,7 @@ export const EventFavouriteCard = ({
                         style={{ maxHeight: "30vh" }}
                         onClick={() => {router.push(`/m/events/${eventContent.eventId}?prev=${encodeURIComponent(`/?screen=profile`)}`)}}
                     />
-                    {eventContent.original && <span className="absolute top-4 left-2 rounded-full py-2 px-2 text-xs shadow-md font-semibold bg-white">
+                    {eventContent.original && <span className="absolute top-4 left-2 rounded-full bg-background py-2 px-2 text-xs shadow-md font-semibold text-foreground">
                             Drifto Original
                     </span>}
                     <div className="p-3 absolute top-3 right-2 z-1000 h-15 w-15" onClick={handleReaction}>

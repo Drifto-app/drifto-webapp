@@ -13,6 +13,7 @@ import { IoChatbubbleEllipsesOutline, IoSend } from 'react-icons/io5';
 import { showTopToast } from "../toast/toast-util";
 import { useAuthStore } from '@/store/auth-store';
 import { FaRegCommentDots } from 'react-icons/fa';
+import { CommentThreadSkeleton } from "@/components/ui/page-skeletons";
 
 interface SingleEventReviewsProps extends React.ComponentProps<"div">{
     event: {[key: string]: any};
@@ -192,10 +193,10 @@ export const SingleEventReviews = ({
             <div className={cn(
                 "w-full flex flex-col items-center justify-center min-h-[85vh]",
                 className,
-                event.eventTheme !== null ? "" : "bg-neutral-100",
+                event.eventTheme !== null ? "" : "bg-muted/40",
             )} {...props}>
-                <div className="w-full h-full flex flex-col items-center justify-center">
-                    <Loader className="h-10 w-10"/>
+                <div className="w-full">
+                    <CommentThreadSkeleton count={4} />
                 </div>
             </div>
         );
@@ -207,7 +208,7 @@ export const SingleEventReviews = ({
             <div className={cn(
                 "w-full flex flex-col items-center justify-center min-h-[85vh]",
                 className,
-                event.eventTheme !== null ? "" : "bg-neutral-100",
+                event.eventTheme !== null ? "" : "bg-muted/40",
             )} {...props}>
                 <div className="w-full h-full flex flex-col items-center justify-center">
                     <h2>Unable to load comments</h2>
@@ -220,11 +221,11 @@ export const SingleEventReviews = ({
         <div className={cn(
             "w-full min-h-[85vh] pb-20",
             className,
-            event.eventTheme !== null ? "" : "bg-neutral-100",
+            event.eventTheme !== null ? "" : "bg-muted/40",
         )} {...props}>
 
             <div className="w-full flex flex-col gap-4 px-4">
-                <h1 className="text-md font-semibold text-neutral-800 pt-4">
+                <h1 className="text-md font-semibold text-foreground pt-4">
                     Event Reviews ({numOfComments})
                 </h1>
             </div>
@@ -244,7 +245,7 @@ export const SingleEventReviews = ({
             {isAuthenticated &&
               <form
                 onSubmit={handleCommentSubmit}
-                className="fixed inset-x-0 z-60 border-t bg-white border-neutral-200 safe-area-inset-bottom flex flex-row"
+                className="fixed inset-x-0 z-60 border-t bg-background border-border safe-area-inset-bottom flex flex-row"
                 style={{
                     bottom: keyboardOffset,
                     transition: "bottom 0.2s ease",
@@ -262,7 +263,7 @@ export const SingleEventReviews = ({
                   <div className="flex items-center py-0 px-3">
                       <button className={cn(
                         "p-3 rounded-full",
-                        comment.length === 0 ? "bg-neutral-300" : "bg-blue-700"
+                        comment.length === 0 ? "bg-muted" : "bg-blue-700"
                       )} type="submit" disabled={comment.length === 0 || submitCommentLoading}>
                           {
                               !submitCommentLoading

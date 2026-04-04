@@ -16,7 +16,7 @@ function EventSingleContent({ className, children, ...props }: EventSingleConten
         <div
             data-slot="input"
             className={cn(
-                "flex flex-row gap-4 rounded-2xl bg-white w-full py-3 px-4 items-center justify-start shadow-md",
+                "flex flex-row gap-4 rounded-2xl bg-background w-full py-3 px-4 items-center justify-start shadow-md",
                 className
             )}
             {...props}
@@ -31,7 +31,7 @@ function EventSingleContentText({ headText, isLine = true, className, children, 
         <div
             data-slot="input"
             className={cn(
-                "flex flex-col gap-4 rounded-2xl bg-white w-full py-4 px-6 items-center justify-start shadow-md",
+                "flex flex-col gap-4 rounded-2xl bg-background w-full py-4 px-6 items-center justify-start shadow-md",
                 className
             )}
             {...props}

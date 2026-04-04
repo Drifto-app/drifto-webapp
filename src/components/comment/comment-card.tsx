@@ -112,7 +112,7 @@ export const CommentCard = ({
         <>
             <div
                 className={cn(
-                    "flex flex-col gap-2 py-5 px-6 border border-neutral-200 rounded-lg bg-white",
+                    "flex flex-col gap-2 py-5 px-6 border border-border rounded-lg bg-background",
                     className
                 )}
                 {...props}
@@ -140,7 +140,7 @@ export const CommentCard = ({
                 </div>
 
                 {/* comment text */}
-                <Linkify text={comment.comment} className="text-neutral-800 text-sm mt-3 mb-5" />
+                <Linkify text={comment.comment} className="text-foreground text-sm mt-3 mb-5" />
 
                 {/* actions */}
                 <div className="flex items-center justify-between gap-6 text-neutral-400 font-bold">

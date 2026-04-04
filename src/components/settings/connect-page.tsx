@@ -21,7 +21,7 @@ const PLACEHOLDER_LINKS = {
 
 export const ConnectPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev");
+    const prev = searchParams?.get("prev") ?? null;
 
 
     return (
@@ -50,8 +50,8 @@ export const ConnectContent = ({ prev, className, ...props }: ConnectContentProp
 
     const RowLink: React.FC<{ href: string; label: string } & React.ComponentProps<"a">> = ({ href, label, ...anchorProps }) => (
         <a href={href} target="_blank" rel="noopener noreferrer" {...anchorProps}>
-            <div className="w-full p-4 border border-neutral-300 rounded-md bg-neutral-100 cursor-pointer">
-                <span className="text-base font-medium text-neutral-900">{label}</span>
+            <div className="w-full p-4 border border-border rounded-md bg-muted/40 cursor-pointer">
+                <span className="text-base font-medium text-foreground">{label}</span>
             </div>
         </a>
     );
@@ -59,17 +59,17 @@ export const ConnectContent = ({ prev, className, ...props }: ConnectContentProp
 
     return (
         <div className={cn("w-full min-h-[100dvh] flex flex-col", className)} {...props}>
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         Connect
                     </p>
                     <div className="w-5" />
@@ -88,7 +88,7 @@ export const ConnectContent = ({ prev, className, ...props }: ConnectContentProp
             </div>
 
 
-            <div className="w-full flex items-center justify-center border-t border-neutral-200">
+            <div className="w-full flex items-center justify-center border-t border-border">
                 <div className="w-20 flex flex-row items-center py-4">
                     <Image
                         src={"/logo-extend.png"}

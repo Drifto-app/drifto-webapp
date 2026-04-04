@@ -24,14 +24,14 @@ export default function HomeContent() {
   const { user } = useAuthStore.getState();
   const { isAuthenticated, isLoading, hasTriedRefresh, locationPublic } = useAuthStore();
 
-  const screen = searchParams.get("screen");
+  const screen = searchParams?.get("screen");
 
   const [activeScreen, setActiveScreen] = useState<string>(screen ?? "events");
   const [location, setLocation] = useState<string | null>(isAuthenticated ? user?.city : locationPublic?.city);
   const eventDisplayRef = useRef<EventDisplayRef>(null);
 
   const handleScreen = (value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
     params.set("screen", value);
     router.replace(`?${params.toString()}`);
 
@@ -61,7 +61,7 @@ export default function HomeContent() {
         return <ProfileDisplay handleScreenChange={handleScreen} />;
       default:
         return (
-          <div className="w-full flex-1 bg-neutral-50">
+          <div className="w-full flex-1 bg-background">
             <HeaderMobile
               location={location}
               setLocation={setLocation}
@@ -77,7 +77,7 @@ export default function HomeContent() {
     return (
       <ScreenProvider>
         <div className="min-h-[100dvh] flex flex-col w-full">
-          <div className="w-full flex-1 bg-neutral-50">
+          <div className="w-full flex-1 bg-background">
             <HeaderMobile
               location={location}
               setLocation={setLocation}

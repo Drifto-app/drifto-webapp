@@ -26,16 +26,17 @@ export const EventTagDialog= ({
     currentEventTags, onTagAdd, onTagRemove
 }: EventTagDialogProps) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const availableTags = useEventTags().filter((tag): tag is { name: string } => Boolean(tag?.name));
+    const selectedTagsText =
+        currentEventTags.length > 0 ? currentEventTags.join(", ") : "Select event tags";
 
     return (
         <>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
-                  <div className=" w-full py-3 px-4 bg-white rounded-md text-wrap flex flex-row justify-between items-center cursor-pointer hover:bg-neutral-300 transition-colors border-1 border-b-neutral-200">
+                  <div className=" w-full py-3 px-4 bg-background rounded-md text-wrap flex flex-row justify-between items-center cursor-pointer hover:bg-muted transition-colors border-1 border-border">
                             <span className="text-sm w-[85%]">
-                            {
-                                currentEventTags.length > 1 ? currentEventTags.join(", ") : currentEventTags[0]
-                            }
+                            {selectedTagsText}
                         </span>
                       <CiEdit size={22} />
                   </div>
@@ -45,7 +46,7 @@ export const EventTagDialog= ({
                       <DialogTitle>Select event tags</DialogTitle>
                   </DialogHeader>
                   <div className="grid grid-cols-2 gap-3 max-h-100 overflow-y-auto flex-grow no-scrollbar">
-                      {useEventTags().map((tag, index) => {
+                      {availableTags.map((tag, index) => {
                           const isSelected = currentEventTags.includes(tag.name);
                           return (
                               <Button

@@ -8,14 +8,15 @@ import {useEffect, useState} from "react";
 import {authApi} from "@/lib/axios";
 import {MdErrorOutline} from "react-icons/md";
 import * as React from "react";
-import {Loader} from "@/components/ui/loader";
 import { useAuthStore } from '@/store/auth-store';
+import { OrderPageSkeleton } from "@/components/ui/page-skeletons";
 
 export default function OrderPage() {
-    const { id } = useParams();
+    const params = useParams<{ id: string }>();
+    const id = params?.id;
     const searchParams = useSearchParams();
 
-    const prev = searchParams.get("prev");
+    const prev = searchParams?.get("prev") ?? null;
 
     const { isAuthenticated, isLoading, hasTriedRefresh } = useAuthStore();
 
@@ -68,9 +69,7 @@ export default function OrderPage() {
     if(loading) {
         return (
           <ScreenProvider>
-              <div className="w-full h-screen flex flex-col items-center justify-center">
-                  <Loader className="h-10 w-10"/>
-              </div>
+              <OrderPageSkeleton />
           </ScreenProvider>
         )
     }

@@ -37,7 +37,7 @@ export const EventReferralCard = ({
     <>
       <div
         className={cn(
-          "w-full flex px-4 py-4 border-neutral-300 border-1 justify-between rounded-md items-center",
+          "w-full flex px-4 py-4 border-border border-1 justify-between rounded-md items-center",
           className
         )}
         {...props}
@@ -188,7 +188,7 @@ export const NewEventReferralCard = ({
               placeholder="Enter Code"
               value={referralCode}
               onChange={(e) => handleReferralCodeChange(e.target.value)}
-              className="py-6 bg-white"
+              className="py-6 bg-background"
               aria-invalid={isInvalidReferral}
             />
             {isInvalidReferral && (
@@ -284,7 +284,7 @@ export const EditEventReferralCard = ({
               placeholder="Enter Code"
               value={referralCode}
               onChange={(e) => handleReferralCodeChange(e.target.value)}
-              className="py-6 bg-white"
+              className="py-6 bg-background"
               aria-invalid={isInvalidReferral}
             />
             {isInvalidReferral && (
@@ -350,7 +350,7 @@ export const DeleteEventReferralCard = ({
         <DialogHeader>
           <DialogTitle>Delete Event Referral</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete event referral? <span className="font-bold text-black">{referralContent.referralCode}</span>
+            Are you sure you want to delete event referral? <span className="font-bold text-foreground">{referralContent.referralCode}</span>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="w-full flex flex-row sm:justify-between justify-between px-4 sm:px-20">
@@ -358,7 +358,7 @@ export const DeleteEventReferralCard = ({
             <Button
               type="button"
               variant="default"
-              className="text-md bg-neutral-300 text-black hover:bg-neutral-300 py-6 px-8 font-semibold"
+              className="text-md bg-muted text-foreground hover:bg-muted py-6 px-8 font-semibold"
             >
               Cancel
             </Button>

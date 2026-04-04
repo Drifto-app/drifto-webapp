@@ -7,7 +7,7 @@ import {CreateEventContent} from "@/components/create-event/create-event-content
 
 export default function CreateEventComponent () {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
 
     return (
         <ProtectedRoute>

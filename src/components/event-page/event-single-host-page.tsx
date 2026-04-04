@@ -13,6 +13,8 @@ import { CoHostManage } from "@/components/event-page/co-host-manage";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { EventReferral } from '@/components/event-page/event-referral';
+import { useTheme } from 'next-themes';
+import { getEventThemeBackground } from '@/lib/event-theme';
 
 interface SingleEventHostPageProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
@@ -27,7 +29,8 @@ export default function SingleEventHostPage(
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const urlScreen = searchParams.get("screen");
+    const urlScreen = searchParams?.get("screen");
+    const { resolvedTheme } = useTheme();
     const [activeScreen, setActiveScreen] = useState<string>(urlScreen ?? "details");
     const [screenTitle, setScreenTitle] = useState<string>("Manage Event");
     const [editedTheme, setEditedTheme] = useState<[string, string] | null>(null);
@@ -60,11 +63,8 @@ export default function SingleEventHostPage(
     // const gradient = useSpotGradient(event.eventTheme);
     const containerStyle = useMemo(() => {
         const themeToUse = activeScreen === "edit" && editedTheme ? editedTheme : event?.eventTheme;
-        const t = themeToUse as [string, string] | undefined;
-        if (!t) return undefined;
-        const [c1, c2] = t;
-        return { background: `linear-gradient(to bottom, ${c1}, ${c2})` } as const;
-    }, [event, editedTheme, activeScreen]);
+        return getEventThemeBackground(themeToUse, resolvedTheme);
+    }, [event, editedTheme, activeScreen, resolvedTheme]);
 
 
     const handleBackClick = () => {
@@ -78,7 +78,7 @@ export default function SingleEventHostPage(
     };
 
     const handleScreen = (value: string, title?: string) => {
-        const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams(searchParams?.toString() ?? "");
         params.set("screen", value);
         router.replace(`?${params.toString()}`);
 
@@ -153,7 +153,7 @@ export default function SingleEventHostPage(
             className={cn(
                 "flex flex-col w-full min-h-[100dvh]",
                 className,
-                event.eventTheme !== null ? "" : "bg-neutral-100",
+                "bg-background text-foreground",
             )}
             style={activeScreen === "details" || activeScreen === "edit" ? containerStyle : undefined}
             {...props}

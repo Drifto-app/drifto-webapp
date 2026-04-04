@@ -191,7 +191,7 @@ function NotificationsDisplay() {
       })}
       {isLoadingMore && (
         <div className="flex justify-center items-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground"></div>
         </div>
       )}
     </div>
@@ -201,12 +201,12 @@ function NotificationsDisplay() {
 function NotificationSkeleton() {
   return (
     <div className="p-3 border-b border-b-neutral-400 flex gap-4 items-center">
-      <div className="bg-neutral-300 p-2 rounded-2xl w-12 h-12 animate-pulse"></div>
+      <div className="bg-muted p-2 rounded-2xl w-12 h-12 animate-pulse"></div>
       <div className="flex-1">
-        <div className="h-5 bg-neutral-300 rounded w-3/4 mb-2 animate-pulse"></div>
-        <div className="h-4 bg-neutral-300 rounded w-full animate-pulse"></div>
+        <div className="h-5 bg-muted rounded w-3/4 mb-2 animate-pulse"></div>
+        <div className="h-4 bg-muted rounded w-full animate-pulse"></div>
       </div>
-      <div className="h-4 bg-neutral-300 rounded w-16 animate-pulse"></div>
+      <div className="h-4 bg-muted rounded w-16 animate-pulse"></div>
     </div>
   );
 }
@@ -286,7 +286,7 @@ function NotificationComponent({
 
   return (
     <div
-      className="p-3 border-b border-b-neutral-400 flex gap-4 items-center hover:bg-neutral-50 transition-colors cursor-pointer"
+      className="p-3 border-b border-b-neutral-400 flex gap-4 items-center hover:bg-background transition-colors cursor-pointer"
       onClick={handleNotificationClick}
     >
       <div className="bg-black p-3 rounded-md w-12 flex-shrink-0">

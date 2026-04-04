@@ -1,5 +1,6 @@
-import { ComponentProps, useEffect } from "react";
+import { ComponentProps, useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { DEFAULT_EVENT_THEME } from "@/lib/event-theme";
 
 interface EventThemeSelectorProps extends ComponentProps<"div"> {
     currentEventTheme: [string, string];
@@ -12,9 +13,9 @@ interface EventThemeType {
     vibe: string;
 }
 
-let eventThemes: EventThemeType[] = [
+const eventThemes: EventThemeType[] = [
     {
-        colors: ['#fff', '#fff'],
+        colors: DEFAULT_EVENT_THEME,
         name: 'Drifto Classic',
         vibe: 'Clean and versatile',
     },
@@ -52,6 +53,7 @@ let eventThemes: EventThemeType[] = [
         colors: ['#ee9ca7', '#ffdde1'],
         name: 'Rose Drift',
         vibe: 'Romantic, gentle, inviting',
+
     },
     {
         colors: ['#96fbc4', '#f9f586'],
@@ -109,25 +111,27 @@ export const EventThemeSelector = ({
     currentEventTheme, setEventTheme, className, ...props
 }: EventThemeSelectorProps) => {
 
-    useEffect(() => {
-        const colorIndex = eventThemes.findIndex((item) => {
-            return eqArrValue(item.colors, currentEventTheme)
-        });
-        eventThemes = [eventThemes[colorIndex], ...eventThemes.slice(0, colorIndex), ...eventThemes.slice(colorIndex + 1)];
-    }, []);
-
-    const handleClick = (item: EventThemeType) => {
-        // if (currentEventTheme === item.colors) {
-        //     setEventTheme(null)
-        //     return;
-        // }
-
-        setEventTheme(item.colors)
-    }
-
     const eqArrValue = (a: [string, string], b: [string, string]) =>
         a[0].toLowerCase() === b[0].toLowerCase() &&
         a[1].toLowerCase() === b[1].toLowerCase();
+
+    const orderedThemes = useMemo(() => {
+        const colorIndex = eventThemes.findIndex((item) => eqArrValue(item.colors, currentEventTheme));
+
+        if (colorIndex <= 0) {
+            return eventThemes;
+        }
+
+        return [
+            eventThemes[colorIndex],
+            ...eventThemes.slice(0, colorIndex),
+            ...eventThemes.slice(colorIndex + 1),
+        ];
+    }, [currentEventTheme]);
+
+    const handleClick = (item: EventThemeType) => {
+        setEventTheme(item.colors)
+    }
 
     return (
         <div
@@ -137,10 +141,10 @@ export const EventThemeSelector = ({
             )}
             {...props}
         >
-            {eventThemes.map((item, index) => (
+            {orderedThemes.map((item, index) => (
                 <div
                     key={index}
-                    className={`flex flex-col justify-center px-4 py-5 rounded-md w-40 shrink-0 cursor-pointer border-2 ${item.name === "Drifto Classic" ? "text-black" : "text-white"} ${eqArrValue(item.colors, currentEventTheme) ? " border-neutral-950" : "border-white"}`}
+                    className={`flex flex-col justify-center px-4 py-5 rounded-md w-40 shrink-0 cursor-pointer border-2 transition-colors ${item.name === "Drifto Classic" ? "text-black" : "text-white"} ${eqArrValue(item.colors, currentEventTheme) ? "border-neutral-950 dark:border-blue-500" : "border-white/70"}`}
                     style={{
                         background: `linear-gradient(to right, ${item.colors[0]}, ${item.colors[1]})`,
                     }}

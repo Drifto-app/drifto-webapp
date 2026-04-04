@@ -464,7 +464,7 @@ export const SignUpForm = ({
                             checked={isAgreed}
                             onChange={(e) => setIsAgreed(e.target.checked)}
                             required
-                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            className="h-4 w-4 rounded border-border text-blue-600 focus:ring-blue-500"
                         />
                         <label htmlFor="isAgreed" className="text-sm">
                             Agree to{' '}

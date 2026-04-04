@@ -173,7 +173,7 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
                 <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                     <DialogTrigger asChild>
                         <Button
-                            className="bg-neutral-300 text-black hover:bg-neutral-300"
+                            className="bg-muted text-foreground hover:bg-muted"
                             type="button"
                         >
                             Edit
@@ -201,13 +201,13 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
                                     placeholder="Description"
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    className="border border-neutral-300 focus:border-blue-600 focus:outline-hidden rounded-md py-2 px-3"
+                                    className="border border-border focus:border-blue-600 focus:outline-hidden rounded-md py-2 px-3"
                                 />
                             </div>
                             {/* Paid/Free Toggle */}
                             <div className="flex items-center justify-between py-2">
                                 <div className="flex flex-col">
-                                    <Label className="text-neutral-700 font-medium">
+                                    <Label className="text-muted-foreground font-medium">
                                         {isPaid ? "Paid Ticket" : "Free Ticket"}
                                     </Label>
                                     <span className="text-xs text-neutral-500">
@@ -260,7 +260,7 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
                                     <Button
                                         type="button"
                                         variant="outline"
-                                        className="text-md border-neutral-400 text-neutral-500 hover:bg-neutral-300 py-6 px-8 font-semibold"
+                                        className="text-md border-neutral-400 text-neutral-500 hover:bg-muted py-6 px-8 font-semibold"
                                     >
                                         Cancel
                                     </Button>

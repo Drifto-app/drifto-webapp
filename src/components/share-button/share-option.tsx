@@ -107,17 +107,17 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({
 
             {/* Panel */}
             <Dialog.Panel
-                className="relative bg-white w-full max-w-md mx-4 mb-0 sm:mb-4
+                className="relative bg-background w-full max-w-md mx-4 mb-0 sm:mb-4
                rounded-t-2xl sm:rounded-2xl shadow-xl
                max-h-[80vh] flex flex-col"
             >
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between p-4 border-b border-border">
                     <div className="flex items-center gap-3">
-                        <IoShareSocialOutline size={24} className="text-gray-700" />
+                        <IoShareSocialOutline size={24} className="text-muted-foreground" />
                         <Dialog.Title className="text-lg font-semibold text-gray-900">Share Event</Dialog.Title>
                     </div>
-                    <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 transition-colors">
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-muted transition-colors">
                         <MdCancel size={24} className="text-gray-500" />
                     </button>
                 </div>
@@ -135,7 +135,7 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({
                         {isNativeShareSupported && (
                             <button
                                 onClick={handleNativeShare}
-                                className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors"
+                                className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-accent/40 transition-colors"
                             >
                                 <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
                                     <IoShareSocialOutline size={24} className="text-white" />
@@ -149,7 +149,7 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({
 
                         <button
                             onClick={handleCopyLink}
-                            className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors"
+                            className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-accent/40 transition-colors"
                         >
                             <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
                                 <FaCopy size={20} className="text-white" />
@@ -164,7 +164,7 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({
                             <button
                                 key={option.name}
                                 onClick={option.onClick}
-                                className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors"
+                                className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-accent/40 transition-colors"
                             >
                                 <div className={`w-12 h-12 ${option.color} rounded-full flex items-center justify-center`}>
                                     <div className="text-white">{option.icon}</div>

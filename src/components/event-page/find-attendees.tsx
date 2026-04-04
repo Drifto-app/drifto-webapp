@@ -196,7 +196,7 @@ export const FindAttendees = ({
                         placeholder="Search username, email or ticket reference"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-6 rounded-full bg-gray-100 focus:bg-white"
+                        className="w-full pl-10 pr-4 py-6 rounded-full bg-muted focus:bg-background"
                     />
                 </div>
 
@@ -208,7 +208,7 @@ export const FindAttendees = ({
                     {tickets.map((ticket) => (
                         <div
                             key={ticket.id}
-                            className="flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden"
+                            className="flex flex-col bg-background rounded-xl border border-border overflow-hidden"
                         >
                             {/* Main Card Row */}
                             <div className="flex items-center justify-between p-4">
@@ -243,7 +243,7 @@ export const FindAttendees = ({
                                 {/* More Options Button */}
                                 <button
                                     onClick={() => handleToggleExpand(ticket.id)}
-                                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                                    className="p-2 rounded-full hover:bg-muted transition-colors"
                                 >
                                     <CgMoreO className="w-6 h-6 text-blue-600" />
                                 </button>

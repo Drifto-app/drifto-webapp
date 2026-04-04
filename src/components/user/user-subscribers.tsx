@@ -8,6 +8,7 @@ import {ChevronDown} from "lucide-react";
 import {Loader} from "@/components/ui/loader";
 import {EventFavouriteCard} from "@/components/profile-display/event-favourite-card";
 import {UserSubscriberCard} from "@/components/user/user-subscriber-card";
+import { UserListSkeleton } from "@/components/ui/page-skeletons";
 
 interface UserSubscribersProps extends ComponentProps<"div"> {}
 
@@ -135,27 +136,29 @@ export const UserSubscribers = ({
             >
 
                 <div className="flex flex-col gap-6 px-4">
-                    {users.map((user) => (
-                        <UserSubscriberCard
-                            key={user.userId}
-                            user={user}
-                            onUserChange={(user: {[key: string]: any}) => {
-                                setUsers(
-                                    (items) => items.map((item) => {
-                                        if(item.userId === user.userId) {
-                                            return user
-                                        }
-                                        return item;
-                                    })
-                                );
-                            }}
-                        />
-                    ))}
+                    {loading && users.length === 0
+                        ? <UserListSkeleton count={5} />
+                        : users.map((user) => (
+                            <UserSubscriberCard
+                                key={user.userId}
+                                user={user}
+                                onUserChange={(user: {[key: string]: any}) => {
+                                    setUsers(
+                                        (items) => items.map((item) => {
+                                            if(item.userId === user.userId) {
+                                                return user
+                                            }
+                                            return item;
+                                        })
+                                    );
+                                }}
+                            />
+                        ))}
                 </div>
 
                 <div ref={sentinelRef} aria-hidden className="h-1" />
 
-                {loading && (
+                {loading && users.length > 0 && (
                     <div className="flex justify-center py-4">
                         <Loader className="h-8 w-8"/>
                     </div>
@@ -206,9 +209,9 @@ const FilterDropdown = ({
             <div className="relative mb-4" ref={dropdownRef}>
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center justify-between w-36 py-2 text-left bg-white rounded-lg border-none outline-none"
+                    className="flex items-center justify-between w-36 py-2 text-left bg-background rounded-lg border-none outline-none"
                 >
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-muted-foreground">
                         {selectedOption?.label || "Select filter"}
                     </span>
                     <ChevronDown
@@ -220,7 +223,7 @@ const FilterDropdown = ({
                 </button>
 
                 {isOpen && (
-                    <div className="absolute z-10 w-36 mt-1 bg-white border border-gray-300 rounded-sm shadow-lg">
+                    <div className="absolute z-10 w-36 mt-1 bg-background border border-border rounded-sm shadow-lg">
                         <div className="">
                             {FILTER_OPTIONS.map((option, index) => (
                                 <button
@@ -229,7 +232,7 @@ const FilterDropdown = ({
                                         onFilterChange(option.value);
                                         setIsOpen(false);
                                     }}
-                                    className={`w-full px-4 py-3 text-left text-sm  border-b border-neutral-300 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 text-gray-700`}
+                                    className={`w-full px-4 py-3 text-left text-sm  border-b border-border hover:bg-accent/40 focus:outline-none focus:bg-accent/40 text-muted-foreground`}
                                 >
                                     {option.label}
                                 </button>
