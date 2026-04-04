@@ -199,11 +199,11 @@ export const PaymentContent = ({
             default:
                 return (
                     <div className="w-full flex flex-col items-center px-4 gap-4 pt-4">
-                        {/*<div className="flex flex-row items-center px-4 py-4 w-full gap-4 rounded-md border-neutral-300 border-1">*/}
+                        {/*<div className="flex flex-row items-center px-4 py-4 w-full gap-4 rounded-md border-border border-1">*/}
                         {/*    <FiBell size={30} className="text-green-500" />*/}
                         {/*    <p className="text-neutral-500 font-medium text-lg">Want to pay differently? Just reselect ticket first</p>*/}
                         {/*</div>*/}
-                        <div className="w-full flex flex-col items-center px-4 py-4 gap-4 border-neutral-300 border-1 rounded-md">
+                        <div className="w-full flex flex-col items-center px-4 py-4 gap-4 border-border border-1 rounded-md">
                             <h3 className="w-full text-left font-bold text-lg">
                                 Order Summary
                             </h3>
@@ -212,13 +212,13 @@ export const PaymentContent = ({
                                     {item.ticketName} - Quantity: {item.amount}
                                 </p>
                             ))}
-                            <div className="w-full flex justify-between text-lg font-bold border-t-1 border-neutral-200 pt-4">
+                            <div className="w-full flex justify-between text-lg font-bold border-t-1 border-border pt-4">
                                 <p>Total:</p>
                                 <p>₦ {orderContent.totalPrice}</p>
                             </div>
                         </div>
                         <div className={cn(
-                            "w-full flex items-center px-4 my-4 border-neutral-300 border-1 rounded-md",
+                            "w-full flex items-center px-4 my-4 border-border border-1 rounded-md",
                             referralError ? "border-red-500" : "focus-within:border-blue-600"
                         )}>
                             <BsGrid3X3Gap size={20} className="text-neutral-400" />
@@ -234,7 +234,7 @@ export const PaymentContent = ({
                         {paymentsOptions.map((item: PaymentOptions, index: number) => (
                             <div
                                 key={index}
-                                className="w-full flex flex-row justify-start gap-6 border-1 border-neutral-200 p-4 rounded-md"
+                                className="w-full flex flex-row justify-start gap-6 border-1 border-border p-4 rounded-md"
                                 onClick={() => {
                                     setActiveScreen(item.value)
                                 }}
@@ -257,16 +257,16 @@ export const PaymentContent = ({
             {...props}
         >
             <div className={cn(
-                "w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center",
+                "w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center",
                 className
             )} {...props}>
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={16}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                     />
-                    <p className="font-semibold text-neutral-950 text-sm w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-sm w-full text-center capitalize truncate ml-4">
                         {title}
                     </p>
                 </div>

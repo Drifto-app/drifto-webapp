@@ -92,7 +92,7 @@ export const PostCard = ({
         <>
             <div
                 className={cn(
-                    "w-full py-4 border-b-1 border-b-neutral-200",
+                    "w-full py-4 border-b-1 border-border",
                     className,
                 )}
                 {...props}
@@ -170,7 +170,7 @@ export const PostCard = ({
                         }}
                     >
                         <span className="flex flex-col gap-2">
-                            <Linkify text={postContent.content} className="text-sm text-neutral-800" />
+                            <Linkify text={postContent.content} className="text-sm text-foreground" />
                             <span className="flex flex-wrap gap-1 text-blue-600" onClick={(e) => e.stopPropagation()}>
                                 {postContent.taggedUsers.map((tagUser: { [key: string]: any }) => (
                                     <a

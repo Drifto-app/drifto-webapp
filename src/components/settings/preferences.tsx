@@ -16,7 +16,7 @@ import {authApi} from "@/lib/axios";
 
 export const UserPreferencesPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
 
     return (
         <ProtectedRoute>
@@ -79,17 +79,17 @@ export const UserPreferencesContent = ({
 
     return (
         <div className={cn("w-full", className)} {...props}>
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         Preferences
                     </p>
                 </div>
@@ -101,7 +101,7 @@ export const UserPreferencesContent = ({
                     {eventTags.map((tag, index) => (
                         <span
                             key={index}
-                            className={`pt-2 pb-25 px-4 rounded-xl text-white font-bold border-3 ${colors[index % colors.length]} ${categories.includes(tag.name) ? "border-black" : "border-transparent"}`}
+                            className={`pt-2 pb-25 px-4 rounded-xl text-white font-bold border-3 ${colors[index % colors.length]} ${categories.includes(tag.name) ? "border-foreground" : "border-transparent"}`}
                             onClick={() => {
                                 setEdited(true);
                                  if(categories.includes(tag.name)) {

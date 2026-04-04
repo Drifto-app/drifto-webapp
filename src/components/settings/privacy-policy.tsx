@@ -92,7 +92,7 @@ const policies = [
 
 export const PrivacyPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev");
+    const prev = searchParams?.get("prev") ?? null;
 
     return (
         <ProtectedRoute>
@@ -117,17 +117,17 @@ export const PrivacyContent = ({ prev, className, ...props }: PrivacyContentProp
     return (
         <div className={cn("w-full min-h-[100dvh] flex flex-col", className)} {...props}>
             {/* Header */}
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         Privacy Policies
                     </p>
                     <div className="w-5" />
@@ -141,12 +141,12 @@ export const PrivacyContent = ({ prev, className, ...props }: PrivacyContentProp
                         <AccordionItem
                             key={p.id}
                             value={`policy-${p.id}`}
-                            className="border-b border-neutral-200"
+                            className="border-b border-border"
                         >
                             <AccordionTrigger className="text-left text-[16px] font-medium py-5 px-2 hover:no-underline">
                                 {p.title}
                             </AccordionTrigger>
-                            <AccordionContent className="text-[14px] text-neutral-600 px-2 pb-5">
+                            <AccordionContent className="text-[14px] text-muted-foreground px-2 pb-5">
                                 {p.content}
                             </AccordionContent>
                         </AccordionItem>

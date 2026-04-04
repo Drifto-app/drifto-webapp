@@ -11,7 +11,7 @@ import {UserPaymentInfo} from "@/components/wallet/user-payment-infos";
 
 export const PaymentSettingsPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
     const pathname = usePathname();
 
     return (
@@ -41,22 +41,22 @@ export const PaymentSettingsContent = ({
     return (
         <div
             className={cn(
-                "w-full min-h-[100dvh] flex flex-col bg-white",
+                "w-full min-h-[100dvh] flex flex-col bg-background",
                 className,
             )}
             {...props}
         >
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         Payment Settings
                     </p>
                     <div className="w-5" />
@@ -67,17 +67,17 @@ export const PaymentSettingsContent = ({
             <div className="w-full flex-1 flex flex-col gap-6 px-4 pt-6 pb-8">
                 {/* Wallet Section */}
                 <div
-                    className="w-full flex items-center justify-between py-4 cursor-pointer hover:bg-neutral-50 transition-colors rounded-lg px-2"
+                    className="w-full flex items-center justify-between py-4 cursor-pointer hover:bg-background transition-colors rounded-lg px-2"
                     onClick={() => router.push(`/m/wallet?prev=${encodeURIComponent(currentPathUrl)}`)}
                     role="button"
                     tabIndex={0}
                 >
-                    <h3 className="font-semibold text-lg text-neutral-950">Wallet</h3>
+                    <h3 className="font-semibold text-lg text-foreground">Wallet</h3>
                     <FaChevronRight size={16} className="text-neutral-400" />
                 </div>
 
                 <div className="w-full flex flex-col gap-4">
-                    <h3 className="font-semibold text-lg text-neutral-950">Manage Accounts</h3>
+                    <h3 className="font-semibold text-lg text-foreground">Manage Accounts</h3>
 
                     <UserPaymentInfo
                         detailsType="BANK_ACCOUNT_DETAILS"

@@ -16,7 +16,7 @@ import { IoIosHelpCircleOutline } from "react-icons/io";
 
 export const WalletPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
 
     const pathname = usePathname();
 
@@ -84,17 +84,17 @@ const WalletContent = ({
             )}
             {...props}
         >
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={16}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-sm w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-sm w-full text-center capitalize truncate ml-4">
                         Wallet
                     </p>
                     <div className="w-5" /> {/* Spacer for centering */}
@@ -112,9 +112,9 @@ const WalletContent = ({
                 </div>
                 <div className="w-full grid grid-cols-2 gap-5">
                     {actionButtons.map((item, index) => (
-                        <span key={index} className="flex gap-2 items-center px-2 py-3 rounded-md border-1 border-neutral-300 text-blue-800" onClick={item.onClick}>
+                        <span key={index} className="flex gap-2 items-center px-2 py-3 rounded-md border-1 border-border text-blue-800" onClick={item.onClick}>
                             {item.icon}
-                            <p className="text-base text-black">{item.text}</p>
+                            <p className="text-base text-foreground">{item.text}</p>
                         </span>
                     ))}
                 </div>

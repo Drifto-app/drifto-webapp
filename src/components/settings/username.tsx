@@ -17,7 +17,7 @@ import {Label} from "@/components/ui/label";
 
 export const UsernamePageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
     const pathname = usePathname();
 
     return (
@@ -137,17 +137,17 @@ export const UsernameContent = ({
             )}
             {...props}
         >
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         Username
                     </p>
                     <div className="w-5" />
@@ -156,7 +156,7 @@ export const UsernameContent = ({
             <div className="w-full flex-1 flex flex-col py-8 px-4 justify-between">
                 <div className="flex flex-col gap-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="username" className="text-sm font-medium text-neutral-700">
+                        <Label htmlFor="username" className="text-sm font-medium text-muted-foreground">
                             Username
                         </Label>
                         <div className="relative flex flex-row gap-2">

@@ -197,7 +197,7 @@ export const CoHostManage = ({
         >
             <div className="flex flex-col w-full gap-6">
                 <div className="w-full flex flex-col gap-2 pt-2">
-                    <h1 className="text-xl font-semibold text-neutral-800 pt-4">
+                    <h1 className="text-xl font-semibold text-foreground pt-4">
                         Add or Remove Co-Host
                     </h1>
                     <p className="text-neutral-400 font-semibold">
@@ -213,7 +213,7 @@ export const CoHostManage = ({
                             }
 
                             return (
-                                <li key={coHost.id} className="w-full py-4 px-4 rounded-xl outline-none border-neutral-200 border-1 shadow-none">
+                                <li key={coHost.id} className="w-full py-4 px-4 rounded-xl outline-none border-border border-1 shadow-none">
                                     <UserEventSinglePlaceholder
                                         user={coHost}
                                         key={coHost.id}
@@ -251,7 +251,7 @@ export const CoHostManage = ({
                                     placeholder="Search username"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-6 rounded-xl bg-gray-100 focus:bg-white"
+                                    className="w-full pl-10 pr-4 py-6 rounded-xl bg-muted focus:bg-background"
                                 />
                             </div>
                         </div>
@@ -266,7 +266,7 @@ export const CoHostManage = ({
                                     {filteredUsers.map((user) => (
                                         <div
                                             key={user.id}
-                                            className="flex items-center justify-between gap-3 p-3 w-full border-b-neutral-200 border-b-1"
+                                            className="flex items-center justify-between gap-3 p-3 w-full border-border border-b-1"
                                         >
                                             <div className="flex items-center justify-center gap-4" onClick={() => { handleUserClick(user.id) }}>
                                                 <div className="relative w-12 h-12 rounded-full flex items-center justify-center">

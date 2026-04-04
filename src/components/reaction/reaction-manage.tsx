@@ -12,6 +12,7 @@ import {useEffect, useRef, useCallback} from "react";
 import {Button} from "@/components/ui/button";
 import {UserSinglePlaceholder} from "@/components/ui/user-placeholder";
 import {showTopToast} from "@/components/toast/toast-util";
+import { UserListSkeleton } from "@/components/ui/page-skeletons";
 
 interface ReactionManageProps extends React.ComponentProps<"div">{
     entityId: string;
@@ -141,22 +142,22 @@ export default function ReactionManagePage(
                 className
             )} {...props}>
                 <div className={cn(
-                    "w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center",
+                    "w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center",
                     className
                 )} {...props}>
                     <div className="flex flex-row items-center px-8">
                         <FaArrowLeft
                             size={20}
                             onClick={handleBackClick}
-                            className="cursor-pointer hover:text-neutral-700 transition-colors"
+                            className="cursor-pointer hover:text-muted-foreground transition-colors"
                         />
-                        <p className="font-semibold text-neutral-950 text-xl w-full text-center capitalize truncate ml-4">
+                        <p className="font-semibold text-foreground text-xl w-full text-center capitalize truncate ml-4">
                             {title}
                         </p>
                     </div>
                 </div>
-                <div className="w-full h-screen flex flex-col items-center justify-center">
-                    <Loader className="h-10 w-10"/>
+                <div className="w-full px-4 py-4">
+                    <UserListSkeleton count={5} />
                 </div>
             </div>
         );
@@ -170,16 +171,16 @@ export default function ReactionManagePage(
                 className
             )} {...props}>
                 <div className={cn(
-                    "w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center",
+                    "w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center",
                     className
                 )} {...props}>
                     <div className="flex flex-row items-center px-8">
                         <FaArrowLeft
                             size={20}
                             onClick={handleBackClick}
-                            className="cursor-pointer hover:text-neutral-700 transition-colors"
+                            className="cursor-pointer hover:text-muted-foreground transition-colors"
                         />
-                        <p className="font-semibold text-neutral-950 text-xl w-full text-center capitalize truncate ml-4">
+                        <p className="font-semibold text-foreground text-xl w-full text-center capitalize truncate ml-4">
                             {<title></title>}
                         </p>
                     </div>
@@ -196,20 +197,20 @@ export default function ReactionManagePage(
             "w-full flex flex-col items-center justify-center pb-20",
             className
         )} {...props}>
-            <div className="w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center">
+            <div className="w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         {title}
                     </p>
                 </div>
             </div>
             <div className="w-full flex flex-col gap-4 px-4">
-                <h1 className="text-md font-semibold text-neutral-800 pt-4">
+                <h1 className="text-md font-semibold text-foreground pt-4">
                     {title} ({users.length})
                 </h1>
             </div>

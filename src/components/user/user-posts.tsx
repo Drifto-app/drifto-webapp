@@ -7,6 +7,7 @@ import {showTopToast} from "@/components/toast/toast-util";
 import {PostCard} from "@/components/post/post-card";
 import * as React from "react";
 import {Loader} from "@/components/ui/loader";
+import { PostFeedSkeleton } from "@/components/ui/page-skeletons";
 
 interface UserPostsProps extends ComponentProps<"div">{
     user: {[key:string]: any};
@@ -121,20 +122,24 @@ export const UserPosts = ({
             ref={scrollRootRef}
             style={{ maxHeight: "calc(100dvh - 80px)" }}
         >
-            <div className="flex flex-col gap-6">
-                {posts.map((post) => (
-                    <PostCard
-                        key={post.id}
-                        postContent={post}
-                        isForUser={isForUser}
-                        onDelete={(postId) => {setPosts((post) => post.filter(p => p.id !== postId))}}
-                    />
-                ))}
-            </div>
+            {loading && posts.length === 0 ? (
+                <PostFeedSkeleton />
+            ) : (
+                <div className="flex flex-col gap-6">
+                    {posts.map((post) => (
+                        <PostCard
+                            key={post.id}
+                            postContent={post}
+                            isForUser={isForUser}
+                            onDelete={(postId) => {setPosts((post) => post.filter(p => p.id !== postId))}}
+                        />
+                    ))}
+                </div>
+            )}
 
             <div ref={sentinelRef} aria-hidden className="h-1" />
 
-            {loading && (
+            {loading && posts.length > 0 && (
                 <div className="flex justify-center py-4">
                     <Loader className="h-8 w-8"/>
                 </div>

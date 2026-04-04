@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/drawer"
 import { Button } from "../ui/button";
 import DoughnutChart from "@/components/ui/doughnut-chart";
+import { StatCardSkeleton } from "@/components/ui/page-skeletons";
 
 interface EventEarningsProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
@@ -75,8 +76,8 @@ export const EventEarnings = ({
 
     if (loading) {
         return (
-            <div className="w-full flex-1 flex flex-col items-center justify-center">
-                <Loader className="h-10 w-10" />
+            <div className="w-full px-4 pt-5 pb-15">
+                <StatCardSkeleton count={5} />
             </div>
         )
     }
@@ -143,7 +144,7 @@ export const EventEarnings = ({
                     </DrawerTrigger>
                     <DrawerContent>
                         <div className="mx-auto w-full max-w-sm">
-                            <DrawerHeader className="border-b border-gray-200">
+                            <DrawerHeader className="border-b border-border">
                                 <DrawerTitle className="text-center text-lg">Ticket Details</DrawerTitle>
                             </DrawerHeader>
                             <div className="flex flex-col pb-8">
@@ -191,7 +192,7 @@ export const EventEarnings = ({
                                             </div>
                                             {/* Divider line between tickets */}
                                             {index < event.tickets.length - 1 && (
-                                                <div className="border-b border-gray-200" />
+                                                <div className="border-b border-border" />
                                             )}
                                         </div>
                                     );

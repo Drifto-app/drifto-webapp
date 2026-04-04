@@ -11,6 +11,7 @@ import { PiFireSimpleBold } from 'react-icons/pi';
 import { CiHeart } from 'react-icons/ci';
 import { FaRegHeart } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
+import { EventCardSkeleton } from "@/components/ui/page-skeletons";
 
 interface UserEventFavouritesProps extends ComponentProps<"div"> {
     handleScreenChange: (value: string) => void;
@@ -124,20 +125,24 @@ export const UserEventFavourites = ({
         >
 
             <div className="flex flex-col gap-8 px-4">
-                {events.map((event) => (
-                    <EventFavouriteCard
-                        eventContent={event}
-                        key={event.eventId}
-                        onUnReact={(eventId: string) => {
-                            setEvents((items) => items.filter(i => i.eventId !== eventId));
-                        }}
-                    />
-                ))}
+                {loading && events.length === 0
+                    ? Array.from({ length: 3 }).map((_, index) => (
+                        <EventCardSkeleton key={index} />
+                    ))
+                    : events.map((event) => (
+                        <EventFavouriteCard
+                            eventContent={event}
+                            key={event.eventId}
+                            onUnReact={(eventId: string) => {
+                                setEvents((items) => items.filter(i => i.eventId !== eventId));
+                            }}
+                        />
+                    ))}
             </div>
 
             <div ref={sentinelRef} aria-hidden className="h-1" />
 
-            {loading && (
+            {loading && events.length > 0 && (
                 <div className="flex justify-center py-4">
                     <Loader className="h-8 w-8"/>
                 </div>
@@ -147,7 +152,7 @@ export const UserEventFavourites = ({
               <div className="flex flex-col items-center gap-4 text-center max-w-md px-4">
                   <FaRegHeart size={40} className="text-blue-800"/>
                  <span className="flex flex-col gap-2">
-                      <p className="text-neutral-800 text-sm font-semibold">
+                      <p className="text-foreground text-sm font-semibold">
                         No liked event...yet!
                       </p>
                       <p className="text-neutral-500 text-xs">

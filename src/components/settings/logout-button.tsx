@@ -49,7 +49,7 @@ export const LogoutButton = ({
             <DialogTrigger asChild>
                 <div
                     className={cn(
-                        "w-full flex items-center gap-4 py-[18px] border-b-[1px] border-b-neutral-300 hover:bg-neutral-50 transition-colors cursor-pointer",
+                        "w-full flex items-center gap-4 py-[18px] border-b-[1px] border-border hover:bg-background transition-colors cursor-pointer",
                         className,
                     )}
                     role="button"
@@ -62,14 +62,14 @@ export const LogoutButton = ({
                     <p className="text-[17px] font-normal text-red-600">Sign out</p>
                 </div>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[400px] rounded-3xl p-6 bg-white border-neutral-200 text-neutral-900 shadow-xl">
+            <DialogContent className="sm:max-w-[400px] rounded-3xl p-6 bg-background border-border text-foreground shadow-xl">
                 <DialogTitle className="text-xl text-center font-semibold mb-2">Sign out</DialogTitle>
                 <DialogDescription className="text-md text-center text-neutral-500 mb-6">
                     Are you sure you want to sign out of your account?
                 </DialogDescription>
                 <DialogFooter className="w-full flex flex-row justify-between gap-4 px-2 mt-4">
                     <DialogClose asChild>
-                        <Button type="button" variant="outline" className="text-md flex-1 rounded-full py-6 border-neutral-300 hover:bg-neutral-100 bg-transparent text-neutral-900 font-medium transition-colors">
+                        <Button type="button" variant="outline" className="text-md flex-1 rounded-full py-6 border-border hover:bg-muted/40 bg-transparent text-foreground font-medium transition-colors">
                             Cancel
                         </Button>
                     </DialogClose>

@@ -9,14 +9,14 @@ import * as React from "react";
 import { useAuthStore } from "@/store/auth-store";
 import { authApi } from "@/lib/axios";
 import { MdErrorOutline } from "react-icons/md";
-import { Loader } from "@/components/ui/loader";
 import { UserEvents } from "@/components/user/user-events";
 import { cn } from "@/lib/utils";
+import { UserEventsPageSkeleton } from "@/components/ui/page-skeletons";
 
 export const UserEventsPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
-    const eventId = searchParams.get("id")
+    const prev = searchParams?.get("prev") ?? null
+    const eventId = searchParams?.get("id") ?? null
 
     return (
         <ProtectedRoute>
@@ -82,9 +82,7 @@ const UserEventsContent = ({
 
     if (loading) {
         return (
-            <div className="w-full h-screen flex flex-col items-center justify-center">
-                <Loader className="h-10 w-10" />
-            </div>
+            <UserEventsPageSkeleton />
         )
     }
 
@@ -96,14 +94,14 @@ const UserEventsContent = ({
             )}
             {...props}
         >
-            <div className={"w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center"}>
+            <div className={"w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center"}>
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={16}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                     />
-                    <p className="font-semibold text-neutral-950 text-sm w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-sm w-full text-center capitalize truncate ml-4">
                         {eventUser?.username}
                     </p>
                 </div>

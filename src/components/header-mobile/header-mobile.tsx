@@ -77,7 +77,7 @@ export const HeaderMobile = ({
             )}>
                 <div
                     className={cn(
-                        "rounded-full shadow-none border-none text-neutral-700 text-center font-black capitalize text-sm",
+                        "rounded-full border-none text-center text-sm font-black capitalize text-foreground shadow-none",
                         isAuthenticated ? "w-90 mb-3" : ""
                     )}
                     onClick={handleLocationClick}
@@ -97,15 +97,19 @@ export const HeaderMobile = ({
             </div>
 
             <div
-                className="w-9/10 max-w-xl flex flex-row items-center border rounded-full px-4 py-4 shadow-xl"
+                className="w-9/10 max-w-xl flex flex-row items-center rounded-full border bg-card/95 px-4 py-4 shadow-xl backdrop-blur-sm"
+                style={{
+                    borderColor: 'var(--home-search-border-color)',
+                    boxShadow: '0 18px 35px color-mix(in srgb, var(--home-search-border-color) 12%, transparent)',
+                }}
                 onClick={handleSearchClick}
             >
-                <IoSearchSharp size={20} />
+                <IoSearchSharp size={20} className="text-foreground" />
                 <div className="flex flex-col justify-center pl-4 h-full w-full mr-8">
                     <div className="h-5 overflow-hidden">
                         <span
                             key={lineIndex}
-                            className="block text-center text-sm font-semibold text-neutral-600 slide-up-animation truncate"
+                            className="slide-up-animation block truncate text-center text-sm font-semibold text-muted-foreground"
                         >
                             {FOLLOW_UP_LINES[lineIndex]}
                         </span>

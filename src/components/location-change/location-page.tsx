@@ -8,7 +8,7 @@ import { useAuthStore } from '@/store/auth-store';
 
 export default function LocationPageContent () {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
 
     const { isAuthenticated, isLoading, hasTriedRefresh } = useAuthStore();
 

@@ -7,10 +7,11 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoutes';
 import * as React from 'react';
 
 export default function PostPage() {
-  const { id } = useParams();
+  const params = useParams<{ id: string }>();
+  const id = params?.id;
 
   const queryParams = useSearchParams();
-  const prev = queryParams.get("prev");
+  const prev = queryParams?.get("prev") ?? null;
 
   const pathname = usePathname();
   const searchParams = useSearchParams();

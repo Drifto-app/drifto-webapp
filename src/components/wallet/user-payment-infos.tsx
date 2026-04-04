@@ -7,6 +7,7 @@ import {Loader} from "@/components/ui/loader";
 import {showTopToast} from "@/components/toast/toast-util";
 import {authApi} from "@/lib/axios";
 import {PaymentInfoCard} from "@/components/wallet/payment-info-card";
+import { UserListSkeleton } from "@/components/ui/page-skeletons";
 
 interface UserPaymentInfoProps extends ComponentProps<"div"> {
     onAccountsLoad?: (paymentInfos: Array<Record<string, any>>) => void;
@@ -150,21 +151,25 @@ export const UserPaymentInfo = ({
             style={{ maxHeight }}
             {...props}
         >
-            {paymentInfos.map((info) => (
-                <PaymentInfoCard
-                    key={info.id}
-                    info={info}
-                    isSelected={paymentInfo?.id === info.id}
-                    onSelect={() => handleSelect(info)}
-                    onDelete={handleDelete}
-                    showDelete={isManage}
-                />
-            ))}
+            {isPaymentInfoLoading && paymentInfos.length === 0 ? (
+                <UserListSkeleton count={3} />
+            ) : (
+                paymentInfos.map((info) => (
+                    <PaymentInfoCard
+                        key={info.id}
+                        info={info}
+                        isSelected={paymentInfo?.id === info.id}
+                        onSelect={() => handleSelect(info)}
+                        onDelete={handleDelete}
+                        showDelete={isManage}
+                    />
+                ))
+            )}
 
             {!isPaymentInfoLoading && paymentInfos.length === 0 && (
-                <div className="w-full flex items-center justify-between px-4 py-4 border border-neutral-300 rounded-lg">
+                <div className="w-full flex items-center justify-between px-4 py-4 border border-border rounded-lg">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-muted/40 flex items-center justify-center">
                             <svg
                                 width="20"
                                 height="20"
@@ -174,20 +179,20 @@ export const UserPaymentInfo = ({
                                 strokeWidth="2"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                className="text-neutral-600"
+                                className="text-muted-foreground"
                             >
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="12" cy="7" r="4"></circle>
                             </svg>
                         </div>
-                        <span className="text-neutral-950 font-medium">No account added</span>
+                        <span className="text-foreground font-medium">No account added</span>
                     </div>
                 </div>
             )}
 
             <span ref={sentinelRef} aria-hidden className="h-1" />
 
-            {isPaymentInfoLoading && (
+            {isPaymentInfoLoading && paymentInfos.length > 0 && (
                 <span className="flex justify-center py-4">
                     <Loader className="h-8 w-8"/>
                 </span>

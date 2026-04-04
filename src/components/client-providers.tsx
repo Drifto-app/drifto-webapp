@@ -5,14 +5,18 @@ import { Bounce, ToastContainer } from 'react-toastify';
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { EventTagsProvider } from "@/hooks/event-tags-providers";
-import {Toaster} from "sonner";
+import { useTheme } from 'next-themes';
+import { Toaster } from '@/components/ui/sonner';
+import { AppearanceProvider } from '@/components/appearance/appearance-provider';
 
 
 interface ClientProvidersProps {
     children: ReactNode;
 }
 
-export function ClientProviders({ children }: ClientProvidersProps) {
+function AppProviders({ children }: ClientProvidersProps) {
+    const { resolvedTheme } = useTheme();
+
     return (
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
             <AuthProvider>
@@ -28,7 +32,7 @@ export function ClientProviders({ children }: ClientProvidersProps) {
                         pauseOnFocusLoss
                         draggable
                         pauseOnHover
-                        theme="colored"
+                        theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
                         transition={Bounce}
                     />
                     <Toaster
@@ -44,5 +48,13 @@ export function ClientProviders({ children }: ClientProvidersProps) {
                 </EventTagsProvider>
             </AuthProvider>
         </GoogleOAuthProvider>
+    );
+}
+
+export function ClientProviders({ children }: ClientProvidersProps) {
+    return (
+        <AppearanceProvider>
+            <AppProviders>{children}</AppProviders>
+        </AppearanceProvider>
     );
 }

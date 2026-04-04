@@ -7,7 +7,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoutes";
 import { ScreenProvider } from "@/components/screen/screen-provider";
 import { UserPaymentInfo } from "@/components/wallet/user-payment-infos";
-import { Loader } from "@/components/ui/loader";
+import { UserListSkeleton } from "@/components/ui/page-skeletons";
 import { showTopToast } from "@/components/toast/toast-util";
 
 // Types
@@ -36,12 +36,13 @@ interface ErrorState {
 }
 
 export default function RefundPageComponent() {
-    const { id } = useParams();
+    const params = useParams<{ id: string }>();
+    const id = params?.id;
     const router = useRouter();
 
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
 
     // State management
     const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -144,7 +145,7 @@ export default function RefundPageComponent() {
         !selectedTicket || loading.refund || (selectedTicket.paid && !paymentInfo);
 
     return (
-        <div className="w-full min-h-[100dvh] bg-gray-50">
+        <div className="w-full min-h-[100dvh] bg-accent/40">
             <RefundHeader title="Request Refund" prev={prev} />
 
             <main className="p-4 pb-24">
@@ -207,7 +208,7 @@ export default function RefundPageComponent() {
             </main>
 
             {/* Confirm Button */}
-            <div className="fixed bottom-0 left-0 w-full border-t border-gray-300 bg-white p-4 flex justify-center">
+            <div className="fixed bottom-0 left-0 w-full border-t border-border bg-background p-4 flex justify-center">
                 <button
                     disabled={isConfirmDisabled}
                     onClick={handleConfirmRefund}
@@ -256,8 +257,8 @@ const TicketList: React.FC<TicketListProps> = ({
                         key={ticket.id}
                         onClick={() => onTicketSelect(ticket)}
                         className={`p-3 text-base font-normal rounded-md border-2 cursor-pointer transition-all hover:shadow-md ${isSelected
-                                ? "text-blue-700 border-blue-700 bg-blue-50"
-                                : "border-gray-300 hover:border-gray-400"
+                            ? "text-blue-700 border-blue-700 bg-blue-50"
+                            : "border-border hover:border-gray-400"
                             }`}
                     >
                         <span className="font-medium">{ticket.ticketName}</span>
@@ -279,8 +280,8 @@ interface LoadingSpinnerProps {
 }
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = () => (
-    <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-        <Loader />
+    <div className="py-4">
+        <UserListSkeleton count={3} />
     </div>
 );
 
@@ -334,16 +335,16 @@ const RefundHeader: React.FC<RefundHeaderProps> = ({ title, prev }) => {
     const router = useRouter();
 
     return (
-        <header className="w-full border-b border-gray-200 bg-white shadow-sm">
+        <header className="w-full border-b border-border bg-background shadow-sm">
             <div className="flex items-center justify-between px-4 py-4 h-16">
                 <button
                     onClick={() => router.push(prev || "/?screen=plans")}
-                    className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 transition-colors"
+                    className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-muted transition-colors"
                     aria-label="Go back"
                 >
-                    <FaArrowLeft size={16} className="text-gray-700" />
+                    <FaArrowLeft size={16} className="text-muted-foreground" />
                 </button>
-                <h1 className="font-semibold text-gray-900 text-base capitalize truncate flex-1 text-center mx-4">
+                <h1 className="font-semibold text-foreground text-base capitalize truncate flex-1 text-center mx-4">
                     {title}
                 </h1>
                 <div className="w-8 h-8" /> {/* Spacer for centering */}

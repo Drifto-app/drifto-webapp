@@ -77,7 +77,7 @@ export const RecentSearchCard = ({
                         </AspectRatio>
                     </div>
                     <div className="w-full max-w-[70%] flex flex-col">
-                        <p className="w-full capitalize text-black text-sm font-bold line-clamp-2">{item.title}</p>
+                        <p className="w-full capitalize text-foreground text-sm font-bold line-clamp-2">{item.title}</p>
                         <ul className="text-neutral-400 text-sm capitalize flex list-disc gap-5 font-medium truncate">
                             <li className="first:list-none">{type}</li>
                             <li>{formatedDate}</li>
@@ -114,7 +114,7 @@ export const RecentSearchCard = ({
                 </div>
                 <div className="w-full  max-w-[70%] flex flex-col" onClick={onClick}>
                     <div className="flex gap-2 items-center">
-                        <p className="text-black text-sm font-bold truncate">{item.username}</p>
+                        <p className="text-foreground text-sm font-bold truncate">{item.username}</p>
                         <UserVerificationBadge user={item} />
                     </div>
                     <p className="text-sm capitalize text-neutral-400">{type}</p>
@@ -155,8 +155,8 @@ export const SuggestionEventCard = ({
                     />
                 </AspectRatio>
                 {event.original && (
-                    <div className="absolute top-2 left-2 rounded-full bg-white px-2 py-[2px] shadow-md">
-                        <span className="text-[10px] font-semibold text-neutral-700 leading-0">
+                    <div className="absolute top-2 left-2 rounded-full bg-background px-2 py-[2px] shadow-md text-foreground">
+                        <span className="text-[10px] font-semibold text-muted-foreground leading-0">
                             Drifto Original
                         </span>
                     </div>
@@ -169,4 +169,3 @@ export const SuggestionEventCard = ({
         </div>
     )
 }
-

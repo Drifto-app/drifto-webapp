@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useMemo } from 'react';
 import { useRouter } from "next/navigation";
+import { useTheme } from 'next-themes';
+import { getEventThemeBackground, isEventThemeLight } from '@/lib/event-theme';
 
 interface SingleEventFooterProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
@@ -18,6 +20,9 @@ export const SingleEventFooter = ({
     currentPathUrl, event, isCoHost, setLoading, setActiveScreen, className, ...props
 }: SingleEventFooterProps) => {
     const router = useRouter();
+    const { resolvedTheme } = useTheme();
+    const footerStyle = getEventThemeBackground(event.eventTheme, resolvedTheme);
+    const isLightSurface = isEventThemeLight(event.eventTheme, resolvedTheme);
 
     const priceLabel = useMemo(() => {
         if (!event.tickets || event.tickets.length === 0) return "Unavailable";
@@ -43,21 +48,17 @@ export const SingleEventFooter = ({
         // This footer section is kept minimal for bottom spacing
         return (
             <div className={cn(
-                "fixed inset-x-0 bottom-0 z-60 border-t border-neutral-200",
+                "fixed inset-x-0 bottom-0 z-60 border-t border-border",
                 "safe-area-inset-bottom flex justify-center",
-                event.eventTheme !== null ? "bg-gradient-to-t" : "bg-neutral-100",
                 className
             )}
-                style={
-                    event.eventTheme
-                        ? {
-                            backgroundImage: `linear-gradient(to top, ${event.eventTheme[0]}, ${event.eventTheme[1]})`
-                        }
-                        : undefined
-                }
+                style={footerStyle}
                 {...props}>
                 <div className="w-full py-3 px-6">
-                    <p className="text-center text-xs text-neutral-500">
+                    <p className={cn(
+                        "text-center text-xs",
+                        isLightSurface ? "text-black/70" : "text-white/75"
+                    )}>
                         Swipe for more actions
                     </p>
                 </div>
@@ -67,23 +68,22 @@ export const SingleEventFooter = ({
 
     return (
         <div className={cn(
-            "fixed inset-x-0 bottom-0 z-60 border-t border-neutral-200",
+            "fixed inset-x-0 bottom-0 z-60 border-t border-border",
             "safe-area-inset-bottom",
-            event.eventTheme !== null ? "bg-gradient-to-t" : "bg-neutral-100",
             className
         )}
-            style={
-                event.eventTheme
-                    ? {
-                        backgroundImage: `linear-gradient(to top, ${event.eventTheme[0]}, ${event.eventTheme[1]})`
-                    }
-                    : undefined
-            }
+            style={footerStyle}
             {...props}>
             <div className="w-full flex flex-row items-center justify-between px-6 py-3">
                 <div>
-                    <p className="text-xs text-neutral-600">Starting:</p>
-                    <h3 className="font-bold text-lg">{priceLabel}</h3>
+                    <p className={cn(
+                        "text-xs",
+                        isLightSurface ? "text-black/65" : "text-white/70"
+                    )}>Starting:</p>
+                    <h3 className={cn(
+                        "font-bold text-lg",
+                        isLightSurface ? "text-black" : "text-white"
+                    )}>{priceLabel}</h3>
                 </div>
                 <Button
                     className="rounded-full px-5 py-6"

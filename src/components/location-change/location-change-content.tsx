@@ -99,19 +99,19 @@ export const LocationChangeContent = ({
       <div className={cn("w-full min-h-[100dvh] flex flex-col", className)} {...props}>
           <div
             className={cn(
-              "w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0"
+              "w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0"
             )}
           >
               <div className="flex flex-row items-center px-8">
                   <FaArrowLeft
                     size={20}
                     onClick={handleBackClick}
-                    className="cursor-pointer hover:text-neutral-700 transition-colors"
+                    className="cursor-pointer hover:text-muted-foreground transition-colors"
                     aria-label="Go back"
                     role="button"
                     tabIndex={0}
                   />
-                  <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                  <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                       Location
                   </p>
               </div>
@@ -129,7 +129,7 @@ export const LocationChangeContent = ({
                       </p>
                   </div>
 
-                  <div className="flex items-center justify-between h-16 px-4 gap-2 rounded-full border border-neutral-200">
+                  <div className="flex items-center justify-between h-16 px-4 gap-2 rounded-full border border-border">
                       {loadError && (
                         <span className="text-sm text-red-600">
                                  Failed to load Google Maps. Please refresh.
@@ -163,7 +163,7 @@ export const LocationChangeContent = ({
                   </div>
 
                   {state && (
-                    <p className="text-sm text-neutral-600 px-2">
+                    <p className="text-sm text-muted-foreground px-2">
                         Detected state: <span className="font-semibold">{state}</span>
                     </p>
                   )}

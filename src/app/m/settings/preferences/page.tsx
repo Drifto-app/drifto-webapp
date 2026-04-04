@@ -1,15 +1,11 @@
-import {Loader} from "@/components/ui/loader";
 import { Suspense } from "react";
 import {UserPreferencesPageContent} from "@/components/settings/preferences";
+import { SettingsDetailSkeleton } from "@/components/ui/page-skeletons";
 
 export default function PreferencesPage() {
 
     return (
-        <Suspense fallback={
-            <div className="w-full h-screen flex items-center justify-center">
-                <Loader />
-            </div>
-        }>
+        <Suspense fallback={<SettingsDetailSkeleton />}>
             <UserPreferencesPageContent />
         </Suspense>
     )

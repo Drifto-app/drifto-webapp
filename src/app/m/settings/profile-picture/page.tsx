@@ -1,15 +1,11 @@
-import {Loader} from "@/components/ui/loader";
 import {Suspense} from "react";
 import {ProfilePicturePageContent} from "@/components/settings/profile-picture";
+import { SettingsDetailSkeleton } from "@/components/ui/page-skeletons";
 
 export default function ProfilePicture() {
 
     return (
-        <Suspense fallback={
-            <div className="w-full h-screen flex items-center justify-center">
-                <Loader />
-            </div>
-        }>
+        <Suspense fallback={<SettingsDetailSkeleton />}>
             <ProfilePicturePageContent />
         </Suspense>
     )

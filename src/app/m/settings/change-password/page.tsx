@@ -1,15 +1,11 @@
 import {Suspense} from "react";
-import {Loader} from "@/components/ui/loader";
 import {PasswordPageContent} from "@/components/settings/change-password";
+import { SettingsDetailSkeleton } from "@/components/ui/page-skeletons";
 
 export default function ChangePasswordPage() {
 
     return (
-        <Suspense fallback={
-            <div className="w-full h-screen flex items-center justify-center">
-                <Loader />
-            </div>
-        }>
+        <Suspense fallback={<SettingsDetailSkeleton />}>
             <PasswordPageContent />
         </Suspense>
     )

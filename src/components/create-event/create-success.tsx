@@ -41,27 +41,27 @@ export const CreateEventSuccess = ({ event, onContinue }: CreateSuccessProps) =>
                     </h1>
 
                     {/* Tips Card */}
-                    <div className="bg-gray-50 shadow-md rounded-lg p-6 mb-8 space-y-6 text-md">
+                    <div className="bg-accent/40 shadow-md rounded-lg p-6 mb-8 space-y-6 text-md">
                         <div>
-                            <p className="text-gray-700 font-medium mb-1">
+                            <p className="text-muted-foreground font-medium mb-1">
                                 Engage Your Guests! The more you interact, the better the experience.
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-gray-700 font-medium mb-1">
+                            <p className="text-muted-foreground font-medium mb-1">
                                 Spread the Word! Share your experience to attract more participants.
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-gray-700 font-medium mb-1">
+                            <p className="text-muted-foreground font-medium mb-1">
                                 Something Came Up? If you need to make changes, let your participants know early.
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-gray-700">
+                            <p className="text-muted-foreground">
                                 Need urgent assistance? Contact{' '}
                                 <a href="mailto:support@drifto.app" className="font-semibold text-gray-900">Drifto Support</a>.
                             </p>
@@ -74,7 +74,7 @@ export const CreateEventSuccess = ({ event, onContinue }: CreateSuccessProps) =>
                     {/* Share Event Button */}
                     <Button
                         onClick={handleQuickShare}
-                        className="w-full bg-white text-lg border border-gray-300 rounded-lg py-7 flex items-center justify-center gap-3 hover:bg-gray-50 transition-colors"
+                        className="w-full bg-background text-lg border border-border rounded-lg py-7 flex items-center justify-center gap-3 hover:bg-accent/40 transition-colors"
                     >
                         <Share2 className="w-5 h-5 text-blue-600" />
                         <span className="text-gray-900 font-semibold">Share Event</span>

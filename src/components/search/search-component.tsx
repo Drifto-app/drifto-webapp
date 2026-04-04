@@ -6,6 +6,7 @@ import { authApi } from "@/lib/axios";
 import { Loader } from "@/components/ui/loader";
 import { showTopToast } from "@/components/toast/toast-util";
 import { RecentSearchCard } from "@/components/search/search-card";
+import { SearchResultsSkeleton, UserListSkeleton } from "@/components/ui/page-skeletons";
 
 export type SearchType = "EVENT" | "USER";
 
@@ -161,7 +162,7 @@ export const SearchComponent = ({
         <button
             className={cn(
                 "px-5 py-2 rounded-full border-1 font-semibold",
-                searchType === type ? "bg-black text-white" : "bg-transparent text-black"
+                searchType === type ? "bg-black text-white" : "bg-transparent text-foreground"
             )}
             onClick={() => setSearchType(type)}
         >
@@ -183,8 +184,8 @@ export const SearchComponent = ({
             {!committed && (
                 <div className="px-4 py-2">
                     {suggestionLoading ? (
-                        <div className="flex justify-center py-8">
-                            <Loader className="h-8 w-8" />
+                        <div className="py-4">
+                            <UserListSkeleton count={4} />
                         </div>
                     ) : !suggestionData ? (
                         <div className="text-center text-neutral-500 py-10">Start typing to see suggestions</div>
@@ -231,9 +232,7 @@ export const SearchComponent = ({
                     style={{ maxHeight: "calc(100dvh - 200px)" }}
                 >
                     {resultsLoading && users.length === 0 && events.length === 0 ? (
-                        <div className="flex justify-center py-10">
-                            <Loader className="h-8 w-8" />
-                        </div>
+                        <SearchResultsSkeleton count={4} />
                     ) : searchType === "USER" ? (
                         users.length ? (
                             <ul className="flex flex-col gap-4">

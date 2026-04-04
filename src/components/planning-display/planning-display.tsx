@@ -16,6 +16,7 @@ import { FaRegHeart } from 'react-icons/fa';
 import { BiCalendarAlt } from 'react-icons/bi';
 import { PiFireSimpleBold } from 'react-icons/pi';
 import { AddToCalendar } from "@/components/share-button/add-to-calendar";
+import { BookingCardSkeleton, EventCardSkeleton } from "@/components/ui/page-skeletons";
 
 // Types
 interface BookingItem {
@@ -153,9 +154,9 @@ function FilterDropdown({
       <div className="relative mb-4" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-between w-36 py-2 text-left bg-white rounded-lg border-none outline-none"
+          className="flex items-center justify-between w-36 py-2 text-left bg-background rounded-lg border-none outline-none"
         >
-          <span className="text-xs font-medium text-gray-700">
+          <span className="text-xs font-medium text-muted-foreground">
             {selectedOption?.label || "Select filter"}
           </span>
           <ChevronDown
@@ -166,7 +167,7 @@ function FilterDropdown({
         </button>
 
         {isOpen && (
-          <div className="absolute z-10 w-36 mt-1 bg-white border border-gray-300 rounded-sm shadow-lg">
+          <div className="absolute z-10 w-36 mt-1 bg-background border border-border rounded-sm shadow-lg">
             <div className="">
               {FILTER_OPTIONS.map((option) => (
                 <button
@@ -175,7 +176,7 @@ function FilterDropdown({
                     onFilterChange(option.value);
                     setIsOpen(false);
                   }}
-                  className={`w-full px-4 py-3 text-left text-xs  border-b border-neutral-300 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 text-gray-700
+                  className={`w-full px-4 py-3 text-left text-xs  border-b border-border hover:bg-accent/40 focus:outline-none focus:bg-accent/40 text-muted-foreground
                   `}
                 >
                   {option.label}
@@ -257,8 +258,8 @@ function BookingCard({ booking, isLast, lastElementRef }: BookingCardProps) {
       </article>
       {booking.numberOfTickets > 1 ? (
         <div className="flex flex-col items-center gap-1">
-          <div className=" w-[95%] h-2 bg-neutral-300 rounded-b-xl"></div>
-          <div className=" w-[93%] h-2 bg-neutral-300 rounded-b-xl"></div>
+          <div className=" w-[95%] h-2 bg-muted rounded-b-xl"></div>
+          <div className=" w-[93%] h-2 bg-muted rounded-b-xl"></div>
         </div>
       ) : (
         <></>
@@ -314,8 +315,10 @@ function BookingsList({
       />
 
       {isLoading && bookings.length === 0 ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader />
+        <div className="space-y-5 py-2">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <BookingCardSkeleton key={index} />
+          ))}
         </div>
       ) : !bookings.length ? (
         <div className="flex flex-col items-center gap-4 text-center max-w-md px-4 mt-20">
@@ -559,8 +562,10 @@ function EventsContent({
 
   if (isLoading && events.length === 0) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <Loader />
+      <div className="space-y-5 py-2">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <EventCardSkeleton key={index} />
+        ))}
       </div>
     );
   }
@@ -751,7 +756,7 @@ export default function PlanningDisplay({ handleScreenChange }: PlanningDisplayP
 
   return (
     //view hieght subtracted from navbar height
-    <div className="w-full overflow-y-scroll bg-gray-50 flex flex-col min-h-[100dvh]">
+    <div className="w-full overflow-y-scroll bg-accent/40 flex flex-col min-h-[100dvh]">
       <div className="p-2">
         <PageHeader headerTitle="Plans" prev={"/?screen=plans"} />
         <Tabs active={activeTab} onClick={setActiveTab} />

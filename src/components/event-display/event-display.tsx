@@ -12,6 +12,7 @@ import { Tabs } from "@/components/event-display/tabs";
 import { useAuthStore } from '@/store/auth-store';
 import { BiCalendarAlt } from 'react-icons/bi';
 import { PiFireSimpleBold } from 'react-icons/pi';
+import { EventCardSkeleton } from "@/components/ui/page-skeletons";
 
 interface EventDisplayProps extends ComponentProps<"div"> {
     location: string | null;
@@ -173,8 +174,10 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
             >
                 <Tabs active={activeEventItem} />
 
-                <div className="flex justify-center py-8">
-                    <Loader className="h-10 w-10" />
+                <div className="flex w-full flex-col gap-8 px-4 py-4">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                        <EventCardSkeleton key={index} />
+                    ))}
                 </div>
             </div>
         );

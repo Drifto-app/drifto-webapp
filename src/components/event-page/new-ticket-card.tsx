@@ -154,14 +154,14 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
                                 placeholder="Description"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="border border-neutral-300 focus:border-blue-600 focus:outline-hidden rounded-md py-2 px-3"
+                                className="border border-border focus:border-blue-600 focus:outline-hidden rounded-md py-2 px-3"
                             />
                         </div>
                         {/* Paid/Free Tabs */}
-                        <div className="flex justify-between w-full items-center rounded-md border border-neutral-200">
+                        <div className="flex justify-between w-full items-center rounded-md border border-border">
                             <span
                                 className={`w-[50%] text-center font-semibold cursor-pointer py-3 border-b-2 ${isSelectedPaid
-                                    ? "text-black border-black"
+                                    ? "text-foreground border-foreground"
                                     : "text-neutral-400 border-transparent"
                                     }`}
                                 onClick={() => handleTabChange(true)}
@@ -170,7 +170,7 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
                             </span>
                             <span
                                 className={`w-[50%] text-center font-semibold cursor-pointer py-3 border-b-2 ${!isSelectedPaid
-                                    ? "text-black border-black"
+                                    ? "text-foreground border-foreground"
                                     : "text-neutral-400 border-transparent"
                                     }`}
                                 onClick={() => handleTabChange(false)}
@@ -214,7 +214,7 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    className="text-md border-neutral-400 text-neutral-500 hover:bg-neutral-300 py-6 px-8 font-semibold"
+                                    className="text-md border-neutral-400 text-neutral-500 hover:bg-muted py-6 px-8 font-semibold"
                                 >
                                     Cancel
                                 </Button>

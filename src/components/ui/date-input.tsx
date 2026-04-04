@@ -55,7 +55,7 @@ export const Calendar28 = ({
             <Label htmlFor="date" className="px-1 capitalize">
                 {label}
             </Label>
-            <div className="relative flex gap-2 border-solid border-1 rounded-sm border-neutral-200">
+            <div className="relative flex gap-2 border-solid border-1 rounded-sm border-border">
                 <Input
                     id="date"
                     value={value}

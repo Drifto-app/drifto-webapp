@@ -40,7 +40,7 @@ export const UserOrderCard = ({
     return (
         <div
             className={cn(
-                "w-full border-b-neutral-200 border-b-1 pb-4 flex flex-col gap-4",
+                "w-full border-border border-b-1 pb-4 flex flex-col gap-4",
                 orderContent.orderStatus !== "PENDING" && "opacity-70",
                 className
             )}

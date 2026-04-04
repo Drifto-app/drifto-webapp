@@ -43,7 +43,7 @@ export const OrderItem = ({
                 <h1 className="w-full text-left text-md font-bold">
                     {ticket.title}
                 </h1>
-                <p className="w-full text-left text-gray-700 text-sm">
+                <p className="w-full text-left text-muted-foreground text-sm">
                     {ticket.price ? `₦ ${ticket.price}` : "Free"}
                 </p>
                 <Linkify text={ticket.description || "No description available"} className="w-full text-left text-gray-400 text-sm" />

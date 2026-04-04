@@ -123,22 +123,22 @@ export const OrderContent = ({
             className
         )} {...props}>
             <div className={cn(
-                "w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center",
+                "w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center",
                 className
             )} {...props}>
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={16}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                     />
-                    <p className="font-semibold text-neutral-950 text-sm w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-sm w-full text-center capitalize truncate ml-4">
                         {event.title}
                     </p>
                 </div>
             </div>
             <div className="flex flex-col items-center px-4">
-                <div className="flex flex-row items-center px-4 py-4 w-full gap-4 rounded-md border-neutral-300 border-1 mt-4">
+                <div className="flex flex-row items-center px-4 py-4 w-full gap-4 rounded-md border-border border-1 mt-4">
                     <MdOutlineDateRange size={36} className="text-green-500" />
                     <p className="text-neutral-500 text-sm font-medium">Need to cancel? Do so before the event starts for a refund (10% fee applies).</p>
                 </div>
@@ -148,7 +148,7 @@ export const OrderContent = ({
                     ))}
                 </div>
             </div>
-            <div className="fixed inset-x-0 bottom-0 z-50 border-t border-neutral-200 w-full bg-white">
+            <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border w-full bg-background">
                 <div className="w-full flex flex-row justify-between items-center px-6 py-3">
                     <div>
                         <p className="text-neutral-500 text-base">Total</p>

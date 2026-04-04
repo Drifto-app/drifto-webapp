@@ -228,7 +228,7 @@ export default function QrScannerDialog({ open, onOpenChange, onResult }: Props)
                     <X size={30} />
                 </div>
 
-                <Dialog.Panel className="bg-white overflow-hidden w-full max-w-xl">
+                <Dialog.Panel className="bg-background overflow-hidden w-full max-w-xl">
                     <div className="relative w-full aspect-[3/4] bg-black">
                         <video
                             ref={videoRef}
@@ -268,7 +268,7 @@ export default function QrScannerDialog({ open, onOpenChange, onResult }: Props)
                                 {!error.includes("HTTPS") && !error.includes("not supported") && (
                                     <button
                                         onClick={retryCamera}
-                                        className="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition-colors"
+                                        className="bg-background/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-background/30 transition-colors"
                                     >
                                         Try Again
                                     </button>

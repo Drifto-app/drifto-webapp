@@ -37,6 +37,8 @@ interface LinkifyProps {
   className?: string;
   /** HTML tag to use as the wrapper (defaults to "p") */
   as?: keyof React.JSX.IntrinsicElements;
+  /** Inline styles applied to the wrapper */
+  style?: React.CSSProperties;
 }
 
 /**
@@ -50,9 +52,9 @@ interface LinkifyProps {
  *
  * Works in both client and server components (no hooks or state).
  */
-export function Linkify({ text, className, as: Tag = "p" }: LinkifyProps) {
+export function Linkify({ text, className, as: Tag = "p", style }: LinkifyProps) {
   if (!text) {
-    return <Tag className={className} />;
+    return <Tag className={className} style={style} />;
   }
 
   const parts: React.ReactNode[] = [];
@@ -96,8 +98,8 @@ export function Linkify({ text, className, as: Tag = "p" }: LinkifyProps) {
 
   // If no URLs were found, render the text as-is
   if (parts.length === 0) {
-    return <Tag className={className}>{text}</Tag>;
+    return <Tag className={className} style={style}>{text}</Tag>;
   }
 
-  return <Tag className={className}>{parts}</Tag>;
+  return <Tag className={className} style={style}>{parts}</Tag>;
 }

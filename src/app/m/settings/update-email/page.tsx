@@ -1,15 +1,11 @@
-import { Loader } from "@/components/ui/loader";
 import { Suspense } from "react";
 import {UpdateEmailPageContent} from "@/components/settings/update-email";
+import { SettingsDetailSkeleton } from "@/components/ui/page-skeletons";
 
 export default function UpdateEmailPage() {
 
     return (
-        <Suspense fallback={
-            <div className="w-full h-screen flex items-center justify-center">
-                <Loader />
-            </div>
-        }>
+        <Suspense fallback={<SettingsDetailSkeleton />}>
             <UpdateEmailPageContent />
         </Suspense>
     )

@@ -5,6 +5,7 @@ import {showTopToast} from "@/components/toast/toast-util";
 import {Loader} from "@/components/ui/loader";
 import * as React from "react";
 import {UserOrderCard} from "@/components/order/user-order-card";
+import { OrderCardSkeleton } from "@/components/ui/page-skeletons";
 
 interface UserOrdersProps extends ComponentProps<"div"> {
     user: {[key: string]: any};
@@ -113,31 +114,39 @@ export const UserOrders = ({
             ref={scrollRootRef}
             style={{ maxHeight: "calc(100dvh - 80px)" }}
         >
-            <div className="flex flex-col gap-20 pb-15">
-                {orders.map((order) => (
-                    <UserOrderCard
-                        key={order.orderId}
-                        orderContent={order}
-                        onCancel={
-                            (orderId: string) => setOrders(
-                                (orders) => orders.map((order) => {
-                                    if(order.orderId === orderId){
-                                        const newOrder = {...order};
-                                        newOrder.orderStatus = "CANCELLED"
-                                        return newOrder;
-                                    }
+            {loading && orders.length === 0 ? (
+                <div className="flex flex-col gap-6 pb-15">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                        <OrderCardSkeleton key={index} />
+                    ))}
+                </div>
+            ) : (
+                <div className="flex flex-col gap-20 pb-15">
+                    {orders.map((order) => (
+                        <UserOrderCard
+                            key={order.orderId}
+                            orderContent={order}
+                            onCancel={
+                                (orderId: string) => setOrders(
+                                    (orders) => orders.map((order) => {
+                                        if(order.orderId === orderId){
+                                            const newOrder = {...order};
+                                            newOrder.orderStatus = "CANCELLED"
+                                            return newOrder;
+                                        }
 
-                                    return order;
-                                })
-                            )
-                        }
-                    />
-                ))}
-            </div>
+                                        return order;
+                                    })
+                                )
+                            }
+                        />
+                    ))}
+                </div>
+            )}
 
             <div ref={sentinelRef} aria-hidden className="h-1" />
 
-            {loading && (
+            {loading && orders.length > 0 && (
                 <div className="flex justify-center py-4">
                     <Loader className="h-8 w-8"/>
                 </div>

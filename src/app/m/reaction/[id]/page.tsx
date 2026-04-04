@@ -7,11 +7,12 @@ import * as React from "react";
 import ReactionManagePage from "@/components/reaction/reaction-manage";
 
 export default function ReactionPage() {
-    const { id } = useParams();
+    const params = useParams<{ id: string }>();
+    const id = params?.id;
 
     const queryParams = useSearchParams();
-    const prev = queryParams.get("prev");
-    const type = queryParams.get("type");
+    const prev = queryParams?.get("prev") ?? null;
+    const type = queryParams?.get("type");
 
     const pathname = usePathname();
     const searchParams = useSearchParams();

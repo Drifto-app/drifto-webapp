@@ -43,7 +43,7 @@ export const FilterTypeDialog = ({
         >
             <DialogTrigger asChild>
                 <div
-                    className="flex items-center justify-center gap-2 text-neutral-800 font-semibold px-3 py-2 rounded-md border-1 border-neutral-300"
+                    className="flex items-center justify-center gap-2 text-foreground font-semibold px-3 py-2 rounded-md border-1 border-border"
                 >
                     <LuFilter size={20} />
                     <span className="capitalize text-sm leading-none">{searchText.toLowerCase() || "Type"}</span>
@@ -51,7 +51,7 @@ export const FilterTypeDialog = ({
             </DialogTrigger>
 
             <DialogContent className="px-0">
-                <DialogHeader className="text-left w-full border-b-1 border-neutral-200 pb-4 px-4">
+                <DialogHeader className="text-left w-full border-b-1 border-border pb-4 px-4">
                     <DialogTitle className="text-xl">Select search type</DialogTitle>
                     <p className="text-neutral-400 text-sm font-semibold">Choose what to search for: Events or Users</p>
                 </DialogHeader>
@@ -157,7 +157,7 @@ export const FilterDateDialog = ({
         >
             <DialogTrigger asChild>
                 <div
-                    className="flex items-center justify-center gap-2 text-neutral-800 font-semibold px-3 py-2 rounded-md border-1 border-neutral-300"
+                    className="flex items-center justify-center gap-2 text-foreground font-semibold px-3 py-2 rounded-md border-1 border-border"
                 >
                     <MdOutlineDateRange size={20} />
                     <span className="capitalize text-sm leading-none whitespace-nowrap">{title || "Date"}</span>
@@ -165,7 +165,7 @@ export const FilterDateDialog = ({
             </DialogTrigger>
 
             <DialogContent className="px-0">
-                <DialogHeader className="text-left w-full border-b-1 border-neutral-200 pb-4 px-4">
+                <DialogHeader className="text-left w-full border-b-1 border-border pb-4 px-4">
                     <DialogTitle className="text-xl">Select a date</DialogTitle>
                     <p className="text-neutral-400 text-sm font-semibold">You can also select a range of dates</p>
                 </DialogHeader>
@@ -173,7 +173,7 @@ export const FilterDateDialog = ({
                     <div className="w-full text-center text-sm">
                         {selectedDateRangeString()}
                     </div>
-                    <div className="border-2 border-neutral-300 rounded-md p-2">
+                    <div className="border-2 border-border rounded-md p-2">
                         <Calendar
                             mode="range"
                             selected={dateRange}
@@ -235,14 +235,14 @@ export const FilterPriceDialog = ({
             onOpenChange={setIsOpen}
         >
             <DialogTrigger asChild>
-                <div className="flex items-center justify-center gap-2 text-neutral-800 font-semibold px-3 py-2 rounded-md border border-neutral-300">
+                <div className="flex items-center justify-center gap-2 text-foreground font-semibold px-3 py-2 rounded-md border border-border">
                     <TbCurrencyNaira size={20} className="flex-shrink-0" />
                     <span className="capitalize text-sm leading-none">{title()}</span>
                 </div>
             </DialogTrigger>
 
             <DialogContent className="px-0">
-                <DialogHeader className="text-left w-full border-b-1 border-neutral-200 pb-4 px-4">
+                <DialogHeader className="text-left w-full border-b-1 border-border pb-4 px-4">
                     <DialogTitle className="text-xl">Select a price</DialogTitle>
                     <p className="text-neutral-400 text-sm font-semibold">Choose from free to premium (paid events)</p>
                 </DialogHeader>
@@ -321,14 +321,14 @@ export const FilterHostDialog = ({
             onOpenChange={setIsOpen}
         >
             <DialogTrigger asChild>
-                <div className="flex items-center justify-center gap-2 text-neutral-800 font-semibold px-3 py-2 rounded-md border border-neutral-300">
+                <div className="flex items-center justify-center gap-2 text-foreground font-semibold px-3 py-2 rounded-md border border-border">
                     <LuUsers size={20} className="flex-shrink-0" />
                     <span className="capitalize text-sm leading-none whitespace-nowrap">{title()}</span>
                 </div>
             </DialogTrigger>
 
             <DialogContent className="px-0">
-                <DialogHeader className="text-left w-full border-b-1 border-neutral-200 pb-4 px-4">
+                <DialogHeader className="text-left w-full border-b-1 border-border pb-4 px-4">
                     <DialogTitle className="text-xl">Select a host type</DialogTitle>
                     <p className="text-neutral-400 text-sm font-semibold">Choose either verified or unverified hosts</p>
                 </DialogHeader>
@@ -418,14 +418,14 @@ export const FilterCategoryDialog = ({
             onOpenChange={setIsOpen}
         >
             <DialogTrigger asChild>
-                <div className="flex items-center justify-center gap-2 text-neutral-800 font-semibold px-3 py-2 rounded-md border border-neutral-300">
+                <div className="flex items-center justify-center gap-2 text-foreground font-semibold px-3 py-2 rounded-md border border-border">
                     <TbCategory size={20} className="flex-shrink-0" />
                     <span className="capitalize text-sm leading-none truncate max-w-20">{title()}</span>
                 </div>
             </DialogTrigger>
 
             <DialogContent className="px-0">
-                <DialogHeader className="text-left w-full border-b-1 border-neutral-200 pb-4 px-4">
+                <DialogHeader className="text-left w-full border-b-1 border-border pb-4 px-4">
                     <DialogTitle className="text-xl">Select a categories</DialogTitle>
                     <p className="text-neutral-400 text-sm font-semibold">Select one or more categories. Scroll to explore all available option</p>
                 </DialogHeader>
@@ -652,7 +652,7 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
     return (
         <div
             ref={mapRef}
-            className="w-full h-64 rounded-lg border-2 border-gray-200"
+            className="w-full h-64 rounded-lg border-2 border-border"
             style={{ minHeight: '256px' }}
         />
     );
@@ -772,7 +772,7 @@ export const FilterLocationDialog = ({
         return (
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
-                    <div className="flex items-center justify-center gap-2 text-neutral-800 font-semibold px-3 py-2 rounded-md border border-neutral-300 hover:bg-gray-50 transition-colors cursor-pointer">
+                    <div className="flex items-center justify-center gap-2 text-foreground font-semibold px-3 py-2 rounded-md border border-border hover:bg-accent/40 transition-colors cursor-pointer">
                         <GrLocation size={20} className="flex-shrink-0" />
                         <span className="capitalize text-sm leading-none truncate max-w-20">{title}</span>
                     </div>
@@ -795,7 +795,7 @@ export const FilterLocationDialog = ({
         return (
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
-                    <div className="flex items-center justify-center gap-2 text-neutral-800 font-semibold px-3 py-2 rounded-md border border-neutral-300 hover:bg-gray-50 transition-colors cursor-pointer">
+                    <div className="flex items-center justify-center gap-2 text-foreground font-semibold px-3 py-2 rounded-md border border-border hover:bg-accent/40 transition-colors cursor-pointer">
                         <GrLocation size={20} className="flex-shrink-0" />
                         <span className="capitalize text-sm leading-none truncate max-w-20">{title}</span>
                     </div>
@@ -813,14 +813,14 @@ export const FilterLocationDialog = ({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <div className="flex items-center justify-center gap-2 text-neutral-800 font-semibold px-3 py-2 rounded-md border border-neutral-300 hover:bg-gray-50 transition-colors cursor-pointer">
+                <div className="flex items-center justify-center gap-2 text-foreground font-semibold px-3 py-2 rounded-md border border-border hover:bg-accent/40 transition-colors cursor-pointer">
                     <GrLocation size={20} className="flex-shrink-0" />
                     <span className="capitalize text-sm leading-none truncate max-w-20">{title}</span>
                 </div>
             </DialogTrigger>
 
             <DialogContent className="px-0 max-w-md mx-auto">
-                <DialogHeader className="text-left w-full border-b border-neutral-200 pb-4 px-4">
+                <DialogHeader className="text-left w-full border-b border-border pb-4 px-4">
                     <DialogTitle className="text-xl">Select City</DialogTitle>
                     <p className="text-neutral-400 text-sm font-medium">Select city to filter search</p>
                 </DialogHeader>
@@ -839,7 +839,7 @@ export const FilterLocationDialog = ({
                                 placeholder="Search for a location"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 py-3 text-sm bg-gray-100 border-0 focus:bg-white focus:ring-2 focus:ring-blue-500"
+                                className="w-full pl-10 py-3 text-sm bg-muted border-0 focus:bg-background focus:ring-2 focus:ring-blue-500"
                             />
                         </Autocomplete>
                     </div>
@@ -869,7 +869,7 @@ export const FilterLocationDialog = ({
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="w-full flex items-center justify-between px-4 pt-4 border-t border-neutral-200">
+                <div className="w-full flex items-center justify-between px-4 pt-4 border-t border-border">
                     <DialogClose asChild>
                         <Button
                             variant="outline"
