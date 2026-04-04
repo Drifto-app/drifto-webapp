@@ -29,6 +29,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { UserEvents } from "@/components/user/user-events";
 import { UserPosts } from "@/components/user/user-posts";
 import defaultImage from "@/assests/default.jpeg";
+import { Linkify } from "@/lib/linkify";
 
 interface UserProps extends ComponentProps<"div"> {
     user: { [key: string]: any }
@@ -204,9 +205,7 @@ export const UserContent = ({
                                         <DialogTitle className="text-left">About</DialogTitle>
                                     </DialogHeader>
                                     <div className="w-full flex flex-col gap-4 text-neutral-600">
-                                        <span className="font-medium text-sm">
-                                            {user.aboutText}
-                                        </span>
+                                        <Linkify text={user.aboutText} className="font-medium text-sm" as="span" />
                                         <div className="w-full flex flex-col gap-3">
                                             {userAboutLinks.map((item, index) => {
                                                 if (!item.value) return

@@ -25,6 +25,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import { ComponentProps, FC, memo, useCallback, useMemo, useState } from "react";
 import { useAuthStore } from '@/store/auth-store';
 import { ReportDrawer } from "@/components/report/report-drawer";
+import { Linkify } from "@/lib/linkify";
 
 type AnyRecord = Record<string, any>;
 
@@ -139,7 +140,7 @@ export const CommentCard = ({
                 </div>
 
                 {/* comment text */}
-                <p className="text-neutral-800 text-sm mt-3 mb-5">{comment.comment}</p>
+                <Linkify text={comment.comment} className="text-neutral-800 text-sm mt-3 mb-5" />
 
                 {/* actions */}
                 <div className="flex items-center justify-between gap-6 text-neutral-400 font-bold">

@@ -66,8 +66,8 @@ export const UserProfile = ({
                 return (
                     <>
                         <div className="w-full flex flex-col px-4 pt-6 pb-25 gap-8">
-                            <div className="flex items-center gap-4">
-                                <div className="w-20 h-20 flex flex-row items-center cursor-pointer" onClick={() => router.push(`/m/settings/profile-picture?prev=${encodeURIComponent(`/?screen=profile`)}`)}>
+                            <div className="flex items-center gap-5 px-2">
+                                <div className="w-24 h-24 flex flex-row items-center cursor-pointer" onClick={() => router.push(`/m/settings/profile-picture?prev=${encodeURIComponent(`/?screen=profile`)}`)}>
                                     <AspectRatio ratio={1}>
                                         <Image
                                             src={user?.profileImage || defaultImage}
@@ -77,11 +77,11 @@ export const UserProfile = ({
                                     </AspectRatio>
                                 </div>
                                 <div className="flex flex-row gap-1 items-center">
-                                    <p className="font-semibold text-base cursor-pointer" onClick={() => router.push(`/m/settings/username?prev=${encodeURIComponent(`/?screen=profile`)}`)} >{user?.username}</p>
+                                    <p className="font-medium text-xl cursor-pointer" onClick={() => router.push(`/m/settings/username?prev=${encodeURIComponent(`/?screen=profile`)}`)} >{user?.username}</p>
                                     <UserVerificationBadge user={user!} isClickable={true} />
                                 </div>
                             </div>
-                            <div className="w-full flex justify-between items-center px-6">
+                            <div className="w-full flex justify-between items-center px-4 mt-2">
                                 {userStats.map((item, index) => (
                                     <span
                                         key={index}
@@ -97,56 +97,48 @@ export const UserProfile = ({
                                             }
                                         }}
                                     >
-                                        <p className="text-neutral-400 text-sm">{item.name}</p>
+                                        <p className="text-neutral-500 text-sm font-medium">{item.name}</p>
                                         <p className="font-bold text-lg">{item.value}</p>
                                     </span>
                                 ))}
                             </div>
-                            <div className="w-full flex gap-3">
+                            <div className="w-full flex gap-3 px-2">
                                 <Button
                                     variant="outline"
-                                    className="flex-1 min-w-0 shadow-none font-semibold border-black py-6"
+                                    className="flex-1 min-w-0 shadow-none font-semibold border-neutral-300 rounded-2xl h-12"
                                     onClick={() => router.push(`/m/settings/edit-profile?prev=${encodeURIComponent(`/?screen=profile`)}`)}
                                 >
-                                    Edit Profile
+                                    Edit profile
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="flex-1 min-w-0 shadow-none font-semibold border-black py-6"
+                                    className="flex-1 min-w-0 shadow-none font-semibold border-neutral-300 rounded-2xl h-12"
                                     onClick={handleQuickShare}
                                 >
                                     Share Profile
                                 </Button>
                             </div>
-                            <div className="w-full grid grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-3 border border-neutral-300 px-4 py-5 rounded-sm items-start cursor-pointer" onClick={() => router.push(
+                            <div className="w-full flex flex-col px-2 mt-4">
+                                <div className="flex flex-row gap-5 items-center justify-start border-b border-neutral-300 py-5 cursor-pointer" onClick={() => router.push(
                                     `/m/user-events?id=${user?.id}&prev=${encodeURIComponent("/?screen=profile")}`
                                 )}>
-                                    <div className="h-10 flex items-center justify-center">
-                                        <PiFireSimpleBold size={32} />
-                                    </div>
-                                    <span className="font-semibold">Experiences</span>
+                                    <PiFireSimpleBold size={24} className="text-neutral-800" />
+                                    <span className="font-normal text-[17px]">Experiences</span>
                                 </div>
 
-                                <div className="flex flex-col gap-3 border border-neutral-300 px-4 py-5 rounded-sm items-start cursor-pointer" onClick={() => setActiveScreen("posts")}>
-                                    <div className="h-10 flex items-center justify-center">
-                                        <FaHashtag size={24} />
-                                    </div>
-                                    <span className="font-semibold">Posts</span>
+                                <div className="flex flex-row gap-5 items-center justify-start border-b border-neutral-300 py-5 cursor-pointer" onClick={() => setActiveScreen("posts")}>
+                                    <FaHashtag size={24} className="text-neutral-800" />
+                                    <span className="font-normal text-[17px]">Posts</span>
                                 </div>
-                                <div className="flex flex-col gap-3 border border-neutral-300 px-4 py-5 rounded-sm items-start cursor-pointer" onClick={() => setActiveScreen("orders")}>
-                                    <div className="h-10 flex items-center justify-center">
-                                        <FaRegClock size={24} />
-                                    </div>
-                                    <span className="font-semibold">Orders</span>
+                                <div className="flex flex-row gap-5 items-center justify-start border-b border-neutral-300 py-5 cursor-pointer" onClick={() => setActiveScreen("orders")}>
+                                    <FaRegClock size={24} className="text-neutral-800" />
+                                    <span className="font-normal text-[17px]">Orders</span>
                                 </div>
                                 <div
-                                    className="flex flex-col gap-3 border border-neutral-300 px-4 py-5 rounded-sm items-start cursor-pointer"
+                                    className="flex flex-row gap-5 items-center justify-start border-b border-neutral-300 py-5 cursor-pointer"
                                     onClick={() => handleScreenChange("plans")}>
-                                    <div className="h-10 flex items-center justify-center">
-                                        <BiCalendarAlt size={24} />
-                                    </div>
-                                    <span className="font-semibold">Plans</span>
+                                    <BiCalendarAlt size={24} className="text-neutral-800" />
+                                    <span className="font-normal text-[17px]">Plans</span>
                                 </div>
                             </div>
                         </div>

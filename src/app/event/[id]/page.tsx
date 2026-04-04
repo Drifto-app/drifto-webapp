@@ -2,6 +2,7 @@ import {Metadata} from 'next'
 import {notFound, redirect} from 'next/navigation'
 import {headers} from 'next/headers'
 import {api} from "@/lib/axios";
+import {Linkify} from "@/lib/linkify";
 import Image from "next/image";
 
 interface Event {
@@ -278,7 +279,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                             <div className="flex flex-wrap gap-4 text-gray-600 mb-4">
                                 <span>📅 {new Date(event.startTime).toLocaleDateString()}</span>
                             </div>
-                            <p className="text-gray-700 leading-relaxed">{event.description}</p>
+                            <Linkify text={event.description} className="text-gray-700 leading-relaxed" />
                         </div>
                     </div>
                 </div>

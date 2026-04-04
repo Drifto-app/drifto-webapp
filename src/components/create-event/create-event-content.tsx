@@ -10,7 +10,10 @@ import {
   IoEarthOutline,
   IoGiftOutline,
   IoLocationOutline,
+  IoPlanetOutline,
+  IoWalletOutline,
 } from "react-icons/io5";
+import { HiSparkles } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 import { CoverImageUploader } from "@/components/ui/cover-image";
 import { Label } from "@/components/ui/label";
@@ -36,6 +39,7 @@ import { showTopToast } from "@/components/toast/toast-util";
 import { CreateEventSuccess } from "@/components/create-event/create-success";
 import { useShare } from "@/hooks/share-option";
 import { CoverVideoUploader } from "../ui/cover-video";
+import { Linkify } from "@/lib/linkify";
 
 interface CreateEventContentProps extends React.ComponentProps<"div"> {
   prev: string | null;
@@ -51,19 +55,19 @@ interface IntroObjectType {
 
 const intoObjects: IntroObjectType[] = [
   {
-    title: "share your passion",
+    title: "Share Your Passion",
     text: "Turn what you love into an unforgettable experience for others.",
-    icon: <IoGiftOutline size={50} className="text-indigo-700" />,
+    icon: <HiSparkles size={28} className="text-blue-500 animate-float-subtle" />,
   },
   {
-    title: "be discovered",
+    title: "Be Discovered",
     text: "Showcase your experience to those who are eager to try something new.",
-    icon: <IoEarthOutline size={50} />,
+    icon: <IoPlanetOutline size={28} className="text-neutral-900 dark:text-neutral-200 animate-float-subtle-slow" />,
   },
   {
-    title: "earn while inspiring",
+    title: "Earn While Inspiring",
     text: "Monetize your ideas and make a difference, one experience at a time.",
-    icon: <IoCashOutline size={50} className="text-green-600" />,
+    icon: <IoWalletOutline size={28} className="text-green-500 animate-float-subtle-delayed" />,
   },
 ];
 
@@ -896,7 +900,7 @@ export const CreateEventContent = ({
                   <IoLocationOutline size={27} />
                   <p className="leading-tight">{`${address}, ${city}, ${state}`}</p>
                 </div>
-                <p className="text-lg leading-tight">{description}</p>
+                <Linkify text={description} className="text-lg leading-tight" />
                 <div className="flex flex-wrap gap-2">
                   {eventTags.map((item, index) => (
                     <div
@@ -987,26 +991,34 @@ export const CreateEventContent = ({
         );
       default:
         return (
-          <div className="w-full flex flex-col flex-1 items-center gap-8 py-8">
-            <div className="w-full flex flex-col gap-4 px-4">
+          <div className="w-full flex flex-col flex-1 items-start gap-6 py-2 px-6 min-h-[calc(100vh-80px)]">
+            <div className="flex flex-col gap-1 w-full mb-2">
+               <h1 className="font-black text-3xl">Create Magic</h1>
+               <p className="text-neutral-500 font-medium tracking-tight">What makes a great event is a great host.</p>
+            </div>
+            <div className="w-full flex flex-col gap-4">
               {intoObjects.map((item, index) => (
                 <div
                   key={index}
-                  className="flex flex-col gap-2 items-center w-full rounded-md shadow-md py-5 px-4"
+                  className="flex flex-row gap-4 items-center w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-transparent py-4 px-4 shadow-sm"
                 >
-                  {item.icon}
-                  <h3 className="font-black text-lg capitalize">
-                    {item.title}
-                  </h3>
-                  <p className="text-neutral-500 text-sm text-center font-semibold leading-tight">
-                    {item.text}
-                  </p>
+                  <div className="bg-neutral-100/50 dark:bg-neutral-800/50 rounded-xl p-3 flex-shrink-0">
+                    {item.icon}
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <h3 className="font-bold text-[1.05rem]">
+                      {item.title}
+                    </h3>
+                    <p className="text-neutral-500 text-sm font-medium leading-tight">
+                      {item.text}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="w-full px-4">
+            <div className="w-full mt-auto mt-8 pb-6">
               <Button
-                className="w-full rounded-md shadow-md py-6 text-md font-semibold bg-blue-800 hover:bg-blue-800"
+                className="w-full rounded-xl py-6 text-[1.05rem] font-semibold bg-blue-700 hover:bg-blue-800 text-white"
                 onClick={() => setActiveScreen("details")}
                 type="button"
               >
@@ -1028,7 +1040,8 @@ export const CreateEventContent = ({
         <>
           <div
             className={cn(
-              "w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center",
+              "w-full flex flex-col gap-3 h-20 justify-center",
+              activeScreen !== "intro" ? "border-b-1 border-b-neutral-300" : "",
               className
             )}
             {...props}
@@ -1039,12 +1052,14 @@ export const CreateEventContent = ({
                 onClick={handleBackClick}
                 className="cursor-pointer hover:text-neutral-700 transition-colors"
               />
-              <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
-                {headerTitle()}
-              </p>
+              {activeScreen !== "intro" && (
+                <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                  {headerTitle()}
+                </p>
+              )}
             </div>
           </div>
-          <form>{renderScreen()}</form>
+          <form className="flex-1 flex flex-col">{renderScreen()}</form>
         </>
       ) : (
         <CreateEventSuccess

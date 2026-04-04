@@ -40,6 +40,7 @@ import { showTopToast } from "@/components/toast/toast-util";
 import { CoverVideoSection } from "./cover-video-section";
 import { useAuthStore } from '@/store/auth-store';
 import { ReportDrawer } from "@/components/report/report-drawer";
+import { Linkify } from "@/lib/linkify";
 
 interface SingleEventDetailsProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
@@ -448,7 +449,7 @@ export const SingleEventDetails = ({
                             </h2>
                         </EventSingleContentText>
                         <EventSingleContentText isLine={false} headText="Event Description" className="flex-col shadow-xl">
-                            <p className="text-sm w-full text-left text-neutral-400 font-semibold">{event.description}</p>
+                            <Linkify text={event.description} className="text-sm w-full text-left text-neutral-400 font-semibold" />
                         </EventSingleContentText>
                         <EventSingleContentText headText={"Event Screenshots"} isLine={false} className="flex-col shadow-xl">
                             <SnapshotCarousel snapshots={event.screenshots} />
@@ -626,7 +627,7 @@ export const SingleEventDetails = ({
                         </div>
                     </EventSingleContentText>
                     <EventSingleContentText headText="About" className="flex-col">
-                        <p className="text-sm w-full text-left">{event.description}</p>
+                        <Linkify text={event.description} className="text-sm w-full text-left" />
                     </EventSingleContentText>
                     <EventSingleContentText headText="Snapshots" className="flex-col">
                         <SnapshotCarousel snapshots={event.screenshots} />

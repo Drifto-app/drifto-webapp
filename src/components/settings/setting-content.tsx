@@ -11,10 +11,11 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { IoCashOutline, IoDocumentTextOutline } from "react-icons/io5";
 import { MdNavigateNext, MdPayment } from "react-icons/md";
 import { TbTools } from "react-icons/tb";
-import { IoMdHappy } from "react-icons/io";
+import { IoMdHappy, IoMdSearch } from "react-icons/io";
 import { PiAt } from "react-icons/pi";
 import { useAuthStore } from "@/store/auth-store";
 import infoImage from "@/assests/settings-info.jpg"
+import { Input } from "@/components/ui/input";
 
 interface SettingContentProps extends ComponentProps<"div"> {
     prev: string | null;
@@ -35,6 +36,7 @@ export const SettingContent = ({
     const { user } = useAuthStore();
 
     const [activeScreen, setActiveScreen] = useState<string>("settings");
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     const settingsOptions: SettingsOptionType[] = [
         { name: "Profile & Preferences", value: "profile", icon: <FaRegUser size={20} />, onClickFunction: () => setActiveScreen("profile") },
@@ -126,36 +128,57 @@ export const SettingContent = ({
                     </div>
                 )
             default:
+                const filteredOptions = settingsOptions.filter((opt) => opt.name.toLowerCase().includes(searchQuery.toLowerCase()));
                 return (
-                    <div className="flex-1 flex flex-col gap-4 px-4 pb-10">
-                        <div className="w-full flex flex-row items-center pl-4 py-3 shadow-2xl rounded-lg cursor-pointer" onClick={() => router.push(`/m/event-create?prev=${encodeURIComponent(currentPathUrl)}`)}>
-                            <span className="max-w-[60%] flex flex-col gap-1">
-                                <h4 className="font-bold text-base">Become a Drifto Host</h4>
-                                <p className="text-neutral-600 leading-tight text-sm">Share what you love. Create moments that matter and get paid.</p>
-                            </span>
-                            <span className="w-[40%] h-32 flex flex-row items-center relative">
-                                <Image
-                                    src={infoImage}
-                                    alt={"Become a host"}
-                                    fill
-                                    className="object-contain"
-                                    loading="eager"
+                    <div className="flex-1 flex flex-col px-4 pb-10 pt-2">
+                        <div className="px-1 mb-4">
+                            <div className="relative">
+                                <IoMdSearch size={22} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500" />
+                                <Input
+                                    type="text"
+                                    placeholder="Search settings..."
+                                    className="pl-12 border-transparent bg-neutral-100 hover:bg-neutral-200/50 focus-visible:bg-neutral-200 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-2xl h-[48px] text-[16px] text-neutral-900 placeholder:text-neutral-500 w-full"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                 />
-                            </span>
+                            </div>
                         </div>
-                        <div className="w-full flex flex-col">
-                            {settingsOptions.map((item, i) => (
-                                <span
-                                    key={i}
-                                    className="w-full flex items-center gap-5 py-6 px-2 border-b-neutral-300 border-b-1 cursor-pointer"
-                                    onClick={item.onClickFunction}
-                                >
-                                    {item.icon}
-                                    <p className="text-base">{item.name}</p>
+                        {searchQuery === "" && (   
+                            <div className="mx-1 mb-4 w-[calc(100%-8px)] flex flex-row items-center pl-4 py-3 shadow-md border-neutral-200 border-[1px] rounded-xl cursor-pointer bg-white" onClick={() => router.push(`/m/event-create?prev=${encodeURIComponent(currentPathUrl)}`)}>
+                                <span className="max-w-[60%] flex flex-col gap-1">
+                                    <h4 className="font-bold text-[16px]">Become a Drifto Host</h4>
+                                    <p className="text-neutral-500 leading-tight text-[13px]">Share what you love. Create moments that matter and get paid.</p>
                                 </span>
-                            ))}
+                                <span className="w-[40%] h-24 flex flex-row items-center relative">
+                                    <Image
+                                        src={infoImage}
+                                        alt={"Become a host"}
+                                        fill
+                                        className="object-contain"
+                                        loading="eager"
+                                    />
+                                </span>
+                            </div>
+                        )}
+                        <div className="w-full flex flex-col px-1">
+                            {filteredOptions.length > 0 ? (
+                                filteredOptions.map((item, i) => (
+                                    <span
+                                        key={i}
+                                        className="w-full flex items-center gap-4 py-[18px] border-b-neutral-300 border-b-[1px] hover:bg-neutral-50 transition-colors cursor-pointer"
+                                        onClick={item.onClickFunction}
+                                    >
+                                        <span className="text-neutral-900 flex-shrink-0 w-7 flex justify-center">
+                                            {item.icon}
+                                        </span>
+                                        <p className="text-[17px] font-normal text-neutral-900">{item.name}</p>
+                                    </span>
+                                ))
+                            ) : (
+                                <p className="text-center text-neutral-500 py-6">No settings found.</p>
+                            )}
                         </div>
-                        <LogoutButton />
+                        <LogoutButton className="px-1" />
                     </div>
                 )
         }
