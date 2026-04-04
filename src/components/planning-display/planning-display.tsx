@@ -15,6 +15,7 @@ import defaultImage from "@/assests/default.jpeg";
 import { FaRegHeart } from 'react-icons/fa';
 import { BiCalendarAlt } from 'react-icons/bi';
 import { PiFireSimpleBold } from 'react-icons/pi';
+import { AddToCalendar } from "@/components/share-button/add-to-calendar";
 
 // Types
 interface BookingItem {
@@ -217,6 +218,17 @@ function BookingCard({ booking, isLast, lastElementRef }: BookingCardProps) {
             className="w-full h-48 object-cover"
             priority={false}
           />
+          <div className="absolute bottom-3 right-3">
+            <AddToCalendar
+              event={{
+                title: booking.title,
+                startTime: booking.startTime,
+                stopTime: booking.stopTime,
+                address: booking.address,
+                description: "You have securely booked a ticket for this fantastic event!"
+              }}
+            />
+          </div>
         </div>
 
         <div className="p-3 space-y-2">

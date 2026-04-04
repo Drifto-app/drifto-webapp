@@ -7,6 +7,7 @@ import { Minus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { LuMinus } from "react-icons/lu";
+import { Linkify } from "@/lib/linkify";
 
 interface OrderItemProps extends React.ComponentProps<"div"> {
     ticket: { [key: string]: any };
@@ -45,9 +46,7 @@ export const OrderItem = ({
                 <p className="w-full text-left text-gray-700 text-sm">
                     {ticket.price ? `₦ ${ticket.price}` : "Free"}
                 </p>
-                <p className="w-full text-left text-gray-400 text-sm">
-                    {ticket.description || "No description available"}
-                </p>
+                <Linkify text={ticket.description || "No description available"} className="w-full text-left text-gray-400 text-sm" />
             </div>
             <div className="flex items-center justify-center gap-6">
                 <Button
