@@ -17,7 +17,7 @@ import Image from "next/image";
 
 export const InviteFriendsPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
     const pathname = usePathname();
 
     return (
@@ -69,22 +69,22 @@ export const InviteFriendsContent = ({
         <>
             <div
                 className={cn(
-                    "w-full min-h-[100dvh] flex flex-col bg-white",
+                    "w-full min-h-[100dvh] flex flex-col bg-background",
                     className,
                 )}
                 {...props}
             >
-                <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+                <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                     <div className="flex flex-row items-center px-8">
                         <FaArrowLeft
                             size={20}
                             onClick={handleBackClick}
-                            className="cursor-pointer hover:text-neutral-700 transition-colors"
+                            className="cursor-pointer hover:text-muted-foreground transition-colors"
                             aria-label="Go back"
                             role="button"
                             tabIndex={0}
                         />
-                        <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                        <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                             Invite Friends
                         </p>
                         <div className="w-5" /> {/* Spacer for centering */}
@@ -103,7 +103,7 @@ export const InviteFriendsContent = ({
 
                     {/* Content */}
                     <div className="flex flex-col items-center text-center mb-12">
-                        <h1 className="text-2xl font-bold text-neutral-950 mb-4">
+                        <h1 className="text-2xl font-bold text-foreground mb-4">
                             Share Drifto with your friends
                         </h1>
                         <p className="text-neutral-500 text-base leading-tight max-w-md">
@@ -123,7 +123,7 @@ export const InviteFriendsContent = ({
                         <Button
                             onClick={handleQuickShare}
                             variant="outline"
-                            className="w-full bg-white border-2 border-neutral-300 hover:bg-neutral-50 text-neutral-950 py-7 font-semibold text-lg rounded-md flex items-center justify-center gap-3"
+                            className="w-full bg-background border-2 border-border hover:bg-background text-foreground py-7 font-semibold text-lg rounded-md flex items-center justify-center gap-3"
                         >
                             <Share2 className="w-5 h-5 text-blue-600" />
                             Share Invite

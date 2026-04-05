@@ -22,14 +22,14 @@ interface TransactionCardProps extends ComponentProps<"div"> {
 type StatusType = "PENDING" | "SUCCESSFUL" | "FAILED"
 
 const STATUS_COLOR: Record<StatusType, string> = {
-    PENDING: "text-neutral-600",
+    PENDING: "text-muted-foreground",
     SUCCESSFUL: "text-green-700",
     FAILED: "text-red-700",
 };
 
 function getStatusColor(status?: string) {
     const key = (status || "PENDING").toUpperCase() as StatusType;
-    return STATUS_COLOR[key] ?? "text-neutral-600";
+    return STATUS_COLOR[key] ?? "text-muted-foreground";
 }
 
 export const TransactionCard = ({
@@ -45,7 +45,7 @@ export const TransactionCard = ({
             <DrawerTrigger asChild>
                 <div
                     className={cn(
-                        "w-full py-4 px-2 border-b border-b-neutral-300 flex items-center justify-between",
+                        "w-full py-4 px-2 border-b border-border flex items-center justify-between",
                         className
                     )}
                     {...props}
@@ -60,7 +60,7 @@ export const TransactionCard = ({
                             }
                         </span>
                         <span className="w-full">
-                            <p className="text-neutral-800 truncate">{transactionContent.description}</p>
+                            <p className="text-foreground truncate">{transactionContent.description}</p>
                             <p className="text-neutral-400">
                                 {isCredit
                                     ? new Date(transactionContent.paidAt || transactionContent.createdAt).toLocaleString()
@@ -95,7 +95,7 @@ export const TransactionCard = ({
                 </DrawerHeader>
 
                 <div className="w-full flex flex-col gap-4 px-8 items-center pb-15">
-                    <div className="text-neutral-800 font-semibold leading-tight">
+                    <div className="text-foreground font-semibold leading-tight">
                         {transactionContent.description}
                     </div>
                     <div className="flex flex-col gap-2 items-center">

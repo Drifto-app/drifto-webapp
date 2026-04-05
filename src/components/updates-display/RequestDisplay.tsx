@@ -148,7 +148,7 @@ const RequestDisplay = () => {
   if (error) {
     return (
       <div className="max-w-2xl mx-auto p-4">
-        <div className="bg-white shadow rounded-lg p-6 text-center">
+        <div className="bg-background shadow rounded-lg p-6 text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={fetchRequests}
@@ -164,7 +164,7 @@ const RequestDisplay = () => {
   if (requests.length === 0) {
     return (
       <div className="max-w-2xl mx-auto p-4">
-        <div className="bg-white shadow rounded-lg p-6 text-center text-gray-500">
+        <div className="bg-background shadow rounded-lg p-6 text-center text-gray-500">
           <p>No pending requests</p>
         </div>
       </div>
@@ -182,7 +182,7 @@ const RequestDisplay = () => {
           return (
             <div
               key={invite.inviteId}
-              className="bg-white shadow rounded-lg overflow-hidden"
+              className="bg-background shadow rounded-lg overflow-hidden"
             >
               {/* Main Request Row */}
               <div className="flex items-center justify-between p-4">
@@ -211,7 +211,7 @@ const RequestDisplay = () => {
                 {/* Toggle Button */}
                 <button
                   onClick={() => toggleDropdown(invite.inviteId)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-muted rounded-full transition-colors"
                   aria-label="Toggle options"
                   disabled={isActionLoading}
                 >
@@ -228,7 +228,7 @@ const RequestDisplay = () => {
                 className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
                   }`}
               >
-                <div className="flex items-center gap-3 border-t border-gray-200 p-3 overflow-x-scroll bg-neutral-100">
+                <div className="flex items-center gap-3 border-t border-border p-3 overflow-x-scroll bg-muted/40">
                   {/* Approve Button */}
                   <button
                     onClick={() =>
@@ -239,14 +239,14 @@ const RequestDisplay = () => {
                       )
                     }
                     disabled={isActionLoading}
-                    className={`w-fit flex items-center gap-2 px-4 py-2 whitespace-nowrap border border-black rounded-full bg-white hover:bg-neutral-100 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed
+                    className={`w-fit flex items-center gap-2 px-4 py-2 whitespace-nowrap border border-foreground rounded-full bg-background hover:bg-muted/40 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed
                       ${isInviteExpired(invite.expireAt) ? " hidden" : " flex"}
                       `}
                   >
                     {isActionLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : null}
-                    <span className="font-medium text-gray-700">Approve</span>
+                    <span className="font-medium text-muted-foreground">Approve</span>
                   </button>
                   {/* Block Button */}
                   <button
@@ -258,22 +258,22 @@ const RequestDisplay = () => {
                       )
                     }
                     disabled={isActionLoading}
-                    className={`w-fit  items-center gap-2 px-4 py-2 whitespace-nowrap border border-black rounded-full bg-white hover:bg-neutral-100 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed 
+                    className={`w-fit  items-center gap-2 px-4 py-2 whitespace-nowrap border border-foreground rounded-full bg-background hover:bg-muted/40 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed 
                       ${isInviteExpired(invite.expireAt) ? " hidden" : " flex"
                       }`}
                   >
                     {isActionLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : null}
-                    <span className="font-medium text-gray-700">Block</span>
+                    <span className="font-medium text-muted-foreground">Block</span>
                   </button>
                   {/* View Profile Button */}
                   <button
                     onClick={() => handleViewProfile(user.id)}
                     disabled={isActionLoading}
-                    className="w-fit flex items-center gap-2 px-4 py-2 whitespace-nowrap border border-black rounded-full bg-white hover:bg-neutral-100 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-fit flex items-center gap-2 px-4 py-2 whitespace-nowrap border border-foreground rounded-full bg-background hover:bg-muted/40 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <span className="font-medium text-gray-700">
+                    <span className="font-medium text-muted-foreground">
                       View Profile
                     </span>
                   </button>{" "}
@@ -281,9 +281,9 @@ const RequestDisplay = () => {
                   <button
                     onClick={() => handleViewEvent(event.eventId)}
                     disabled={isActionLoading}
-                    className="w-fit flex items-center gap-2 px-4 py-2 whitespace-nowrap border border-black rounded-full bg-white hover:bg-neutral-100 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-fit flex items-center gap-2 px-4 py-2 whitespace-nowrap border border-foreground rounded-full bg-background hover:bg-muted/40 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <span className="font-medium text-gray-700">
+                    <span className="font-medium text-muted-foreground">
                       View Event
                     </span>
                   </button>
@@ -299,13 +299,13 @@ const RequestDisplay = () => {
 
 function RequestSkeleton() {
   return (
-    <div className="bg-white shadow rounded-lg overflow-hidden">
+    <div className="bg-background shadow rounded-lg overflow-hidden">
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
-          <div className="rounded-full bg-neutral-300 h-12 w-12 animate-pulse"></div>
-          <div className="h-5 bg-neutral-300 rounded w-32 animate-pulse"></div>
+          <div className="rounded-full bg-muted h-12 w-12 animate-pulse"></div>
+          <div className="h-5 bg-muted rounded w-32 animate-pulse"></div>
         </div>
-        <div className="h-9 w-9 bg-neutral-300 rounded-full animate-pulse"></div>
+        <div className="h-9 w-9 bg-muted rounded-full animate-pulse"></div>
       </div>
     </div>
   );

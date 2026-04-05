@@ -17,6 +17,8 @@ import { LoaderSmall } from "@/components/ui/loader";
 import { showTopToast } from "@/components/toast/toast-util";
 import { EventThemeSelector } from "@/components/event-page/event-theme";
 import { CoverVideoUploader } from '@/components/ui/cover-video';
+import { DEFAULT_EVENT_THEME, getEventThemeBackground, isEventThemeLight } from '@/lib/event-theme';
+import { useTheme } from "next-themes";
 
 interface EventEditProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
@@ -38,6 +40,7 @@ const headerItems: HeaderItem[] = [
 export const EventEdit = ({
     event, className, setEvent, setMainActiveScreen, onThemeChange, ...props
 }: EventEditProps) => {
+    const { resolvedTheme } = useTheme();
     const [activeScreen, setActiveScreen] = useState<string>("details");
 
 
@@ -65,7 +68,9 @@ export const EventEdit = ({
     const [screenshots, setScreenshots] = useState<string[]>(event.screenshots)
     const [tickets, setTickets] = useState<any[]>(event.tickets);
     const [coverVideo, setCoverVideo] = useState<string | undefined>(event.coverVideo);
-    const [eventTheme, setEventTheme] = useState<[string, string]>(event.eventTheme === null ? ["#fff", "#fff"] : event.eventTheme);
+    const [eventTheme, setEventTheme] = useState<[string, string]>(
+        event.eventTheme ?? DEFAULT_EVENT_THEME
+    );
 
     const handleThemeChange = React.useCallback((theme: [string, string]) => {
         setEventTheme(theme);
@@ -73,10 +78,17 @@ export const EventEdit = ({
     }, [onThemeChange]);
 
     const detailsContainerStyle = React.useMemo(() => {
-        if (!eventTheme || eventTheme.length !== 2) return undefined;
-        const [c1, c2] = eventTheme;
-        return { background: `linear-gradient(to bottom, ${c1}, ${c2})` } as const;
-    }, [eventTheme]);
+        return getEventThemeBackground(eventTheme, resolvedTheme);
+    }, [eventTheme, resolvedTheme]);
+    const isLightSurface = isEventThemeLight(eventTheme, resolvedTheme);
+    const strongTextClass = isLightSurface ? "text-black" : "text-white";
+    const mutedTextClass = isLightSurface ? "text-black/70" : "text-white/75";
+    const fieldClass = isLightSurface
+        ? "bg-background text-black placeholder:text-black/45"
+        : "border-white/15 bg-black/85 text-white placeholder:text-white/45";
+    const panelClass = isLightSurface
+        ? "bg-background text-black"
+        : "border-white/15 bg-black/85 text-white";
 
 
     const handleCoverVideoChange = useCallback((newUrl: string | null) => {
@@ -249,29 +261,29 @@ export const EventEdit = ({
                         />
                         <div className="w-full flex flex-col gap-5 px-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="title" className="text-neutral-500">Title</Label>
+                                <Label htmlFor="title" className={mutedTextClass}>Title</Label>
                                 <Input
                                     id="title"
                                     type="text"
                                     placeholder="Title"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    className="py-6 bg-white"
+                                    className={cn("py-6", fieldClass)}
                                 />
                             </div>
                             <div className="grid gap-2 ">
-                                <Label htmlFor="description" className="text-neutral-500">Description</Label>
+                                <Label htmlFor="description" className={mutedTextClass}>Description</Label>
                                 <textarea
                                     id="decription"
                                     placeholder="Description"
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     rows={8}
-                                    className="py-2 px-3 bg-white rounded-md border-1 border-neutral-200 focus:border-blue-600 focus:border-1 focus:outline-hidden"
+                                    className={cn("py-2 px-3 rounded-md border border-border focus:border-blue-600 focus:outline-hidden", fieldClass)}
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <div className="text-neutral-500">Location</div>
+                                <div className={mutedTextClass}>Location</div>
                                 <LocationSearchDialog
                                     currentLocation={{ coordinates, address, city, state }}
                                     onLocationUpdate={handleLocationChange}
@@ -279,31 +291,31 @@ export const EventEdit = ({
                                 />
                             </div>
                             <div className="grid gap-2 w-full">
-                                <Label htmlFor="secure-location" className="text-neutral-500">Secure Location</Label>
-                                <div className="flex flex-row justify-between items-center rounded-md px-4 py-4 bg-white gap-2">
+                                <Label htmlFor="secure-location" className={mutedTextClass}>Secure Location</Label>
+                                <div className={cn("flex flex-row justify-between items-center rounded-md px-4 py-4 gap-2 border border-border", panelClass)}>
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="font-bold">Hide Exact Location</h3>
-                                        <p className="text-sm text-neutral-500">Enable to hide the exact location fromm attendees until necessary</p>
+                                        <h3 className={cn("font-bold", strongTextClass)}>Hide Exact Location</h3>
+                                        <p className={cn("text-sm", mutedTextClass)}>Enable to hide the exact location fromm attendees until necessary</p>
                                     </div>
                                     <Switch id="secure-location" size="medium" checked={locationSecure} onCheckedChange={() => { setLocationSecure(!locationSecure) }} />
                                 </div>
                             </div>
                             <div className="grid gap-2 w-full">
-                                <Label htmlFor="event-visible" className="text-neutral-500">Event Visibility</Label>
-                                <div className="flex flex-row justify-between items-center rounded-md px-4 py-4 bg-white gap-2">
+                                <Label htmlFor="event-visible" className={mutedTextClass}>Event Visibility</Label>
+                                <div className={cn("flex flex-row justify-between items-center rounded-md px-4 py-4 gap-2 border border-border", panelClass)}>
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="font-bold">Public Event</h3>
-                                        <p className="text-sm text-neutral-500">Enable to make the event visible to all users.</p>
+                                        <h3 className={cn("font-bold", strongTextClass)}>Public Event</h3>
+                                        <p className={cn("text-sm", mutedTextClass)}>Enable to make the event visible to all users.</p>
                                     </div>
                                     <Switch id="event-visible" size="medium" checked={isPublic} onCheckedChange={() => { setIsPublic(!isPublic) }} />
                                 </div>
                             </div>
                             <div className="grid gap-2 w-full">
-                                <Label htmlFor="fee-bearer" className="text-neutral-500">Fee Bearer</Label>
-                                <div className="flex flex-row justify-between items-center rounded-md px-4 py-4 bg-white gap-2">
+                                <Label htmlFor="fee-bearer" className={mutedTextClass}>Fee Bearer</Label>
+                                <div className={cn("flex flex-row justify-between items-center rounded-md px-4 py-4 gap-2 border border-border", panelClass)}>
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="font-bold">Pass fee to the ticket buyer</h3>
-                                        <p className="text-sm text-neutral-500">Enable to charge ticket fees directly to the buyer.</p>
+                                        <h3 className={cn("font-bold", strongTextClass)}>Pass fee to the ticket buyer</h3>
+                                        <p className={cn("text-sm", mutedTextClass)}>Enable to charge ticket fees directly to the buyer.</p>
                                     </div>
                                     <Switch
                                         id="fee-bearer"
@@ -326,7 +338,7 @@ export const EventEdit = ({
                                 }
                             </div>
                             <div className="grid gap-2 w-full">
-                                <Label htmlFor="m-age" className="text-neutral-500">Minimum Age</Label>
+                                <Label htmlFor="m-age" className={mutedTextClass}>Minimum Age</Label>
                                 <Input
                                     id="m-age"
                                     name="m-age"
@@ -336,11 +348,11 @@ export const EventEdit = ({
                                     placeholder="Minimum Age"
                                     value={minimumAge}
                                     onChange={(e) => handleMinimumAgeChange(e.target.value)}
-                                    className="py-2 bg-white"
+                                    className={cn("py-2", fieldClass)}
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <div className="text-neutral-500">Event Tags</div>
+                                <div className={mutedTextClass}>Event Tags</div>
                                 <EventTagDialog
                                     currentEventTags={eventTags}
                                     onTagAdd={
@@ -351,13 +363,13 @@ export const EventEdit = ({
                             </div>
                             <div className="grid gap-2">
                                 <div className="flex flex-col">
-                                    <div className="font-bold">Event Theme</div>
-                                    <p className="text-neutral-400 text-xs font-semibold">Select a theme that sets the vibe for your event</p>
+                                    <div className={cn("font-bold", strongTextClass)}>Event Theme</div>
+                                    <p className={cn("text-xs font-semibold", mutedTextClass)}>Select a theme that sets the vibe for your event</p>
                                 </div>
                                 <EventThemeSelector currentEventTheme={eventTheme} setEventTheme={handleThemeChange} />
                             </div>
                             <div className="grid gap-2 w-full">
-                                <Label htmlFor="m-age" className="text-neutral-500">Snapshots</Label>
+                                <Label htmlFor="m-age" className={mutedTextClass}>Snapshots</Label>
                                 <ImageSnapshots setSubmitDisabled={setSubmitDisabled} initialImages={screenshots} maxImages={50} onImageAdd={setScreenshots} onImageRemove={setScreenshots} />
                             </div>
                             <CoverVideoUploader
@@ -395,8 +407,8 @@ export const EventEdit = ({
                             className={cn(
                                 "flex flex-col items-center pb-3 border-b-2 cursor-pointer px-4",
                                 activeScreen === item.value
-                                    ? "border-neutral-950 text-neutral-950"
-                                    : "border-transparent text-neutral-500"
+                                    ? (isLightSurface ? "border-neutral-950 text-black" : "border-blue-500 text-white")
+                                    : (isLightSurface ? "border-transparent text-black/60" : "border-transparent text-white/65")
                             )}
                         >
                             <span className="text-md mt-1 whitespace-nowrap font-semibold">

@@ -140,7 +140,7 @@ const faqs = [
 
 export const FaqPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev");
+    const prev = searchParams?.get("prev") ?? null;
 
     return (
         <ProtectedRoute>
@@ -174,17 +174,17 @@ export const FaqContent = ({ prev, className, ...props }: FaqContentProps) => {
     return (
         <div className={cn("w-full min-h-[100dvh] flex flex-col", className)} {...props}>
             {/* Header */}
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         FAQs
                     </p>
                     <div className="w-5" />
@@ -193,7 +193,7 @@ export const FaqContent = ({ prev, className, ...props }: FaqContentProps) => {
 
             {/* Search */}
             <div className="w-full px-6 py-5">
-                <div className="flex items-center gap-3 px-4 py-2 border border-neutral-300 rounded-full">
+                <div className="flex items-center gap-3 px-4 py-2 border border-border rounded-full">
                     <IoSearchSharp size={25} className="text-neutral-500" />
                     <Input
                         placeholder="Search FAQs"
@@ -208,11 +208,11 @@ export const FaqContent = ({ prev, className, ...props }: FaqContentProps) => {
             <div className="w-full flex-1 flex flex-col px-4 pb-8">
                 <Accordion type="single" collapsible className="w-full">
                     {filteredFaqs.map((item) => (
-                        <AccordionItem key={item.id} value={`faq-${item.id}`} className="border-b border-neutral-200">
+                        <AccordionItem key={item.id} value={`faq-${item.id}`} className="border-b border-border">
                             <AccordionTrigger className="text-left text-[16px] font-medium py-5 px-1 hover:no-underline">
                                 {item.question}
                             </AccordionTrigger>
-                            <AccordionContent className="text-[14px] text-neutral-600 px-1 pb-5 whitespace-pre-line">
+                            <AccordionContent className="text-[14px] text-muted-foreground px-1 pb-5 whitespace-pre-line">
                                 {item.answer}
                             </AccordionContent>
                         </AccordionItem>

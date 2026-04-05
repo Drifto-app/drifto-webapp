@@ -1,16 +1,12 @@
 import { Suspense } from "react";
-import { Loader } from "@/components/ui/loader";
 import {ConnectPageContent} from "@/components/settings/connect-page";
+import { SettingsDetailSkeleton } from "@/components/ui/page-skeletons";
 
 
 export default function ConnectPage() {
     return (
         <Suspense
-            fallback={
-                <div className="w-full h-screen flex items-center justify-center">
-                    <Loader />
-                </div>
-            }
+            fallback={<SettingsDetailSkeleton />}
         >
             <ConnectPageContent />
         </Suspense>

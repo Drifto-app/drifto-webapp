@@ -9,7 +9,7 @@ export default function SearchContent () {
 
     const searchParams = useSearchParams();
 
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
 
     return (
         <ProtectedRoute>

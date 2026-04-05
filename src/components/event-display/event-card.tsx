@@ -214,7 +214,7 @@ export const EventCard = ({
           )}
 
           {event.original && (
-            <div className="absolute top-4 left-2 rounded-full py-2 px-2 text-xs shadow-md font-semibold bg-white">
+            <div className="absolute top-4 left-2 rounded-full bg-background py-2 px-2 text-xs shadow-md font-semibold text-foreground">
               Drifto Original
             </div>
           )}

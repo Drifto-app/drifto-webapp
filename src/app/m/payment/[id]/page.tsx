@@ -5,16 +5,17 @@ import {ScreenProvider} from "@/components/screen/screen-provider";
 import {MdErrorOutline} from "react-icons/md";
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {Loader} from "@/components/ui/loader";
 import {useParams, useSearchParams} from "next/navigation";
 import {authApi} from "@/lib/axios";
 import {PaymentContent} from "@/components/payment/payment-content";
+import { PaymentPageSkeleton } from "@/components/ui/page-skeletons";
 
 export default function PaymentPage() {
-    const { id } = useParams();
+    const params = useParams<{ id: string }>();
+    const id = params?.id;
     const searchParams = useSearchParams();
 
-    const prev = searchParams.get("prev");
+    const prev = searchParams?.get("prev") ?? null;
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -64,9 +65,7 @@ export default function PaymentPage() {
         return (
             <ProtectedRoute>
                 <ScreenProvider>
-                    <div className="w-full h-screen flex flex-col items-center justify-center">
-                        <Loader className="h-10 w-10"/>
-                    </div>
+                    <PaymentPageSkeleton />
                 </ScreenProvider>
             </ProtectedRoute>
         )

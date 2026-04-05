@@ -48,7 +48,7 @@ export const SnapshotCarousel: React.FC<SnapshotCarouselProps> = ({ snapshots })
                 <div className="absolute top-4 right-4 text-white" onClick={closeModal}>
                     <X size={30} />
                 </div>
-                <Dialog.Panel className="bg-white overflow-hidden w-full max-h-[95%]">
+                <Dialog.Panel className="bg-background overflow-hidden w-full max-h-[95%]">
                     {activeSrc && (
                         <Image
                             src={activeSrc}

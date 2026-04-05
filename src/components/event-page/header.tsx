@@ -2,6 +2,8 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { FaArrowLeft } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { useTheme } from 'next-themes';
+import { getEventThemeBackground, isEventThemeLight } from '@/lib/event-theme';
 
 interface SingleEventHeaderProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
@@ -30,6 +32,10 @@ export const SingleEventHeader = ({
     title = "Manage Event", isCoHostComponent = false, isCoHost, event, activeScreen, setActiveScreen, prev, onBackClick, className, ...props
 }: SingleEventHeaderProps) => {
     const router = useRouter();
+    const { resolvedTheme } = useTheme();
+
+    const headerStyle = getEventThemeBackground(event?.eventTheme, resolvedTheme);
+    const isLightSurface = isEventThemeLight(event?.eventTheme, resolvedTheme);
 
     const handleBackClick = () => {
         if (onBackClick) {
@@ -50,16 +56,22 @@ export const SingleEventHeader = ({
     if (isCoHost) {
         return (
             <div className={cn(
-                "w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 justify-center",
+                "w-full border-b border-border flex flex-col gap-3 justify-center",
                 className
-            )} {...props}>
+            )} style={headerStyle} {...props}>
                 <div className="flex flex-row items-center px-8 py-6">
                     <FaArrowLeft
                         size={16}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className={cn(
+                            "cursor-pointer transition-colors",
+                            isLightSurface ? "text-black/80 hover:text-black" : "text-white/85 hover:text-white"
+                        )}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className={cn(
+                        "font-semibold text-md w-full text-center capitalize truncate ml-4",
+                        isLightSurface ? "text-black" : "text-white"
+                    )}>
                         {isCoHostComponent ? title : "Manage Event"}
                     </p>
                 </div>
@@ -69,16 +81,22 @@ export const SingleEventHeader = ({
 
     return (
         <div className={cn(
-            "w-full border-b-1 border-b-neutral-300 flex flex-col gap-5 h-28 justify-between",
+            "w-full border-b border-border flex h-28 flex-col justify-between gap-5",
             className
-        )} {...props}>
+        )} style={headerStyle} {...props}>
             <div className="flex flex-row items-center pt-8 px-8">
                 <FaArrowLeft
                     size={16}
                     onClick={handleBackClick}
-                    className="cursor-pointer hover:text-neutral-700 transition-colors"
+                    className={cn(
+                        "cursor-pointer transition-colors",
+                        isLightSurface ? "text-black/80 hover:text-black" : "text-white/85 hover:text-white"
+                    )}
                 />
-                <p className="font-semibold text-neutral-800 text-md w-full text-center capitalize truncate ml-4">
+                <p className={cn(
+                    "font-semibold text-md w-full text-center capitalize truncate ml-4",
+                    isLightSurface ? "text-black" : "text-white"
+                )}>
                     {event.title}
                 </p>
             </div>
@@ -88,10 +106,14 @@ export const SingleEventHeader = ({
                         <div
                             onClick={() => setActiveScreen!(item.value)}
                             className={cn(
-                                "flex flex-col items-center hover:text-neutral-900 pb-1 border-b-2 cursor-pointer px-4",
+                                "flex flex-col items-center pb-1 border-b-2 cursor-pointer px-4 transition-colors",
                                 activeScreen === item.value
-                                    ? "border-neutral-950 text-neutral-950"
-                                    : "border-transparent text-neutral-700"
+                                    ? isLightSurface
+                                        ? "border-black text-black"
+                                        : "border-white text-white"
+                                    : isLightSurface
+                                        ? "border-transparent text-black/55 hover:text-black"
+                                        : "border-transparent text-white/65 hover:text-white"
                             )}
                         >
                             <span className="text-sm mt-1 whitespace-nowrap">

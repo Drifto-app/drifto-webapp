@@ -1,15 +1,11 @@
 import {Suspense} from "react";
-import {Loader} from "@/components/ui/loader";
 import SearchContent from "@/components/search/search-content";
+import { SearchPageSkeleton } from "@/components/ui/page-skeletons";
 
 export default function SearchPage() {
 
     return (
-        <Suspense fallback={
-            <div className="w-full h-screen flex items-center justify-center">
-                <Loader />
-            </div>
-        }>
+        <Suspense fallback={<SearchPageSkeleton />}>
             <SearchContent />
         </Suspense>
     )

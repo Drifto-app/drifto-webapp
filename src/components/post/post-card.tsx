@@ -7,6 +7,7 @@ import * as React from "react";
 import { FaFlag, FaHeart, FaRegComment, FaRegHeart } from "react-icons/fa";
 import { AiOutlineSend } from "react-icons/ai";
 import { MediaCarousel, MediaDialog } from "@/components/post/post-media";
+import { Linkify } from "@/lib/linkify";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SlOptionsVertical } from "react-icons/sl";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
@@ -91,7 +92,7 @@ export const PostCard = ({
         <>
             <div
                 className={cn(
-                    "w-full py-4 border-b-1 border-b-neutral-200",
+                    "w-full py-4 border-b-1 border-border",
                     className,
                 )}
                 {...props}
@@ -169,9 +170,7 @@ export const PostCard = ({
                         }}
                     >
                         <span className="flex flex-col gap-2">
-                            <p className="text-sm text-neutral-800">
-                                {postContent.content}
-                            </p>
+                            <Linkify text={postContent.content} className="text-sm text-foreground" />
                             <span className="flex flex-wrap gap-1 text-blue-600" onClick={(e) => e.stopPropagation()}>
                                 {postContent.taggedUsers.map((tagUser: { [key: string]: any }) => (
                                     <a

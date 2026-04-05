@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { UserListSkeleton } from "@/components/ui/page-skeletons";
 
 interface EventReferralProps extends ComponentProps<"div"> {
   event: {[key: string]: any};
@@ -53,7 +54,7 @@ export const EventReferral = ({
   return (
     <div
       className={cn(
-        "w-full flex-1 bg-gray-50 py-4 px-4 flex flex-col justify-between",
+        "w-full flex-1 bg-accent/40 py-4 px-4 flex flex-col justify-between",
         className,
       )}
       {...props}
@@ -71,9 +72,7 @@ export const EventReferral = ({
             </h2>
             {loading
               ? <div className="w-full flex flex-col gap-4">
-                <div className="flex justify-center items-center py-8">
-                  <Loader />
-                </div>
+                <UserListSkeleton count={3} />
               </div>
               : <div className="w-full flex flex-col gap-4">
                 {referrals.map(referral => (

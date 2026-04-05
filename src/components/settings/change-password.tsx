@@ -15,7 +15,7 @@ import {authApi} from "@/lib/axios";
 
 export const PasswordPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
     const pathname = usePathname();
 
     return (
@@ -118,17 +118,17 @@ export const PasswordContent = ({
     return (
         <div
             className={cn(
-                "w-full min-h-[100dvh] flex flex-col bg-neutral-50",
+                "w-full min-h-[100dvh] flex flex-col bg-background",
                 className,
             )}
             {...props}
         >
-            <div className="w-full border-b border-b-neutral-300 bg-white flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border bg-background flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-6">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
@@ -140,7 +140,7 @@ export const PasswordContent = ({
                 <div className="flex flex-col gap-8">
                     {/* Header Section */}
                     <div className="flex flex-col gap-2">
-                        <h1 className="text-3xl font-bold text-neutral-950">Change Your Password</h1>
+                        <h1 className="text-3xl font-bold text-foreground">Change Your Password</h1>
                         <p className="text-neutral-500 text-base">
                             Change your password by entering the current one and creating a new one.
                         </p>
@@ -155,7 +155,7 @@ export const PasswordContent = ({
                                 placeholder="Current Password"
                                 value={oldPassword}
                                 onChange={handleOldPasswordChange}
-                                className="w-full py-7 text-base pr-16 rounded-md border-2 border-neutral-200 focus:border-blue-500 bg-white"
+                                className="w-full py-7 text-base pr-16 rounded-md border-2 border-border focus:border-blue-500 bg-background"
                             />
                             <button
                                 type="button"
@@ -173,7 +173,7 @@ export const PasswordContent = ({
                                 placeholder="New Password"
                                 value={newPassword}
                                 onChange={handleNewPasswordChange}
-                                className="w-full py-7 text-base pr-16 rounded-md border-2 border-neutral-200 focus:border-blue-500 bg-white"
+                                className="w-full py-7 text-base pr-16 rounded-md border-2 border-border focus:border-blue-500 bg-background"
                             />
                             <button
                                 type="button"
@@ -196,7 +196,7 @@ export const PasswordContent = ({
                                 placeholder="Confirm Password"
                                 value={confirmPassword}
                                 onChange={handleConfirmPasswordChange}
-                                className="w-full py-7 text-base pr-16 rounded-md border-2 border-neutral-200 focus:border-blue-500 bg-white"
+                                className="w-full py-7 text-base pr-16 rounded-md border-2 border-border focus:border-blue-500 bg-background"
                             />
                             <button
                                 type="button"

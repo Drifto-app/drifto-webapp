@@ -2,6 +2,7 @@ import {Metadata} from 'next'
 import {notFound, redirect} from 'next/navigation'
 import {headers} from 'next/headers'
 import {api} from "@/lib/axios";
+import {Linkify} from "@/lib/linkify";
 import Image from "next/image";
 
 interface Event {
@@ -248,7 +249,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
         const event = await getPublicEvent(resolvedParams.id)
         if (!event) notFound()
         return (
-            <div className="min-h-[100dvh] bg-gray-50 py-8">
+            <div className="min-h-[100dvh] bg-accent/40 py-8">
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{
@@ -264,7 +265,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                     }}
                 />
                 <div className="max-w-4xl mx-auto px-4">
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div className="bg-background rounded-lg shadow-lg overflow-hidden">
                         <div className="relative h-64">
                             <Image
                                 src={event.titleFileUrl}
@@ -278,7 +279,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                             <div className="flex flex-wrap gap-4 text-gray-600 mb-4">
                                 <span>📅 {new Date(event.startTime).toLocaleDateString()}</span>
                             </div>
-                            <p className="text-gray-700 leading-relaxed">{event.description}</p>
+                            <Linkify text={event.description} className="text-muted-foreground leading-relaxed" />
                         </div>
                     </div>
                 </div>

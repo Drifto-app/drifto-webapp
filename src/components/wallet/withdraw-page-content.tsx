@@ -17,7 +17,7 @@ import { authApi } from "@/lib/axios";
 
 export const WalletWithdrawalPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
     const pathname = usePathname();
 
     return (
@@ -113,17 +113,17 @@ export const WalletTransactionsContent = ({
             )}
             {...props}
         >
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={16}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-sm w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-sm w-full text-center capitalize truncate ml-4">
                         Withdrawal
                     </p>
                     <div className="w-5" /> {/* Spacer for centering */}
@@ -134,8 +134,8 @@ export const WalletTransactionsContent = ({
                     <h3 className="font-bold text-lg w-full">Enter amount you want to withdraw</h3>
                     <p className="text-neutral-500 w-full leading-tight">Enter an amount of at least 100 Naira. Make sure you have already stored your account number in the payment settings screen so we can deposit the money there.</p>
                     <div className="w-full flex flex-col gap-2">
-                        <div className="w-full flex items-center gap-3 px-4 py-2 border border-neutral-300 rounded-lg focus-within:border-blue-600">
-                            <TbCurrencyNaira size={20} className="text-neutral-600" />
+                        <div className="w-full flex items-center gap-3 px-4 py-2 border border-border rounded-lg focus-within:border-blue-600">
+                            <TbCurrencyNaira size={20} className="text-muted-foreground" />
                             <Input
                                 placeholder="Amount"
                                 value={amount}

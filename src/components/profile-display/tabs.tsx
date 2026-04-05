@@ -26,7 +26,7 @@ export function ProfileTabs({ active, onClick }: TabsProps) {
     };
 
     return (
-        <ul className="flex flex-row flex-nowrap justify-center w-full gap-6 overflow-x-auto px-4 mt-4 no-scrollbar">
+        <ul className="flex flex-row w-full overflow-x-auto mt-4 no-scrollbar border-b border-border">
             {TAB_OPTIONS.map((tab) => (
                 <Tab
                     key={tab.value}
@@ -49,22 +49,22 @@ interface TabProps {
 
 function Tab({ label, value, isActive, onClick }: TabProps) {
     return (
-        <li className="flex-shrink-0">
+        <li className="flex-1">
             <div
                 onClick={() => onClick(value)}
                 className={cn(
-                    "flex flex-col items-center border-b-3 cursor-pointer px-4 transition-all gap-1",
+                    "flex flex-col items-center border-b-2 cursor-pointer pb-3 transition-all",
                     isActive
-                        ? "pb-2 border-b-neutral-800"
-                        : "pb-0 opacity-50 border-transparent"
+                        ? "border-b-neutral-800 dark:border-b-blue-500 opacity-100"
+                        : "opacity-60 border-transparent"
                 )}
             >
         <span
             className={cn(
-                "mt-1 whitespace-nowrap",
+                "whitespace-nowrap transition-colors",
                 isActive
-                    ? "text-md font-bold text-neutral-700"
-                    : "text-[15px] text-neutral-500"
+                    ? "text-md font-bold text-foreground dark:text-white"
+                    : "text-[15px] text-muted-foreground dark:text-neutral-400"
             )}
         >
           {label}

@@ -53,7 +53,7 @@ export default function Error({ error, reset }:  {
           </button>
           <a
             href="/"
-            className="px-8 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors duration-200"
+            className="px-8 py-3 bg-background text-foreground font-medium rounded-lg hover:bg-gray-200 transition-colors duration-200"
           >
             Go Home
           </a>
@@ -62,7 +62,7 @@ export default function Error({ error, reset }:  {
         {/* Decorative Element */}
         <div className="mt-16 flex justify-center gap-2">
           <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-          <div className="w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: '75ms' }}></div>
+          <div className="w-2 h-2 bg-background rounded-full animate-pulse" style={{ animationDelay: '75ms' }}></div>
           <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '150ms' }}></div>
         </div>
       </div>

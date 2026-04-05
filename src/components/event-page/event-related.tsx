@@ -8,6 +8,7 @@ import {Loader} from "@/components/ui/loader";
 import {Button} from "@/components/ui/button";
 import {useCallback, useEffect, useRef, useState} from "react";
 import { useAuthStore } from '@/store/auth-store';
+import { EventCardSkeleton } from "@/components/ui/page-skeletons";
 
 interface SingleEventRelatedProps extends React.ComponentProps<"div">{
     event: {[key: string]: any};
@@ -132,12 +133,14 @@ export const SingleEventRelated = ({
                 className={cn(
                     "w-full min-h-[85vh] flex flex-col items-center justify-center",
                     className,
-                    event.eventTheme !== null ? "" : "bg-neutral-100",
+                    event.eventTheme !== null ? "" : "bg-muted/40",
                 )}
                 {...props}
             >
-                <div className="flex justify-center py-8">
-                    <Loader className="h-10 w-10"/>
+                <div className="flex w-full flex-col gap-8 px-4 py-6">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                        <EventCardSkeleton key={index} />
+                    ))}
                 </div>
             </div>
         );
@@ -150,7 +153,7 @@ export const SingleEventRelated = ({
                 className={cn(
                     "w-full min-h-[85vh] flex flex-col items-center justify-center",
                     className,
-                    event.eventTheme !== null ? "" : "bg-neutral-100",
+                    event.eventTheme !== null ? "" : "bg-muted/40",
                 )}
                 {...props}
             >
@@ -177,12 +180,12 @@ export const SingleEventRelated = ({
                 className={cn(
                     "w-full min-h-[85vh] flex flex-col items-center justify-center",
                     className,
-                    event.eventTheme !== null ? "" : "bg-neutral-100",
+                    event.eventTheme !== null ? "" : "bg-muted/40",
                 )}
                 {...props}
             >
                 <div className="text-center max-w-md px-4">
-                    <h3 className="text-lg font-semibold text-neutral-700 mb-2">
+                    <h3 className="text-lg font-semibold text-muted-foreground mb-2">
                         No Related Events
                     </h3>
                     <p className="text-neutral-500 mb-4">
@@ -204,13 +207,13 @@ export const SingleEventRelated = ({
             className={cn(
                 "w-full min-h-[85vh]",
                 className,
-                event.eventTheme !== null ? "" : "bg-neutral-100",
+                event.eventTheme !== null ? "" : "bg-muted/40",
             )}
             {...props}
         >
             <div className="px-4 py-6">
                 <div className="mb-6">
-                    <h2 className="text-xl font-semibold text-neutral-900 mb-1">
+                    <h2 className="text-xl font-semibold text-foreground mb-1">
                         Related Events ({totalCount})
                     </h2>
                 </div>

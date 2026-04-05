@@ -12,6 +12,7 @@ import { IoChatbubbleEllipsesOutline, IoSend } from 'react-icons/io5';
 import { Loader, LoaderSmall } from '@/components/ui/loader';
 import { Button } from '@/components/ui/button';
 import { BiSolidError } from 'react-icons/bi';
+import { PostDetailPageSkeleton } from '@/components/ui/page-skeletons';
 
 
 interface SinglePostContentProps extends ComponentProps<"div"> {
@@ -192,24 +193,22 @@ export const SinglePostContent = ({
       className
     )} {...props}>
       <div className={cn(
-      "w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center",
+      "w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center",
       className
       )} {...props}>
         <div className="flex flex-row items-center px-8">
           <FaArrowLeft
             size={20}
             onClick={handleBackClick}
-            className="cursor-pointer hover:text-neutral-700 transition-colors"
+            className="cursor-pointer hover:text-muted-foreground transition-colors"
           />
-          <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+          <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
             Post
           </p>
         </div>
       </div>
       {initialLoading
-        ? (<div className="w-full h-screen flex flex-col items-center justify-center">
-          <Loader className="h-10 w-10"/>
-        </div>)
+        ? <PostDetailPageSkeleton />
         : error && comments.length === 0
           ? ( <div className="w-full h-screen flex flex-col gap-3 items-center justify-center">
             <BiSolidError size={40} className="text-red-600"/>
@@ -234,7 +233,7 @@ export const SinglePostContent = ({
 
               <form
                 onSubmit={handleCommentSubmit}
-                className="fixed inset-x-0 z-60 border-t bg-white border-neutral-200 safe-area-inset-bottom flex flex-row"
+                className="fixed inset-x-0 z-60 border-t bg-background border-border safe-area-inset-bottom flex flex-row"
                 style={{
                   bottom: keyboardOffset,
                   transition: "bottom 0.2s ease",
@@ -252,7 +251,7 @@ export const SinglePostContent = ({
                 <div className="flex items-center py-0 px-3">
                   <button className={cn(
                     "p-3 rounded-full",
-                    comment.length === 0 ? "bg-neutral-300" : "bg-blue-700"
+                    comment.length === 0 ? "bg-muted" : "bg-blue-700"
                   )} type="submit" disabled={comment.length === 0 || submitCommentLoading}>
                     {
                       !submitCommentLoading

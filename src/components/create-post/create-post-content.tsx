@@ -415,19 +415,19 @@ export const CreatePostContent = ({
             >
                 <div
                     className={cn(
-                        "w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0"
+                        "w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0"
                     )}
                 >
                     <div className="flex flex-row items-center px-8">
                         <FaArrowLeft
                             size={20}
                             onClick={handleBackClick}
-                            className="cursor-pointer hover:text-neutral-700 transition-colors"
+                            className="cursor-pointer hover:text-muted-foreground transition-colors"
                             aria-label="Go back"
                             role="button"
                             tabIndex={0}
                         />
-                        <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                        <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                             Create Post
                         </p>
                     </div>
@@ -452,14 +452,14 @@ export const CreatePostContent = ({
                                     value={postText}
                                     onChange={handleTextareaChange}
                                     rows={5}
-                                    className="w-full py-2 px-3 bg-white rounded-md border-1 border-neutral-200 focus:border-blue-600 focus:border-1 focus:outline-hidden placeholder:text-lg"
+                                    className="w-full py-2 px-3 bg-background rounded-md border-1 border-border focus:border-blue-600 focus:border-1 focus:outline-hidden placeholder:text-lg"
                                 />
 
                                 {/* Mention/Hashtag Dropdown */}
                                 {mentionState.isActive && (
                                     <div
                                         ref={mentionDropdownRef}
-                                        className="absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-200 rounded-md shadow-lg max-h-60 overflow-y-auto z-10"
+                                        className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg max-h-60 overflow-y-auto z-10"
                                         onScroll={handleDropdownScroll}
                                     >
                                         {mentionState.loading && mentionState.results.length === 0 && (
@@ -478,7 +478,7 @@ export const CreatePostContent = ({
                                             <div
                                                 key={result.id}
                                                 className={cn(
-                                                    "p-3 flex items-center gap-3 cursor-pointer hover:bg-neutral-50"
+                                                    "p-3 flex items-center gap-3 cursor-pointer hover:bg-background"
                                                 )}
                                                 onClick={() => selectMention(result)}
                                             >
@@ -498,7 +498,7 @@ export const CreatePostContent = ({
                                                                 </AspectRatio>
                                                             </div>
                                                             <div className="flex gap-2 items-center">
-                                                                <p className="text-black text-sm font-bold truncate">{result.username}</p>
+                                                                <p className="text-foreground text-sm font-bold truncate">{result.username}</p>
                                                                 <UserVerificationBadge user={result} />
                                                             </div>
                                                         </div>
@@ -509,7 +509,7 @@ export const CreatePostContent = ({
                                                             <Hash size={16} className="text-blue-600" />
                                                         </span>
                                                         <span className="flex-1">
-                                                            <p className="font-medium text-neutral-900 leading-tight line-clamp-2">{result.title}</p>
+                                                            <p className="font-medium text-foreground leading-tight line-clamp-2">{result.title}</p>
                                                         </span>
                                                     </div>
                                                 )}
@@ -623,7 +623,7 @@ export const CreatePostContent = ({
                             </div>
                         </div>
                         <div className="w-full flex justify-between px-2">
-                            <label className="border-1 border-neutral-200 p-3 rounded-full bg-white">
+                            <label className="border-1 border-border p-3 rounded-full bg-background">
                                 {isUploading ? <LoaderSmall /> : <HiOutlineRectangleStack size={30} />}
                                 <input
                                     type="file"
@@ -635,7 +635,7 @@ export const CreatePostContent = ({
                             </label>
                             <Button
                                 variant="link"
-                                className="border-none bg-white font-semibold text-lg text-blue-800"
+                                className="border-none bg-background font-semibold text-lg text-blue-800"
                                 disabled={isUploading || isPostLoading}
                                 onClick={() => handlePostSubmit()}
                             >
@@ -658,7 +658,7 @@ export const CreatePostContent = ({
                     <X size={30} />
                 </div>
 
-                <Dialog.Panel className="bg-white overflow-hidden w-full max-h-[95%]">
+                <Dialog.Panel className="bg-background overflow-hidden w-full max-h-[95%] text-foreground">
                     {!activeMediaFile ? null : activeMediaFile.type === "IMAGE"
                         ? (
                             <Image

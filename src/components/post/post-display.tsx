@@ -11,6 +11,7 @@ import { Loader } from "@/components/ui/loader";
 import { FaPlus } from "react-icons/fa";
 import { PostCard } from "@/components/post/post-card";
 import { Button } from "@/components/ui/button";
+import { PostFeedSkeleton } from "@/components/ui/page-skeletons";
 
 interface PostDisplayProps extends ComponentProps<"div"> { }
 
@@ -121,13 +122,13 @@ export const PostDisplay = ({ className, ...props }: PostDisplayProps) => {
     return (
         <div
             className={cn(
-                "w-full flex flex-col min-h-[100dvh] bg-gray-50",
+                "w-full flex flex-col min-h-[100dvh] bg-accent/40",
                 className,
             )}
             style={{ maxHeight: "calc(100dvh - 80px)" }}
         >
             <div className={cn(
-                "w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 py-4 justify-center",
+                "w-full border-b-1 border-border flex flex-col gap-3 py-4 justify-center",
                 className
             )} {...props}>
                 <div className="flex flex-row items-center justify-between px-4">
@@ -136,7 +137,7 @@ export const PostDisplay = ({ className, ...props }: PostDisplayProps) => {
                         className="bg-transparent rounded-none p-0 shadow-none"
                         onClick={() => router.push(`/m/settings?prev=${encodeURIComponent("/?screen=posts")}`)}
                     >
-                        <FiSettings size={20} className="text-black" />
+                        <FiSettings size={20} className="text-foreground" />
                     </button>
                 </div>
             </div>
@@ -145,13 +146,17 @@ export const PostDisplay = ({ className, ...props }: PostDisplayProps) => {
                 className="w-full flex flex-col"
                 {...props}
             >
-                <div className="w-full flex flex-col gap-2 pt-4 pb-20">
-                    {posts.map((post) => (
-                        <PostCard key={post.id} postContent={post} />
-                    ))}
-                </div>
+                {loading && posts.length === 0 ? (
+                    <PostFeedSkeleton />
+                ) : (
+                    <div className="w-full flex flex-col gap-2 pt-4 pb-20">
+                        {posts.map((post) => (
+                            <PostCard key={post.id} postContent={post} />
+                        ))}
+                    </div>
+                )}
 
-                {loading && (
+                {loading && posts.length > 0 && (
                     <div className="w-full flex items-center justify-center pt-5 pb-10">
                         <Loader className="h-8 w-8" />
                     </div>

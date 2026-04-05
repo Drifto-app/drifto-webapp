@@ -58,17 +58,17 @@ export const SearchDetails = ({ prev, className, ...props }: SearchDetailsProps)
 
     return (
         <div className={cn("w-full flex flex-col min-h-[100dvh]", className)} {...props}>
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-6 justify-center pt-6 pb-4 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-6 justify-center pt-6 pb-4 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         Search
                     </p>
                 </div>
@@ -97,7 +97,7 @@ export const SearchDetails = ({ prev, className, ...props }: SearchDetailsProps)
                         )}
                     </div>
                     <div className="rounded-full p-2 border-1 border-neutral-400" onClick={() => setActiveScreen("advance-search")}>
-                        <IoOptionsOutline size={25} className="text-neutral-700" />
+                        <IoOptionsOutline size={25} className="text-muted-foreground" />
                     </div>
                 </div>
             </div>

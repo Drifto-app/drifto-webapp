@@ -31,7 +31,7 @@ function UserVerificationBadge({ user, isClickable = false }: { user: { [key: st
     let description = ""
 
     if (user.userVerificationType === "ORGANIZATION_VERIFICATION") {
-        verificationStyle = "text-black";
+        verificationStyle = "text-foreground";
         description = "The account is verified as an affiliated account to Drifto";
     } else if (user.userVerificationType === "USER_VERIFICATION") {
         verificationStyle = "text-blue-600"

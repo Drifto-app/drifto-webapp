@@ -29,6 +29,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { UserEvents } from "@/components/user/user-events";
 import { UserPosts } from "@/components/user/user-posts";
 import defaultImage from "@/assests/default.jpeg";
+import { Linkify } from "@/lib/linkify";
 
 interface UserProps extends ComponentProps<"div"> {
     user: { [key: string]: any }
@@ -130,7 +131,7 @@ export const UserContent = ({
                             </div>
                             <div className="w-full flex flex-col">
                                 <div className="flex gap-2 items-center">
-                                    <p className="text-black text-sm font-bold truncate">{user.username}</p>
+                                    <p className="text-foreground text-sm font-bold truncate">{user.username}</p>
                                     <UserVerificationBadge user={user} isClickable={true} />
                                 </div>
                             </div>
@@ -148,14 +149,14 @@ export const UserContent = ({
                                 ? <div className="w-full flex gap-3">
                                     <Button
                                         variant="outline"
-                                        className="flex-1 min-w-0 shadow-none font-semibold border-black py-6"
+                                        className="flex-1 min-w-0 shadow-none font-semibold border-foreground py-6"
                                         onClick={() => router.push(`/m/settings/edit-profile?prev=${encodeURIComponent(`${pathname}?${searchParams}`)}`)}
                                     >
                                         Edit Profile
                                     </Button>
                                     <Button
                                         variant="outline"
-                                        className="flex-1 min-w-0 shadow-none font-semibold border-black py-6"
+                                        className="flex-1 min-w-0 shadow-none font-semibold border-foreground py-6"
                                         onClick={() => router.push(`/m/event-create?prev=${encodeURIComponent(`${pathname}?${searchParams}`)}`)}
                                     >
                                         Create Event
@@ -171,7 +172,7 @@ export const UserContent = ({
                                     {user.followed
                                         ? <Button
                                             variant="outline"
-                                            className="flex-1 min-w-0 shadow-none font-semibold border-black py-6"
+                                            className="flex-1 min-w-0 shadow-none font-semibold border-foreground py-6"
                                             onClick={handleUnsubscribeClick}
                                             disabled={isSubscribeLoading}
                                         >
@@ -203,16 +204,14 @@ export const UserContent = ({
                                     <DialogHeader>
                                         <DialogTitle className="text-left">About</DialogTitle>
                                     </DialogHeader>
-                                    <div className="w-full flex flex-col gap-4 text-neutral-600">
-                                        <span className="font-medium text-sm">
-                                            {user.aboutText}
-                                        </span>
+                                    <div className="w-full flex flex-col gap-4 text-muted-foreground">
+                                        <Linkify text={user.aboutText} className="font-medium text-sm" as="span" />
                                         <div className="w-full flex flex-col gap-3">
                                             {userAboutLinks.map((item, index) => {
                                                 if (!item.value) return
                                                 return (
                                                     <div key={index} className="flex flex-col">
-                                                        <span className="font-bold text-neutral-700">{item.name}</span>
+                                                        <span className="font-bold text-muted-foreground">{item.name}</span>
                                                         <span className="w-full flex items-center justify-between">
                                                             <p>{item.value}</p>
                                                             <span
@@ -230,7 +229,7 @@ export const UserContent = ({
                                 </DialogContent>
                             </Dialog>
                             <div className="w-full grid grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-3 border border-neutral-300 px-4 py-5 rounded-sm items-start" onClick={() => router.push(
+                                <div className="flex flex-col gap-3 border border-border px-4 py-5 rounded-sm items-start" onClick={() => router.push(
                                     isUserProfile
                                         ? `/m/user-events?prev=${encodeURIComponent(`${pathname}?${searchParams}`)}`
                                         : `/m/user-events?id=${user?.id}&prev=${encodeURIComponent(`${pathname}?${searchParams}`)}`
@@ -241,7 +240,7 @@ export const UserContent = ({
                                     <span className="font-semibold">Experiences</span>
                                 </div>
 
-                                <div className="flex flex-col gap-3 border border-neutral-300 px-4 py-5 rounded-sm items-start" onClick={() => setActiveScreen("posts")}>
+                                <div className="flex flex-col gap-3 border border-border px-4 py-5 rounded-sm items-start" onClick={() => setActiveScreen("posts")}>
                                     <div className="h-10 flex items-center justify-center">
                                         <FaHashtag size={24} />
                                     </div>
@@ -263,14 +262,14 @@ export const UserContent = ({
                 )}
                 {...props}
             >
-                <div className={"w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center"}>
+                <div className={"w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center"}>
                     <div className="flex flex-row items-center px-8">
                         <FaArrowLeft
                             size={16}
                             onClick={handleBackClick}
-                            className="cursor-pointer hover:text-neutral-700 transition-colors"
+                            className="cursor-pointer hover:text-muted-foreground transition-colors"
                         />
-                        <p className="font-semibold text-neutral-950 text-sm w-full text-center capitalize truncate ml-4">
+                        <p className="font-semibold text-foreground text-sm w-full text-center capitalize truncate ml-4">
                             {user.username}
                         </p>
                     </div>
@@ -286,7 +285,7 @@ export const UserContent = ({
                 <div className="absolute top-4 right-4 text-white" onClick={() => setIsOpen(false)}>
                     <X size={30} />
                 </div>
-                <HeadDialog.Panel className="bg-white overflow-hidden w-full max-h-[95%]">
+                <HeadDialog.Panel className="bg-background overflow-hidden w-full max-h-[95%] text-foreground">
                     <Image
                         src={user.profileImage || defaultImage}
                         alt="Snapshot"

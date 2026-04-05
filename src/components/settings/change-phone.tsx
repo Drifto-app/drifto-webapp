@@ -18,7 +18,7 @@ import {useAuthStore} from "@/store/auth-store";
 
 export const UpdatePhonePageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
 
     const pathname = usePathname();
 
@@ -124,7 +124,7 @@ const UpdatePhoneContent = ({
                         <div className="w-full flex flex-col items-center justify-center gap-6">
                             <span className="w-full flex flex-col gap-2 items-center text-center">
                                 <p className="text-2xl font-bold">Enter Your Phone Number</p>
-                                <p className="text-neutral-600 text-lg">Please enter your phone number to continue.</p>
+                                <p className="text-muted-foreground text-lg">Please enter your phone number to continue.</p>
                             </span>
                             <Input
                                 type="tel"
@@ -156,7 +156,7 @@ const UpdatePhoneContent = ({
                         <div className="flex flex-col items-center justify-center gap-6">
                             <span className="w-full flex flex-col gap-2 items-center text-center">
                                 <p className="text-2xl font-bold">Enter the verification code</p>
-                                <p className="text-neutral-600 text-lg">We sent a code to your email. Enter it below to continue.</p>
+                                <p className="text-muted-foreground text-lg">We sent a code to your email. Enter it below to continue.</p>
                             </span>
                             <InputOTP
                                 maxLength={6}
@@ -201,7 +201,7 @@ const UpdatePhoneContent = ({
                     >
                         <span className="w-full flex flex-col gap-2 items-center text-center">
                             <p className="text-2xl font-bold">{"We need to verify it's you"}</p>
-                            <p className="text-neutral-600 text-lg">We will send a verification code to your email</p>
+                            <p className="text-muted-foreground text-lg">We will send a verification code to your email</p>
                         </span>
                         <Button
                             className="w-full bg-blue-800 hover:bg-blue-800 py-7 font-semibold text-lg rounded-md"
@@ -223,17 +223,17 @@ const UpdatePhoneContent = ({
             )}
             {...props}
         >
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         Update Phone
                     </p>
                 </div>

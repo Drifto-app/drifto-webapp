@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { UserVerificationBadge } from "@/components/ui/user-placeholder";
 import { showTopToast } from "@/components/toast/toast-util";
 import defaultImage from "@/assests/default.jpeg";
+import { UserListSkeleton } from "@/components/ui/page-skeletons";
 
 interface HostInvitesProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
@@ -72,9 +73,7 @@ export const HostInvites = ({
                 {...props}
             >
                 <div className="w-full flex flex-col gap-4">
-                    <div className="flex justify-center items-center py-8">
-                        <Loader />
-                    </div>
+                    <UserListSkeleton count={3} />
                 </div>
             </div>
         )
@@ -91,7 +90,7 @@ export const HostInvites = ({
             >
                 <div className="w-full flex flex-col gap-4">
                     <div className="flex items-center justify-between pt-4 pb-2">
-                        <h1 className="text-xl font-semibold text-neutral-800">
+                        <h1 className="text-xl font-semibold text-foreground">
                             Co-Host Invites
                         </h1>
                     </div>
@@ -112,7 +111,7 @@ export const HostInvites = ({
     return (
         <div
             className={cn(
-                "w-full flex-1 bg-gray-50 pt-2",
+                "w-full flex-1 bg-accent/40 pt-2",
                 className
             )}
             {...props}
@@ -127,7 +126,7 @@ export const HostInvites = ({
                 ) : (
                     <div className="w-full px-4">
                         {invites.map((invite) => (
-                            <div key={invite.inviteId} className="w-full flex items-center justify-between py-4 pb-4 border-b-neutral-200 border-b-1">
+                            <div key={invite.inviteId} className="w-full flex items-center justify-between py-4 pb-4 border-border border-b-1">
                                 <div className="flex items-center gap-3">
                                     {/* Avatar */}
                                     <div className="w-12 h-12 rounded-full flex items-center justify-center">
@@ -153,7 +152,7 @@ export const HostInvites = ({
                                     {/* User Info */}
                                     <div className="flex flex-col">
                                         <div className="flex gap-1 items-center">
-                                            <span className="font-bold text-neutral-900">
+                                            <span className="font-bold text-foreground">
                                                 {invite.userPlaceHolder.username}
                                             </span>
                                             <UserVerificationBadge user={invite.userPlaceHolder} />

@@ -8,7 +8,7 @@ import {SettingContent} from "@/components/settings/setting-content";
 
 export default function SettingsPageContent () {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
 
     const pathname = usePathname();
 

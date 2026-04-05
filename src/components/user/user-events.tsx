@@ -8,6 +8,7 @@ import {authApi} from "@/lib/axios";
 import {showTopToast} from "@/components/toast/toast-util";
 import {Loader} from "@/components/ui/loader";
 import {UserEventCard} from "@/components/user/user-event-card";
+import { EventCardSkeleton } from "@/components/ui/page-skeletons";
 
 interface UserEventsProps extends ComponentProps<"div"> {
     user: {[key:string]: any};
@@ -155,14 +156,18 @@ export const UserEvents = ({
                 </div>
             </div>
             <div className="w-full flex flex-col gap-10 px-4">
-                {events.map((event) => (
-                    <UserEventCard event={event} key={event.id} />
-                ))}
+                {loading && events.length === 0
+                    ? Array.from({ length: 3 }).map((_, index) => (
+                        <EventCardSkeleton key={index} />
+                    ))
+                    : events.map((event) => (
+                        <UserEventCard event={event} key={event.id} />
+                    ))}
             </div>
 
             <div ref={sentinelRef} aria-hidden className="h-1" />
 
-            {loading && (
+            {loading && events.length > 0 && (
                 <div className="flex justify-center py-4">
                     <Loader className="h-8 w-8"/>
                 </div>

@@ -10,7 +10,10 @@ import {
   IoEarthOutline,
   IoGiftOutline,
   IoLocationOutline,
+  IoPlanetOutline,
+  IoWalletOutline,
 } from "react-icons/io5";
+import { HiSparkles } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 import { CoverImageUploader } from "@/components/ui/cover-image";
 import { Label } from "@/components/ui/label";
@@ -36,6 +39,13 @@ import { showTopToast } from "@/components/toast/toast-util";
 import { CreateEventSuccess } from "@/components/create-event/create-success";
 import { useShare } from "@/hooks/share-option";
 import { CoverVideoUploader } from "../ui/cover-video";
+import { Linkify } from "@/lib/linkify";
+import {
+  DEFAULT_EVENT_THEME,
+  getEventThemeBackground,
+  isEventThemeLight,
+} from '@/lib/event-theme';
+import { useTheme } from 'next-themes';
 
 interface CreateEventContentProps extends React.ComponentProps<"div"> {
   prev: string | null;
@@ -51,19 +61,19 @@ interface IntroObjectType {
 
 const intoObjects: IntroObjectType[] = [
   {
-    title: "share your passion",
+    title: "Share Your Passion",
     text: "Turn what you love into an unforgettable experience for others.",
-    icon: <IoGiftOutline size={50} className="text-indigo-700" />,
+    icon: <HiSparkles size={28} className="text-blue-500 animate-float-subtle" />,
   },
   {
-    title: "be discovered",
+    title: "Be Discovered",
     text: "Showcase your experience to those who are eager to try something new.",
-    icon: <IoEarthOutline size={50} />,
+    icon: <IoPlanetOutline size={28} className="text-foreground dark:text-neutral-200 animate-float-subtle-slow" />,
   },
   {
-    title: "earn while inspiring",
+    title: "Earn While Inspiring",
     text: "Monetize your ideas and make a difference, one experience at a time.",
-    icon: <IoCashOutline size={50} className="text-green-600" />,
+    icon: <IoWalletOutline size={28} className="text-green-500 animate-float-subtle-delayed" />,
   },
 ];
 
@@ -85,6 +95,7 @@ export const CreateEventContent = ({
   className,
   ...props
 }: CreateEventContentProps) => {
+  const { resolvedTheme } = useTheme();
   const router = useRouter();
 
   const [event, setEvent] = useState<{ [key: string]: any } | null>(null);
@@ -132,10 +143,7 @@ export const CreateEventContent = ({
   const [eventTags, setEventTags] = useState<string[]>([]);
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [tickets, setTickets] = useState<any[]>([]);
-  const [eventTheme, setEventTheme] = useState<[string, string]>([
-    "#fff",
-    "#fff",
-  ]);
+  const [eventTheme, setEventTheme] = useState<[string, string]>(DEFAULT_EVENT_THEME);
 
   useEffect(() => {
     window.scrollTo({
@@ -161,11 +169,24 @@ export const CreateEventContent = ({
     !eventTheme ||
     !titleImage;
 
-  const detailsContainerStyle = React.useMemo(() => {
-    if (!eventTheme || eventTheme.length !== 2) return undefined;
-    const [c1, c2] = eventTheme;
-    return { background: `linear-gradient(to bottom, ${c1}, ${c2})` } as const;
-  }, [eventTheme]);
+  const detailsContainerStyle = React.useMemo(
+    () => getEventThemeBackground(eventTheme, resolvedTheme),
+    [eventTheme, resolvedTheme],
+  );
+
+  const isLightEventSurface = React.useMemo(
+    () => isEventThemeLight(eventTheme, resolvedTheme),
+    [eventTheme, resolvedTheme],
+  );
+
+  const createScreenTextClass = isLightEventSurface ? "text-black" : "text-white";
+  const createScreenMutedTextClass = isLightEventSurface ? "text-black/65" : "text-white/70";
+  const createScreenFieldClass = isLightEventSurface
+    ? "border-black/10 bg-white/92 text-black placeholder:text-black/45"
+    : "border-white/18 bg-black/28 text-white placeholder:text-white/45";
+  const createScreenCardClass = isLightEventSurface
+    ? "border-black/10 bg-white/24"
+    : "border-white/12 bg-black/18";
 
   const handleBackClick = () => {
     if (activeScreen === "details") {
@@ -503,7 +524,7 @@ export const CreateEventContent = ({
             />
             <div className="w-full flex flex-col px-4 gap-5 mt-4 pb-15">
               <div className="grid gap-2">
-                <Label htmlFor="title" className="text-neutral-500">
+                <Label htmlFor="title" className={createScreenMutedTextClass}>
                   Title
                 </Label>
                 <Input
@@ -512,12 +533,12 @@ export const CreateEventContent = ({
                   placeholder="Event Title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="py-6 "
+                  className={cn("py-6", createScreenFieldClass)}
                   required
                 />
               </div>
               <div className="grid gap-2 ">
-                <Label htmlFor="description" className="text-neutral-500">
+                <Label htmlFor="description" className={createScreenMutedTextClass}>
                   Description
                 </Label>
                 <textarea
@@ -526,7 +547,10 @@ export const CreateEventContent = ({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={8}
-                  className="py-2 px-3 bg-white rounded-md border-1 border-neutral-200 focus:border-blue-600 focus:border-1 focus:outline-hidden"
+                  className={cn(
+                    "rounded-md border-1 px-3 py-2 focus:border-blue-600 focus:border-1 focus:outline-hidden",
+                    createScreenFieldClass,
+                  )}
                   required
                 />
               </div>
@@ -551,7 +575,7 @@ export const CreateEventContent = ({
                 )}
               </div>
               <div className="grid gap-2 w-full">
-                <Label htmlFor="m-age" className="text-neutral-500">
+                <Label htmlFor="m-age" className={createScreenMutedTextClass}>
                   Minimum Age
                 </Label>
                 <Input
@@ -563,11 +587,11 @@ export const CreateEventContent = ({
                   placeholder="Minimum Age"
                   value={minimumAge}
                   onChange={(e) => handleMinimumAgeChange(e.target.value)}
-                  className="py-2 bg-white"
+                  className={cn("py-2", createScreenFieldClass)}
                 />
               </div>
               <div className="grid gap-2">
-                <div className="text-neutral-500">Location</div>
+                <div className={createScreenMutedTextClass}>Location</div>
                 <LocationSearchDialog
                   currentLocation={{ coordinates, address, city, state }}
                   onLocationUpdate={handleLocationChange}
@@ -578,8 +602,8 @@ export const CreateEventContent = ({
               </div>
               <div className="grid gap-2">
                 <div className="flex flex-col">
-                  <div className="font-bold">Event Genre</div>
-                  <p className="text-neutral-400 text-xs font-semibold">
+                  <div className={cn("font-bold", createScreenTextClass)}>Event Genre</div>
+                  <p className={cn("text-xs font-semibold", createScreenMutedTextClass)}>
                     Select genres that best describe your event
                   </p>
                 </div>
@@ -593,8 +617,8 @@ export const CreateEventContent = ({
               </div>
               <div className="grid gap-2">
                 <div className="flex flex-col">
-                  <div className="font-bold">Event Theme</div>
-                  <p className="text-neutral-400 text-xs font-semibold">
+                  <div className={cn("font-bold", createScreenTextClass)}>Event Theme</div>
+                  <p className={cn("text-xs font-semibold", createScreenMutedTextClass)}>
                     Select a theme that sets the vibe for your event
                   </p>
                 </div>
@@ -605,8 +629,8 @@ export const CreateEventContent = ({
               </div>
               <div className="grid gap-2 w-full">
                 <div className="flex flex-col">
-                  <div className="font-bold">Event Snapshots</div>
-                  <p className="text-neutral-400 text-xs font-semibold">
+                  <div className={cn("font-bold", createScreenTextClass)}>Event Snapshots</div>
+                  <p className={cn("text-xs font-semibold", createScreenMutedTextClass)}>
                     Choose up to 20 pictures that best represent you experience
                   </p>
                 </div>
@@ -620,8 +644,8 @@ export const CreateEventContent = ({
               </div>
               <div className="grid gap-2 w-full">
                 <div className="flex flex-col">
-                  <div className="font-bold">Cover Video (Optional)</div>
-                  <p className="text-neutral-400 text-xs font-semibold">
+                  <div className={cn("font-bold", createScreenTextClass)}>Cover Video (Optional)</div>
+                  <p className={cn("text-xs font-semibold", createScreenMutedTextClass)}>
                     Add short video teaser (max 60s) to grab attention
                   </p>
                 </div>
@@ -648,15 +672,18 @@ export const CreateEventContent = ({
         return (
           <div className="w-full flex-1">
             <div className="w-full flex flex-col gap-6 px-4 py-4">
-              <div className="flex flex-col gap-4 px-4 py-4 w-full items-center justify-center border-1 border-neutral-200 rounded-md shadow-md">
-                <h2 className="font-bold text-xl">Create Ticket for Event</h2>
+              <div className={cn(
+                "flex w-full flex-col items-center justify-center gap-4 rounded-md border-1 px-4 py-4 shadow-md",
+                createScreenCardClass,
+              )}>
+                <h2 className={cn("font-bold text-xl", createScreenTextClass)}>Create Ticket for Event</h2>
                 <div
-                  className={`flex justify-between w-full items-center rounded-md border border-neutral-200`}
+                  className={cn("flex w-full items-center justify-between rounded-md border", createScreenCardClass)}
                 >
                   <span
                     className={`w-[50%] text-center font-semibold cursor-pointer pl-4 py-3 border-b-2  ${isSelectedTicketPaid
-                      ? "text-black border-black"
-                      : "text-neutral-400 border-transparent"
+                      ? `${createScreenTextClass} border-blue-500`
+                      : `${createScreenMutedTextClass} border-transparent`
                       }`}
                     onClick={() => {
                       setIsSelectedTicketPaid(true);
@@ -667,8 +694,8 @@ export const CreateEventContent = ({
                   </span>
                   <span
                     className={`w-[50%] text-center font-semibold pr-4cursor-pointer py-3 border-b-2 ${!isSelectedTicketPaid
-                      ? "text-black border-black"
-                      : "text-neutral-400 border-transparent"
+                      ? `${createScreenTextClass} border-blue-500`
+                      : `${createScreenMutedTextClass} border-transparent`
                       }`}
                     onClick={() => {
                       setIsSelectedTicketPaid(false);
@@ -680,7 +707,7 @@ export const CreateEventContent = ({
                 </div>
                 <div className="w-full flex flex-col gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="title" className="text-neutral-500">
+                    <Label htmlFor="title" className={createScreenMutedTextClass}>
                       Ticket Name
                     </Label>
                     <Input
@@ -695,7 +722,7 @@ export const CreateEventContent = ({
                           nameError: false,
                         })
                       }
-                      className="py-6 "
+                      className={cn("py-6", createScreenFieldClass)}
                       required
                     />
                     {currentTicketData.nameError && (
@@ -705,7 +732,7 @@ export const CreateEventContent = ({
                     )}
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="title" className="text-neutral-500">
+                    <Label htmlFor="title" className={createScreenMutedTextClass}>
                       Description
                     </Label>
                     <textarea
@@ -720,7 +747,10 @@ export const CreateEventContent = ({
                         })
                       }
                       rows={5}
-                      className="py-2 px-3 bg-white rounded-md border-1 border-neutral-200 focus:border-blue-600 focus:border-1 focus:outline-hidden"
+                      className={cn(
+                        "rounded-md border-1 px-3 py-2 focus:border-blue-600 focus:border-1 focus:outline-hidden",
+                        createScreenFieldClass,
+                      )}
                       required
                     />
                     {currentTicketData.descriptionError && (
@@ -732,7 +762,7 @@ export const CreateEventContent = ({
                   <div className="flex gap-3 items-start">
                     {isSelectedTicketPaid && (
                       <div className="grid gap-2 w-full">
-                        <Label htmlFor="title" className="text-neutral-500">
+                        <Label htmlFor="title" className={createScreenMutedTextClass}>
                           Price
                         </Label>
                         <Input
@@ -743,7 +773,7 @@ export const CreateEventContent = ({
                           onChange={(e) =>
                             handleTicketPriceChange(e.target.value)
                           }
-                          className="py-6 "
+                          className={cn("py-6", createScreenFieldClass)}
                           required
                         />
                         {currentTicketData.priceError && (
@@ -754,7 +784,7 @@ export const CreateEventContent = ({
                       </div>
                     )}
                     <div className="grid gap-2 w-full">
-                      <Label htmlFor="title" className="text-neutral-500">
+                      <Label htmlFor="title" className={createScreenMutedTextClass}>
                         Quantity
                       </Label>
                       <Input
@@ -765,7 +795,7 @@ export const CreateEventContent = ({
                         onChange={(e) =>
                           handleTicketQuantityChange(e.target.value)
                         }
-                        className="py-6 "
+                        className={cn("py-6", createScreenFieldClass)}
                         required
                       />
                       {currentTicketData.quantityError && (
@@ -793,19 +823,22 @@ export const CreateEventContent = ({
               </div>
               <div className="flex flex-col gap-3">
                 {tickets.length > 0 && (
-                  <h3 className="font-semibold text-xl">
+                  <h3 className={cn("font-semibold text-xl", createScreenTextClass)}>
                     You created tickets ({tickets.length})
                   </h3>
                 )}
                 {tickets.map((ticket) => (
                   <div
                     key={ticket.id}
-                    className="flex flex-col gap-4 p-4 border-1 border-neutral-600 rounded-md shadow-md"
+                    className={cn(
+                      "flex flex-col gap-4 rounded-md border-1 p-4 shadow-md",
+                      createScreenCardClass,
+                    )}
                   >
                     <div className="flex justify-between w-full items-center">
-                      <span className="font-semibold text-sm leading-none capitalize">
-                        {ticket.name}
-                      </span>
+                        <span className={cn("font-semibold text-sm leading-none capitalize", createScreenTextClass)}>
+                          {ticket.name}
+                        </span>
                       <Button
                         size="icon"
                         variant="outline"
@@ -817,11 +850,11 @@ export const CreateEventContent = ({
                       </Button>
                     </div>
                     <div className="w-full flex justify-between items-center">
-                      <span className="flex items-center gap-1">
+                      <span className={cn("flex items-center gap-1", createScreenTextClass)}>
                         <GoTag className="text-blue-800" />
                         {ticket.price ? ticket.price : "0.00"}
                       </span>
-                      <span className="flex items-center gap-1">
+                      <span className={cn("flex items-center gap-1", createScreenMutedTextClass)}>
                         <TbUsers className="text-blue-800" />
                         Qty: {ticket.quantity}
                       </span>
@@ -868,8 +901,8 @@ export const CreateEventContent = ({
                   className="object-cover h-full w-full rounded-lg"
                 />
               </div>
-              <h3 className="font-bold text-2xl">{title}</h3>
-              <div className="flex flex-col gap-4 text-neutral-700 font-medium text-md">
+              <h3 className={cn("font-bold text-2xl", createScreenTextClass)}>{title}</h3>
+              <div className={cn("flex flex-col gap-4 font-medium text-md", createScreenMutedTextClass)}>
                 <div className="w-full flex items-center justify-start gap-4">
                   <div className="flex items-center gap-1">
                     <GoCalendar size={20} />
@@ -896,37 +929,43 @@ export const CreateEventContent = ({
                   <IoLocationOutline size={27} />
                   <p className="leading-tight">{`${address}, ${city}, ${state}`}</p>
                 </div>
-                <p className="text-lg leading-tight">{description}</p>
+                <Linkify text={description} className="text-lg leading-tight" />
                 <div className="flex flex-wrap gap-2">
                   {eventTags.map((item, index) => (
                     <div
                       key={index}
-                      className="inline-block text-sm font-medium px-3 py-1 bg-neutral-300 text-neutral-700 rounded-full"
+                      className={cn(
+                        "inline-block rounded-full px-3 py-1 text-sm font-medium",
+                        isLightEventSurface ? "bg-black/10 text-black/75" : "bg-white/10 text-white/75",
+                      )}
                     >
                       {item}
                     </div>
                   ))}
                 </div>
                 <div className="w-full flex flex-col gap-3">
-                  <div className="font-bold text-black text-lg">Snapshots</div>
+                  <div className={cn("font-bold text-lg", createScreenTextClass)}>Snapshots</div>
                   <SnapshotCarousel snapshots={screenshots} />
                 </div>
                 <div className="w-full flex flex-col gap-3">
-                  <div className="font-bold text-black text-lg">Tickets</div>
+                  <div className={cn("font-bold text-lg", createScreenTextClass)}>Tickets</div>
                   <div className="flex flex-col gap-2 w-full">
                     {tickets.map((ticket) => (
                       <div
                         key={ticket.id}
-                        className="flex flex-col gap-2 px-4 py-4 bg-neutral-200 rounded-md"
+                        className={cn(
+                          "flex flex-col gap-2 rounded-md px-4 py-4",
+                          isLightEventSurface ? "bg-black/8" : "bg-white/8",
+                        )}
                       >
-                        <span className="font-bold text-black">
+                        <span className={cn("font-bold", createScreenTextClass)}>
                           {ticket.name}
                         </span>
                         <div className="w-full flex justify-between items-center">
                           <span className="text-blue-700 font-semibold">
                             {ticket.price || "FREE"}
                           </span>
-                          <span className="font-medium text-sm text-neutral-600">
+                          <span className={cn("font-medium text-sm", createScreenMutedTextClass)}>
                             Quantity: {ticket.quantity}
                           </span>
                         </div>
@@ -944,7 +983,7 @@ export const CreateEventContent = ({
                         setFeeOnUser(!isFeeOnUser);
                       }}
                     />
-                    <span className="font-semibold">
+                    <span className={cn("font-semibold", createScreenTextClass)}>
                       Pass fees to the ticket buyer
                     </span>
                   </div>
@@ -957,7 +996,7 @@ export const CreateEventContent = ({
                         setLocationSecure(!locationSecure);
                       }}
                     />
-                    <span className="font-semibold">Extra Security</span>
+                    <span className={cn("font-semibold", createScreenTextClass)}>Extra Security</span>
                   </div>
                   <div className="w-full flex gap-4 items-center">
                     <Switch
@@ -968,7 +1007,7 @@ export const CreateEventContent = ({
                         setIsPublic(!isPublic);
                       }}
                     />
-                    <span className="font-semibold">
+                    <span className={cn("font-semibold", createScreenTextClass)}>
                       Make this event public
                     </span>
                   </div>
@@ -987,26 +1026,34 @@ export const CreateEventContent = ({
         );
       default:
         return (
-          <div className="w-full flex flex-col flex-1 items-center gap-8 py-8">
-            <div className="w-full flex flex-col gap-4 px-4">
+          <div className="w-full flex flex-col flex-1 items-start gap-6 py-2 px-6 min-h-[calc(100vh-80px)]">
+            <div className="flex flex-col gap-1 w-full mb-2">
+               <h1 className="font-black text-3xl text-foreground">Create Magic</h1>
+               <p className="text-muted-foreground font-medium tracking-tight">What makes a great event is a great host.</p>
+            </div>
+            <div className="w-full flex flex-col gap-4">
               {intoObjects.map((item, index) => (
                 <div
                   key={index}
-                  className="flex flex-col gap-2 items-center w-full rounded-md shadow-md py-5 px-4"
+                  className="flex flex-row gap-4 items-center w-full rounded-2xl border border-border dark:border-neutral-800 bg-transparent py-4 px-4 shadow-sm"
                 >
-                  {item.icon}
-                  <h3 className="font-black text-lg capitalize">
-                    {item.title}
-                  </h3>
-                  <p className="text-neutral-500 text-sm text-center font-semibold leading-tight">
-                    {item.text}
-                  </p>
+                  <div className="bg-muted/40/50 dark:bg-neutral-800/50 rounded-xl p-3 flex-shrink-0">
+                    {item.icon}
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <h3 className="font-bold text-[1.05rem] text-foreground">
+                      {item.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm font-medium leading-tight">
+                      {item.text}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="w-full px-4">
+            <div className="w-full mt-auto mt-8 pb-6">
               <Button
-                className="w-full rounded-md shadow-md py-6 text-md font-semibold bg-blue-800 hover:bg-blue-800"
+                className="w-full rounded-xl py-6 text-[1.05rem] font-semibold bg-blue-700 hover:bg-blue-800 text-white"
                 onClick={() => setActiveScreen("details")}
                 type="button"
               >
@@ -1020,7 +1067,7 @@ export const CreateEventContent = ({
 
   return (
     <div
-      className={cn("w-full min-h-[100dvh] flex flex-col", className)}
+      className={cn("w-full min-h-[100dvh] flex flex-col bg-background text-foreground", className)}
       style={activeScreen === "details" ? detailsContainerStyle : undefined}
       {...props}
     >
@@ -1028,7 +1075,8 @@ export const CreateEventContent = ({
         <>
           <div
             className={cn(
-              "w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center",
+              "w-full flex flex-col gap-3 h-20 justify-center",
+              activeScreen !== "intro" ? "border-b-1 border-border" : "",
               className
             )}
             {...props}
@@ -1037,14 +1085,21 @@ export const CreateEventContent = ({
               <FaArrowLeft
                 size={20}
                 onClick={handleBackClick}
-                className="cursor-pointer hover:text-neutral-700 transition-colors"
+                className="cursor-pointer hover:text-muted-foreground transition-colors"
               />
-              <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
-                {headerTitle()}
-              </p>
+              {activeScreen !== "intro" && (
+                <p className={cn(
+                  "font-semibold text-md w-full text-center capitalize truncate ml-4",
+                  activeScreen === "details" || activeScreen === "ticket" || activeScreen === "preview"
+                    ? createScreenTextClass
+                    : "text-foreground",
+                )}>
+                  {headerTitle()}
+                </p>
+              )}
             </div>
           </div>
-          <form>{renderScreen()}</form>
+          <form className="flex-1 flex flex-col">{renderScreen()}</form>
         </>
       ) : (
         <CreateEventSuccess

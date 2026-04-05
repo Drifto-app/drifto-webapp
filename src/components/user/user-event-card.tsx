@@ -36,7 +36,7 @@ export const UserEventCard = ({
                     style={{ maxHeight: "30vh" }}
                     onClick={() => {router.push(`/m/events/${event.id}?prev=${encodeURIComponent(pathname + "?" + searchParams)}`)}}
                 />
-                {event.original && <span className="absolute top-4 left-2 rounded-full py-2 px-2 text-xs shadow-md font-semibold bg-white">
+                {event.original && <span className="absolute top-4 left-2 rounded-full bg-background py-2 px-2 text-xs shadow-md font-semibold text-foreground">
                     Drifto Original
                 </span>}
             </div>

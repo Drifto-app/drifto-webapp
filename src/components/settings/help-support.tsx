@@ -33,7 +33,7 @@ const policies = [
 
 export const HelpSupportPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev");
+    const prev = searchParams?.get("prev") ?? null;
     const pathname = usePathname();
 
     return (
@@ -85,7 +85,7 @@ export const HelpSupportContent = ({ prev, currentPathUrl, className, ...props }
 
     const FAQRow: React.FC<{ title: string; onClick?: () => void } & React.ComponentProps<"div">> = ({ title, onClick }) => (
         <div
-            className="w-full py-4 flex items-center justify-between border-b border-neutral-200 cursor-pointer"
+            className="w-full py-4 flex items-center justify-between border-b border-border cursor-pointer"
             onClick={onClick}
         >
             <span className="text-base">{title}</span>
@@ -99,7 +99,7 @@ export const HelpSupportContent = ({ prev, currentPathUrl, className, ...props }
             className="w-full py-3 flex items-center gap-3 cursor-pointer"
             onClick={onClick}
         >
-            <div className="text-neutral-700">{icon}</div>
+            <div className="text-muted-foreground">{icon}</div>
             <span className="text-base">{label}</span>
         </div>
     );
@@ -107,17 +107,17 @@ export const HelpSupportContent = ({ prev, currentPathUrl, className, ...props }
     return (
         <div className={cn("w-full min-h-[100dvh] flex flex-col", className)} {...props}>
             {/* Header */}
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         Help & Support
                     </p>
                     <div className="w-5" />
@@ -126,7 +126,7 @@ export const HelpSupportContent = ({ prev, currentPathUrl, className, ...props }
 
             <div className="w-full flex-1 flex flex-col py-6 px-4 gap-6">
                 <div className="w-full">
-                    <div className="flex items-center justify-center gap-3 px-4 py-3 border border-neutral-300 rounded-full" role="button" onClick={onSearchClick}>
+                    <div className="flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-full" role="button" onClick={onSearchClick}>
                         <IoSearchSharp size={25} />
                         <span className="font-bold">Search</span>
                     </div>
@@ -136,11 +136,11 @@ export const HelpSupportContent = ({ prev, currentPathUrl, className, ...props }
                     <h3 className="text-base font-semibold mb-2">Popular FAQs</h3>
                     <Accordion type="single" collapsible className="w-full">
                         {policies.map((p) => (
-                            <AccordionItem key={p.id} value={`policy-${p.id}`} className="border-b-1 border-neutral-200">
+                            <AccordionItem key={p.id} value={`policy-${p.id}`} className="border-b-1 border-border">
                                 <AccordionTrigger className="text-left text-[16px] font-medium py-5 px-1 hover:no-underline">
                                     {p.title}
                                 </AccordionTrigger>
-                                <AccordionContent className="text-[14px] text-neutral-600 px-1 pb-5 whitespace-pre-line">
+                                <AccordionContent className="text-[14px] text-muted-foreground px-1 pb-5 whitespace-pre-line">
                                     {p.content}
                                 </AccordionContent>
                             </AccordionItem>

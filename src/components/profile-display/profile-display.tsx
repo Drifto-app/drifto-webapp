@@ -47,18 +47,18 @@ export const ProfileDisplay = ({ handleScreenChange }: ProfileDisplayProps) => {
 
     return (
         <div className={cn(
-            "w-full min-h-[100dvh] bg-gray-50 flex flex-col relative",
+            "w-full min-h-[100dvh] bg-accent/40 flex flex-col relative",
             activeScreen !== "profile" && "z-99999"
         )}>
             {activeScreen !== "profile"
-                ? <div className={"w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center"}>
+                ? <div className={"w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center"}>
                     <div className="flex flex-row items-center px-8">
                         <FaArrowLeft
                             size={16}
                             onClick={() => setActiveScreen("profile")}
-                            className="cursor-pointer hover:text-neutral-700 transition-colors"
+                            className="cursor-pointer hover:text-muted-foreground transition-colors"
                         />
-                        <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                        <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                             {title}
                         </p>
                     </div>

@@ -79,7 +79,7 @@ export function CoverImageUploader({
     return (
         <div
             className={cn(
-                "relative w-full h-80 bg-gray-100 overflow-hidden",
+                "relative w-full h-80 bg-muted overflow-hidden",
                 className
             )}
             {...props}

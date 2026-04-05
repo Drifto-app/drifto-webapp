@@ -1,15 +1,11 @@
 import {Suspense} from "react";
-import {Loader} from "@/components/ui/loader";
 import CreateEventComponent from "@/components/create-event/create-event-component";
+import { CreateEventPageSkeleton } from "@/components/ui/page-skeletons";
 
 export default function CreateEventPage() {
 
     return (
-        <Suspense fallback={
-            <div className="w-full h-screen flex items-center justify-center">
-                <Loader />
-            </div>
-        }>
+        <Suspense fallback={<CreateEventPageSkeleton />}>
             <CreateEventComponent />
         </Suspense>
     )

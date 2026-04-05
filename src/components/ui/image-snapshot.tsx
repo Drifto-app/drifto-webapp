@@ -143,8 +143,8 @@ export const ImageSnapshots = ({
 
     if (images.length === 0 && !isUploading) {
         return (
-            <div className="w-full bg-white rounded-lg p-4">
-                <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition">
+            <div className="w-full bg-background rounded-lg p-4">
+                <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/40 transition">
                     <Plus className="w-10 h-10 text-gray-400 mb-2" />
                     <span className="text-gray-500">Add Snapshot</span>
                     <input
@@ -208,7 +208,7 @@ export const ImageSnapshots = ({
                                     <CardContent className="p-0">
                                         <AspectRatio ratio={4 / 3}>
                                             <label
-                                                className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                                className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/40 transition">
                                                 {isUploading ? (
                                                     <LoaderSmall />
                                                 ) : (
@@ -251,7 +251,7 @@ export const ImageSnapshots = ({
                     <X size={30} />
                 </div>
 
-                <Dialog.Panel className="bg-white overflow-hidden w-full max-h-[95%]">
+                <Dialog.Panel className="bg-background overflow-hidden w-full max-h-[95%]">
                     {activeImage && (
                         <Image
                             src={activeImage}

@@ -1,16 +1,12 @@
 import { Suspense } from "react";
-import { Loader } from "@/components/ui/loader";
 import { FaqPageContent } from "@/components/settings/faq";
+import { SettingsDetailSkeleton } from "@/components/ui/page-skeletons";
 
 
 export default function FaqPage() {
     return (
         <Suspense
-            fallback={
-                <div className="w-full h-screen flex items-center justify-center">
-                    <Loader />
-                </div>
-            }
+            fallback={<SettingsDetailSkeleton />}
         >
             <FaqPageContent />
         </Suspense>

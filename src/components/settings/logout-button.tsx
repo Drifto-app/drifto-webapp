@@ -7,20 +7,19 @@ import {
     Dialog,
     DialogClose,
     DialogContent,
-    DialogDescription, DialogFooter,
+    DialogDescription,
+    DialogFooter,
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 import { showTopToast } from "@/components/toast/toast-util";
-import { api } from "@/lib/axios";
 import { LoaderSmall } from "@/components/ui/loader";
 import { useRouter } from "next/navigation";
+import { IoLogOutOutline } from "react-icons/io5";
 
-interface LogoutButtonProps extends ComponentProps<"button"> {
-
-}
+interface LogoutButtonProps extends ComponentProps<"div"> {}
 
 export const LogoutButton = ({
     className, ...props
@@ -48,35 +47,39 @@ export const LogoutButton = ({
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button
+                <div
                     className={cn(
-                        "w-full rounded-sm bg-blue-800 hover:bg-blue-800 focus:outline-none text-lg font-bold py-7 shadow-2xl",
+                        "w-full flex items-center gap-4 py-[18px] border-b-[1px] border-border hover:bg-background transition-colors cursor-pointer",
                         className,
                     )}
+                    role="button"
+                    tabIndex={0}
                     {...props}
                 >
-                    Sign Out
-                </Button>
+                    <span className="text-red-600 flex-shrink-0 w-7 flex justify-center">
+                        <IoLogOutOutline size={26} className="text-red-600" />
+                    </span>
+                    <p className="text-[17px] font-normal text-red-600">Sign out</p>
+                </div>
             </DialogTrigger>
-            <DialogContent>
-                <DialogTitle className="text-xl text-center">Logout</DialogTitle>
-                <DialogDescription className="text-md text-center">
-                    Are you sure you want to logout?
+            <DialogContent className="sm:max-w-[400px] rounded-3xl p-6 bg-background border-border text-foreground shadow-xl">
+                <DialogTitle className="text-xl text-center font-semibold mb-2">Sign out</DialogTitle>
+                <DialogDescription className="text-md text-center text-neutral-500 mb-6">
+                    Are you sure you want to sign out of your account?
                 </DialogDescription>
-                <DialogFooter className="w-full flex flex-row sm:justify-between justify-between px-4 sm:px-20">
+                <DialogFooter className="w-full flex flex-row justify-between gap-4 px-2 mt-4">
                     <DialogClose asChild>
-                        <Button type="button" variant="secondary" className="text-xl bg-neutral-300 py-6 px-8 font-semibold">
+                        <Button type="button" variant="outline" className="text-md flex-1 rounded-full py-6 border-border hover:bg-muted/40 bg-transparent text-foreground font-medium transition-colors">
                             Cancel
                         </Button>
                     </DialogClose>
                     <Button
                         type="button"
-                        variant="secondary"
-                        className="text-xl py-6 px-8 bg-red-600 text-white font-semibold"
+                        className="text-md flex-1 py-6 rounded-full bg-red-600 hover:bg-red-700 text-white font-medium transition-colors"
                         disabled={isLoading}
                         onClick={handleLogout}
                     >
-                        {isLoading ? <LoaderSmall /> : "Confirm"}
+                        {isLoading ? <LoaderSmall /> : "Sign out"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

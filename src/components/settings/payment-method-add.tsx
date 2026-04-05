@@ -15,7 +15,7 @@ import {authApi} from "@/lib/axios";
 
 export const AddPaymentInfoPageContent = () => {
     const searchParams = useSearchParams();
-    const prev = searchParams.get("prev")
+    const prev = searchParams?.get("prev") ?? null
     const pathname = usePathname();
 
     return (
@@ -171,22 +171,22 @@ export const AddPaymentInfoContent = ({
     return (
         <div
             className={cn(
-                "w-full min-h-[100dvh] flex flex-col bg-white",
+                "w-full min-h-[100dvh] flex flex-col bg-background",
                 className,
             )}
             {...props}
         >
-            <div className="w-full border-b border-b-neutral-300 flex flex-col gap-3 justify-center h-20 flex-shrink-0">
+            <div className="w-full border-b border-border flex flex-col gap-3 justify-center h-20 flex-shrink-0">
                 <div className="flex flex-row items-center px-8">
                     <FaArrowLeft
                         size={20}
                         onClick={handleBackClick}
-                        className="cursor-pointer hover:text-neutral-700 transition-colors"
+                        className="cursor-pointer hover:text-muted-foreground transition-colors"
                         aria-label="Go back"
                         role="button"
                         tabIndex={0}
                     />
-                    <p className="font-semibold text-neutral-950 text-md w-full text-center capitalize truncate ml-4">
+                    <p className="font-semibold text-foreground text-md w-full text-center capitalize truncate ml-4">
                         Add Payment Info
                     </p>
                     <div className="w-5" />
@@ -197,7 +197,7 @@ export const AddPaymentInfoContent = ({
                 <div className="flex flex-col gap-8">
                     {/* Account Number Section */}
                     <div className="flex flex-col gap-3">
-                        <h2 className="text-xl font-bold text-neutral-950">
+                        <h2 className="text-xl font-bold text-foreground">
                             Enter your account number
                         </h2>
                         <p className="text-neutral-500 text-sm">
@@ -210,7 +210,7 @@ export const AddPaymentInfoContent = ({
                                 value={accountNumber}
                                 onChange={handleAccountNumberChange}
                                 maxLength={10}
-                                className="w-full py-6 text-base rounded-md border-2 border-neutral-200"
+                                className="w-full py-6 text-base rounded-md border-2 border-border"
                             />
                             {isResolvingAccount && (
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -223,7 +223,7 @@ export const AddPaymentInfoContent = ({
                     {/* Banks Section */}
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-neutral-950">
+                            <h2 className="text-xl font-bold text-foreground">
                                 Available Banks
                             </h2>
                         </div>
@@ -239,7 +239,7 @@ export const AddPaymentInfoContent = ({
                                 placeholder="Search banks..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full py-6 pl-12 text-base rounded-md border-2 border-neutral-200"
+                                className="w-full py-6 pl-12 text-base rounded-md border-2 border-border"
                             />
                         </div>
 
@@ -258,10 +258,10 @@ export const AddPaymentInfoContent = ({
                                             "w-full py-4 px-4 text-left rounded-md border-2 transition-colors",
                                             selectedBank === bank.code
                                                 ? "border-blue-600 bg-blue-50"
-                                                : "border-neutral-200 hover:border-neutral-300"
+                                                : "border-border hover:border-border"
                                         )}
                                     >
-                                        <p className="text-neutral-800 font-medium">
+                                        <p className="text-foreground font-medium">
                                             {bank.name}
                                         </p>
                                     </button>
@@ -275,8 +275,8 @@ export const AddPaymentInfoContent = ({
                     {/* Resolved Account Display */}
                     {resolvedAccount && (
                         <div className="flex flex-col gap-2 p-4 bg-green-50 border-2 border-green-500 rounded-md">
-                            <p className="text-sm text-neutral-600 font-medium">Account Name</p>
-                            <p className="text-lg font-bold text-neutral-950">
+                            <p className="text-sm text-muted-foreground font-medium">Account Name</p>
+                            <p className="text-lg font-bold text-foreground">
                                 {resolvedAccount.accountName}
                             </p>
                         </div>
