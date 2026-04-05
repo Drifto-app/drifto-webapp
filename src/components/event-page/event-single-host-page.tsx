@@ -14,7 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { EventReferral } from '@/components/event-page/event-referral';
 import { useTheme } from 'next-themes';
-import { getEventThemeBackground } from '@/lib/event-theme';
+import { EventThemeColors, getEventThemeBackground } from '@/lib/event-theme';
 
 interface SingleEventHostPageProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
@@ -33,7 +33,7 @@ export default function SingleEventHostPage(
     const { resolvedTheme } = useTheme();
     const [activeScreen, setActiveScreen] = useState<string>(urlScreen ?? "details");
     const [screenTitle, setScreenTitle] = useState<string>("Manage Event");
-    const [editedTheme, setEditedTheme] = useState<[string, string] | null>(null);
+    const [editedTheme, setEditedTheme] = useState<EventThemeColors | null>(null);
 
     useEffect(() => {
         const changeTitle = () => {

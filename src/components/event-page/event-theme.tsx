@@ -1,14 +1,14 @@
 import { ComponentProps, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { DEFAULT_EVENT_THEME } from "@/lib/event-theme";
+import { DEFAULT_EVENT_THEME, EventThemeColors } from "@/lib/event-theme";
 
 interface EventThemeSelectorProps extends ComponentProps<"div"> {
-    currentEventTheme: [string, string];
-    setEventTheme: (newEventTheme: [string, string]) => void
+    currentEventTheme: EventThemeColors;
+    setEventTheme: (newEventTheme: EventThemeColors) => void
 }
 
 interface EventThemeType {
-    colors: [string, string];
+    colors: EventThemeColors;
     name: string;
     vibe: string;
 }
@@ -71,7 +71,7 @@ const eventThemes: EventThemeType[] = [
         vibe: 'Calm, refreshing, steady',
     },
     {
-        colors: ['#1FA2FF', '#12D8FA'],
+        colors: ['#1FA2FF', '#12D8FA', '#A6FFCB'],
         name: 'Sky Surge',
         vibe: 'Uplifting, breezy, inspiring',
     },
@@ -111,9 +111,9 @@ export const EventThemeSelector = ({
     currentEventTheme, setEventTheme, className, ...props
 }: EventThemeSelectorProps) => {
 
-    const eqArrValue = (a: [string, string], b: [string, string]) =>
-        a[0].toLowerCase() === b[0].toLowerCase() &&
-        a[1].toLowerCase() === b[1].toLowerCase();
+    const eqArrValue = (a: string[], b: string[]) =>
+        a.length === b.length &&
+        a.every((color, index) => color.toLowerCase() === b[index]?.toLowerCase());
 
     const orderedThemes = useMemo(() => {
         const colorIndex = eventThemes.findIndex((item) => eqArrValue(item.colors, currentEventTheme));
@@ -146,7 +146,7 @@ export const EventThemeSelector = ({
                     key={index}
                     className={`flex flex-col justify-center px-4 py-5 rounded-md w-40 shrink-0 cursor-pointer border-2 transition-colors ${item.name === "Drifto Classic" ? "text-black" : "text-white"} ${eqArrValue(item.colors, currentEventTheme) ? "border-neutral-950 dark:border-blue-500" : "border-white/70"}`}
                     style={{
-                        background: `linear-gradient(to right, ${item.colors[0]}, ${item.colors[1]})`,
+                        background: `linear-gradient(to right, ${item.colors.join(', ')})`,
                     }}
                     onClick={() => handleClick(item)}
                 >
