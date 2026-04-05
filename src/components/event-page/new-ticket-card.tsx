@@ -128,7 +128,11 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
         <div className="w-full flex flex-col items-center justify-center mt-4 gap-3">
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full text-lg text-blue-600 py-7 border-blue-600 hover:border-blue-600 hover:text-blue-600" type="button">
+                    <Button
+                        variant="outline"
+                        className="w-full py-7 text-lg text-blue-600 border-blue-600 bg-card text-foreground shadow-sm hover:border-blue-600 hover:text-blue-600 dark:bg-card dark:text-blue-400 dark:border-blue-500"
+                        type="button"
+                    >
                         + Add Ticket
                     </Button>
                 </DialogTrigger>
@@ -138,7 +142,7 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
                             <DialogTitle className="text-xl">Add New Ticket</DialogTitle>
                         </DialogHeader>
                         <div className="grid gap-3">
-                            <Label htmlFor="title" className="text-neutral-500">Ticket Title</Label>
+                            <Label htmlFor="title" className="text-muted-foreground">Ticket Title</Label>
                             <Input
                                 id="title"
                                 type="text"
@@ -148,13 +152,13 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
                             />
                         </div>
                         <div className="grid gap-3">
-                            <Label htmlFor="description" className="text-neutral-500">Description</Label>
+                            <Label htmlFor="description" className="text-muted-foreground">Description</Label>
                             <textarea
                                 id="description"
                                 placeholder="Description"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="border border-border focus:border-blue-600 focus:outline-hidden rounded-md py-2 px-3"
+                                className="border border-border bg-background text-foreground focus:border-blue-600 focus:outline-hidden rounded-md py-2 px-3"
                             />
                         </div>
                         {/* Paid/Free Tabs */}
@@ -162,7 +166,7 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
                             <span
                                 className={`w-[50%] text-center font-semibold cursor-pointer py-3 border-b-2 ${isSelectedPaid
                                     ? "text-foreground border-foreground"
-                                    : "text-neutral-400 border-transparent"
+                                    : "text-muted-foreground border-transparent"
                                     }`}
                                 onClick={() => handleTabChange(true)}
                             >
@@ -171,7 +175,7 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
                             <span
                                 className={`w-[50%] text-center font-semibold cursor-pointer py-3 border-b-2 ${!isSelectedPaid
                                     ? "text-foreground border-foreground"
-                                    : "text-neutral-400 border-transparent"
+                                    : "text-muted-foreground border-transparent"
                                     }`}
                                 onClick={() => handleTabChange(false)}
                             >
@@ -180,7 +184,7 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
                         </div>
                         {isSelectedPaid && (
                             <div className="grid gap-3">
-                                <Label htmlFor="price" className="text-neutral-500">Price</Label>
+                                <Label htmlFor="price" className="text-muted-foreground">Price</Label>
                                 <Input
                                     id="price"
                                     type="text"
@@ -198,7 +202,7 @@ export const NewTicketCard = ({ addTicket, eventId }: NewTicketCardProps) => {
                             </div>
                         )}
                         <div className="grid gap-3">
-                            <Label htmlFor="price" className="text-neutral-500">Quantity</Label>
+                            <Label htmlFor="price" className="text-muted-foreground">Quantity</Label>
                             <Input
                                 id="quantity"
                                 type="text"

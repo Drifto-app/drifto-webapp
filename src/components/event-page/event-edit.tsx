@@ -17,14 +17,14 @@ import { LoaderSmall } from "@/components/ui/loader";
 import { showTopToast } from "@/components/toast/toast-util";
 import { EventThemeSelector } from "@/components/event-page/event-theme";
 import { CoverVideoUploader } from '@/components/ui/cover-video';
-import { DEFAULT_EVENT_THEME, getEventThemeBackground, isEventThemeLight } from '@/lib/event-theme';
+import { DEFAULT_EVENT_THEME, EventThemeColors, getEventThemeBackground, isEventThemeLight } from '@/lib/event-theme';
 import { useTheme } from "next-themes";
 
 interface EventEditProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
     setEvent: (event: { [key: string]: any }) => void;
     setMainActiveScreen: (activeScreen: string, title?: string) => void;
-    onThemeChange?: (theme: [string, string]) => void;
+    onThemeChange?: (theme: EventThemeColors) => void;
 }
 
 interface HeaderItem {
@@ -68,11 +68,11 @@ export const EventEdit = ({
     const [screenshots, setScreenshots] = useState<string[]>(event.screenshots)
     const [tickets, setTickets] = useState<any[]>(event.tickets);
     const [coverVideo, setCoverVideo] = useState<string | undefined>(event.coverVideo);
-    const [eventTheme, setEventTheme] = useState<[string, string]>(
+    const [eventTheme, setEventTheme] = useState<EventThemeColors>(
         event.eventTheme ?? DEFAULT_EVENT_THEME
     );
 
-    const handleThemeChange = React.useCallback((theme: [string, string]) => {
+    const handleThemeChange = React.useCallback((theme: EventThemeColors) => {
         setEventTheme(theme);
         onThemeChange?.(theme);
     }, [onThemeChange]);
@@ -89,6 +89,8 @@ export const EventEdit = ({
     const panelClass = isLightSurface
         ? "bg-background text-black"
         : "border-white/15 bg-black/85 text-white";
+    const appFieldClass = "!border-border !bg-card !text-foreground placeholder:!text-muted-foreground shadow-sm";
+    const appPanelClass = "border-border bg-card text-card-foreground shadow-sm";
 
 
     const handleCoverVideoChange = useCallback((newUrl: string | null) => {
@@ -229,7 +231,7 @@ export const EventEdit = ({
         switch (activeScreen) {
             case "tickets":
                 return (
-                    <div className="px-3 flex flex-col gap-3 pt-2">
+                    <div className="px-3 flex flex-col gap-3 pt-2 pb-28">
                         {tickets.map((ticket, index) => (
                             <TicketCard
                                 key={index}
@@ -259,7 +261,7 @@ export const EventEdit = ({
                             mediaFileType={"EVENT_HEADER"}
                             setSubmitDisabled={setSubmitDisabled}
                         />
-                        <div className="w-full flex flex-col gap-5 px-4">
+                        <div className="w-full flex flex-col gap-5 px-4 pt-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="title" className={mutedTextClass}>Title</Label>
                                 <Input
@@ -268,7 +270,7 @@ export const EventEdit = ({
                                     placeholder="Title"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    className={cn("py-6", fieldClass)}
+                                    className={cn("py-6 font-medium", appFieldClass)}
                                 />
                             </div>
                             <div className="grid gap-2 ">
@@ -279,7 +281,7 @@ export const EventEdit = ({
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     rows={8}
-                                    className={cn("py-2 px-3 rounded-md border border-border focus:border-blue-600 focus:outline-hidden", fieldClass)}
+                                    className={cn("py-2 px-3 rounded-md border border-border focus:border-blue-600 focus:outline-hidden", appFieldClass)}
                                 />
                             </div>
                             <div className="grid gap-2">
@@ -292,30 +294,30 @@ export const EventEdit = ({
                             </div>
                             <div className="grid gap-2 w-full">
                                 <Label htmlFor="secure-location" className={mutedTextClass}>Secure Location</Label>
-                                <div className={cn("flex flex-row justify-between items-center rounded-md px-4 py-4 gap-2 border border-border", panelClass)}>
+                                <div className={cn("flex flex-row justify-between items-center rounded-md px-4 py-4 gap-2 border", appPanelClass)}>
                                     <div className="flex flex-col gap-1">
-                                        <h3 className={cn("font-bold", strongTextClass)}>Hide Exact Location</h3>
-                                        <p className={cn("text-sm", mutedTextClass)}>Enable to hide the exact location fromm attendees until necessary</p>
+                                        <h3 className="font-bold text-foreground">Hide Exact Location</h3>
+                                        <p className="text-sm text-muted-foreground">Enable to hide the exact location fromm attendees until necessary</p>
                                     </div>
                                     <Switch id="secure-location" size="medium" checked={locationSecure} onCheckedChange={() => { setLocationSecure(!locationSecure) }} />
                                 </div>
                             </div>
                             <div className="grid gap-2 w-full">
                                 <Label htmlFor="event-visible" className={mutedTextClass}>Event Visibility</Label>
-                                <div className={cn("flex flex-row justify-between items-center rounded-md px-4 py-4 gap-2 border border-border", panelClass)}>
+                                <div className={cn("flex flex-row justify-between items-center rounded-md px-4 py-4 gap-2 border", appPanelClass)}>
                                     <div className="flex flex-col gap-1">
-                                        <h3 className={cn("font-bold", strongTextClass)}>Public Event</h3>
-                                        <p className={cn("text-sm", mutedTextClass)}>Enable to make the event visible to all users.</p>
+                                        <h3 className="font-bold text-foreground">Public Event</h3>
+                                        <p className="text-sm text-muted-foreground">Enable to make the event visible to all users.</p>
                                     </div>
                                     <Switch id="event-visible" size="medium" checked={isPublic} onCheckedChange={() => { setIsPublic(!isPublic) }} />
                                 </div>
                             </div>
                             <div className="grid gap-2 w-full">
                                 <Label htmlFor="fee-bearer" className={mutedTextClass}>Fee Bearer</Label>
-                                <div className={cn("flex flex-row justify-between items-center rounded-md px-4 py-4 gap-2 border border-border", panelClass)}>
+                                <div className={cn("flex flex-row justify-between items-center rounded-md px-4 py-4 gap-2 border", appPanelClass)}>
                                     <div className="flex flex-col gap-1">
-                                        <h3 className={cn("font-bold", strongTextClass)}>Pass fee to the ticket buyer</h3>
-                                        <p className={cn("text-sm", mutedTextClass)}>Enable to charge ticket fees directly to the buyer.</p>
+                                        <h3 className="font-bold text-foreground">Pass fee to the ticket buyer</h3>
+                                        <p className="text-sm text-muted-foreground">Enable to charge ticket fees directly to the buyer.</p>
                                     </div>
                                     <Switch
                                         id="fee-bearer"
@@ -348,7 +350,7 @@ export const EventEdit = ({
                                     placeholder="Minimum Age"
                                     value={minimumAge}
                                     onChange={(e) => handleMinimumAgeChange(e.target.value)}
-                                    className={cn("py-2", fieldClass)}
+                                    className={cn("py-2 font-medium", appFieldClass)}
                                 />
                             </div>
                             <div className="grid gap-2">
