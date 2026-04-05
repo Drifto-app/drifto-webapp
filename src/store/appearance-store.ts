@@ -12,14 +12,14 @@ export interface SearchBorderColorOption {
 }
 
 export const SEARCH_BORDER_COLORS: SearchBorderColorOption[] = [
-  { id: 'blue', label: 'Blue', value: '#1d4ed8' },
+  { id: 'blue', label: 'Blue', value: '#0041c2' },
   { id: 'cyan', label: 'Cyan', value: '#22d3ee' },
   { id: 'purple', label: 'Purple', value: '#c084fc' },
   { id: 'teal', label: 'Teal', value: '#14b8a6' },
   { id: 'pink', label: 'Pink', value: '#ff0f7b' },
 ];
 
-const DEFAULT_SEARCH_BORDER_COLOR = SEARCH_BORDER_COLORS[4];
+const DEFAULT_SEARCH_BORDER_COLOR = SEARCH_BORDER_COLORS[0];
 
 interface AppearanceState {
   homeSearchBorderColor: SearchBorderColorId;
