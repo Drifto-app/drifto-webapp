@@ -145,7 +145,7 @@ export const SettingContent = ({
                                 />
                             </div>
                         </div>
-                        {searchQuery === "" && (   
+                        {/* {searchQuery === "" && (   
                             <div className="mx-1 mb-4 flex w-[calc(100%-8px)] cursor-pointer flex-row items-center rounded-xl border border-border bg-card pl-4 py-3 shadow-md" onClick={() => router.push(`/m/event-create?prev=${encodeURIComponent(currentPathUrl)}`)}>
                                 <span className="max-w-[60%] flex flex-col gap-1">
                                     <h4 className="font-bold text-[16px]">Become a Drifto Host</h4>
@@ -161,7 +161,7 @@ export const SettingContent = ({
                                     />
                                 </span>
                             </div>
-                        )}
+                        )} */}
                         <div className="w-full flex flex-col px-1">
                             {filteredOptions.length > 0 ? (
                                 filteredOptions.map((item, i) => (
