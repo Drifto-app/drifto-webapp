@@ -398,7 +398,7 @@ export const EventEdit = ({
 
     return (
         <div className={cn(
-            "w-full min-h-[85vh]",
+            "w-full min-h-[85vh] bg-background text-foreground",
             className
         )} style={activeScreen === "details" ? detailsContainerStyle : undefined} {...props}>
             <ul className="w-full flex flex-row justify-between pt-2">

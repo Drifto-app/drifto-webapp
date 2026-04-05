@@ -48,6 +48,10 @@ export const getEventThemeBackground = (
   eventTheme: string[] | null | undefined,
   resolvedTheme?: string,
 ) => {
+  if (isDefaultEventTheme(eventTheme)) {
+    return undefined;
+  }
+
   const colors = getEventThemeColors(eventTheme, resolvedTheme);
   return { background: `linear-gradient(to bottom, ${colors.join(', ')})` } as const;
 };
