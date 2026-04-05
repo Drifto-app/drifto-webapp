@@ -1,43 +1,63 @@
 'use client';
 
-export const DEFAULT_EVENT_THEME: [string, string] = ['#ffffff', '#ffffff'];
-export const LIGHT_EVENT_FALLBACK: [string, string] = ['#ffffff', '#ffffff'];
-export const DARK_EVENT_FALLBACK: [string, string] = ['#121212', '#121212'];
+export type EventThemeColors = [string, string, ...string[]];
+
+export const DEFAULT_EVENT_THEME: EventThemeColors = ['#ffffff', '#ffffff'];
+export const LIGHT_EVENT_FALLBACK: EventThemeColors = ['#ffffff', '#ffffff'];
+export const DARK_EVENT_FALLBACK: EventThemeColors = ['#121212', '#121212'];
+
+const normalizeHexColor = (color: string) => {
+  const normalized = color.trim().toLowerCase().replace('#', '');
+  const expanded =
+    normalized.length === 3
+      ? normalized
+          .split('')
+          .map((char) => char + char)
+          .join('')
+      : normalized.slice(0, 6);
+
+  return `#${expanded}`;
+};
 
 export const isDefaultEventTheme = (
-  eventTheme: [string, string] | null | undefined,
+  eventTheme: string[] | null | undefined,
 ) => {
-  if (!eventTheme || eventTheme.length !== 2) {
+  if (!eventTheme || eventTheme.length < 2) {
     return true;
   }
 
   return (
-    eventTheme[0].toLowerCase() === DEFAULT_EVENT_THEME[0] &&
-    eventTheme[1].toLowerCase() === DEFAULT_EVENT_THEME[1]
+    eventTheme.length === DEFAULT_EVENT_THEME.length &&
+    normalizeHexColor(eventTheme[0]) === normalizeHexColor(DEFAULT_EVENT_THEME[0]) &&
+    normalizeHexColor(eventTheme[1]) === normalizeHexColor(DEFAULT_EVENT_THEME[1])
   );
 };
 
 export const getEventThemeColors = (
-  eventTheme: [string, string] | null | undefined,
+  eventTheme: string[] | null | undefined,
   resolvedTheme?: string,
-): [string, string] => {
-  if (eventTheme && eventTheme.length === 2 && !isDefaultEventTheme(eventTheme)) {
-    return eventTheme;
+): EventThemeColors => {
+  if (eventTheme && eventTheme.length >= 2 && !isDefaultEventTheme(eventTheme)) {
+    return eventTheme as EventThemeColors;
   }
 
   return resolvedTheme === 'dark' ? DARK_EVENT_FALLBACK : LIGHT_EVENT_FALLBACK;
 };
 
 export const getEventThemeBackground = (
-  eventTheme: [string, string] | null | undefined,
+  eventTheme: string[] | null | undefined,
   resolvedTheme?: string,
 ) => {
-  const [c1, c2] = getEventThemeColors(eventTheme, resolvedTheme);
-  return { background: `linear-gradient(to bottom, ${c1}, ${c2})` } as const;
+  if (isDefaultEventTheme(eventTheme)) {
+    return undefined;
+  }
+
+  const colors = getEventThemeColors(eventTheme, resolvedTheme);
+  return { background: `linear-gradient(to bottom, ${colors.join(', ')})` } as const;
 };
 
 const hexToRgb = (hex: string) => {
-  const normalized = hex.replace('#', '').trim();
+  const normalized = normalizeHexColor(hex).replace('#', '');
   const expanded =
     normalized.length === 3
       ? normalized
@@ -81,10 +101,11 @@ const getColorLuminance = (hex: string) => {
 };
 
 export const isEventThemeLight = (
-  eventTheme: [string, string] | null | undefined,
+  eventTheme: string[] | null | undefined,
   resolvedTheme?: string,
 ) => {
-  const [c1, c2] = getEventThemeColors(eventTheme, resolvedTheme);
-  const averageLuminance = (getColorLuminance(c1) + getColorLuminance(c2)) / 2;
+  const colors = getEventThemeColors(eventTheme, resolvedTheme);
+  const averageLuminance =
+    colors.reduce((sum, color) => sum + getColorLuminance(color), 0) / colors.length;
   return averageLuminance > 0.55;
 };

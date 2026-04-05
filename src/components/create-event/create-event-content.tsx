@@ -42,6 +42,7 @@ import { CoverVideoUploader } from "../ui/cover-video";
 import { Linkify } from "@/lib/linkify";
 import {
   DEFAULT_EVENT_THEME,
+  EventThemeColors,
   getEventThemeBackground,
   isEventThemeLight,
 } from '@/lib/event-theme';
@@ -143,7 +144,7 @@ export const CreateEventContent = ({
   const [eventTags, setEventTags] = useState<string[]>([]);
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [tickets, setTickets] = useState<any[]>([]);
-  const [eventTheme, setEventTheme] = useState<[string, string]>(DEFAULT_EVENT_THEME);
+  const [eventTheme, setEventTheme] = useState<EventThemeColors>(DEFAULT_EVENT_THEME);
 
   useEffect(() => {
     window.scrollTo({
@@ -432,7 +433,7 @@ export const CreateEventContent = ({
       !coordinates?.longitude ||
       (isAgeRestricted && !minimumAge) ||
       eventTags.length <= 0 ||
-      eventTheme.length !== 2 ||
+      eventTheme.length < 2 ||
       tickets.length === 0;
 
     if (isSubmitDataInvalid) {
@@ -887,7 +888,7 @@ export const CreateEventContent = ({
           !coordinates?.longitude ||
           (isAgeRestricted && !minimumAge) ||
           eventTags.length <= 0 ||
-          eventTheme.length !== 2 ||
+          eventTheme.length < 2 ||
           tickets.length === 0;
 
         return (

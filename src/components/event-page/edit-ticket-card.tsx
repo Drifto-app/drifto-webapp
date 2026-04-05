@@ -149,7 +149,7 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
 
     return (
         <div
-            className="bg-neutral-200 rounded-md px-4 py-3 flex flex-col gap-2"
+            className="bg-background text-foreground border border-border rounded-md px-4 py-3 flex flex-col gap-2"
         >
             {/* Title & Price */}
             <div className="w-full flex items-center justify-between text-lg">
@@ -158,10 +158,10 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
             </div>
 
             {/* Ticket Info */}
-            <p className="w-full text-sm text-neutral-500">
+            <p className="w-full text-sm text-muted-foreground">
                 Quantity: {ticket.totalQuantity}
             </p>
-            <p className="w-full text-sm text-neutral-500">
+            <p className="w-full text-sm text-muted-foreground">
                 Purchased: {ticket.purchasedQuantity}
             </p>
             <p className="w-full text-sm text-blue-600">
@@ -185,7 +185,7 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
                                 <DialogTitle className="text-xl">Edit Ticket</DialogTitle>
                             </DialogHeader>
                             <div className="grid gap-3">
-                                <Label htmlFor="title" className="text-neutral-500">Ticket Title</Label>
+                                <Label htmlFor="title" className="text-muted-foreground">Ticket Title</Label>
                                 <Input
                                     id="title"
                                     type="text"
@@ -195,13 +195,13 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
                                 />
                             </div>
                             <div className="grid gap-3">
-                                <Label htmlFor="description" className="text-neutral-500">Description</Label>
+                                <Label htmlFor="description" className="text-muted-foreground">Description</Label>
                                 <textarea
                                     id="description"
                                     placeholder="Description"
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    className="border border-border focus:border-blue-600 focus:outline-hidden rounded-md py-2 px-3"
+                                    className="border border-border bg-background text-foreground focus:border-blue-600 focus:outline-hidden rounded-md py-2 px-3"
                                 />
                             </div>
                             {/* Paid/Free Toggle */}
@@ -210,7 +210,7 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
                                     <Label className="text-muted-foreground font-medium">
                                         {isPaid ? "Paid Ticket" : "Free Ticket"}
                                     </Label>
-                                    <span className="text-xs text-neutral-500">
+                                    <span className="text-xs text-muted-foreground">
                                         {isPaid ? "Ticket requires payment" : "Ticket is free"}
                                     </span>
                                 </div>
@@ -221,7 +221,7 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
                             </div>
                             {isPaid && (
                                 <div className="grid gap-3">
-                                    <Label htmlFor="price" className="text-neutral-500">Price</Label>
+                                    <Label htmlFor="price" className="text-muted-foreground">Price</Label>
                                     <Input
                                         id="price"
                                         type="text"
@@ -239,7 +239,7 @@ export const TicketCard = ({ ticket, removeTicket, onChange }: TicketCardProps) 
                                 </div>
                             )}
                             <div className="grid gap-3">
-                                <Label htmlFor="price" className="text-neutral-500">Quantity</Label>
+                                <Label htmlFor="price" className="text-muted-foreground">Quantity</Label>
                                 <Input
                                     id="quantity"
                                     type="text"

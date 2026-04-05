@@ -36,6 +36,7 @@ export const SingleEventHeader = ({
 
     const headerStyle = getEventThemeBackground(event?.eventTheme, resolvedTheme);
     const isLightSurface = isEventThemeLight(event?.eventTheme, resolvedTheme);
+    const headerBorderClass = isLightSurface ? "border-black/15" : "border-white/15";
 
     const handleBackClick = () => {
         if (onBackClick) {
@@ -56,7 +57,8 @@ export const SingleEventHeader = ({
     if (isCoHost) {
         return (
             <div className={cn(
-                "w-full border-b border-border flex flex-col gap-3 justify-center",
+                "w-full border-b flex flex-col gap-3 justify-center bg-background text-foreground",
+                headerBorderClass,
                 className
             )} style={headerStyle} {...props}>
                 <div className="flex flex-row items-center px-8 py-6">
@@ -81,7 +83,8 @@ export const SingleEventHeader = ({
 
     return (
         <div className={cn(
-            "w-full border-b border-border flex h-28 flex-col justify-between gap-5",
+            "w-full border-b flex h-28 flex-col justify-between gap-5 bg-background text-foreground",
+            headerBorderClass,
             className
         )} style={headerStyle} {...props}>
             <div className="flex flex-row items-center pt-8 px-8">

@@ -429,17 +429,17 @@ export const SingleEventDetails = ({
                             </DialogContent>
                         </Dialog>
                         <EventSingleContentText isLine={false} headText={"Event Title:"} className="shadow-xl">
-                            <h1 className={cn("capitalize font-black text-3xl w-full", strongTextClass)}>{event.title}</h1>
+                            <h1 className="capitalize font-black text-3xl w-full text-foreground">{event.title}</h1>
                         </EventSingleContentText>
                         <EventSingleContentText isLine={false} headText={"Location:"} className="shadow-xl">
-                            <p className={cn("capitalize font-black text-base w-full", strongTextClass)}>
+                            <p className="capitalize font-black text-base w-full text-foreground">
                                 {`${event.address}, ${event.city}, ${event.state}`}
                             </p>
                         </EventSingleContentText>
                         <EventSingleContentText isLine={false} headText={"Event Time:"} className="shadow-xl items-start">
                             <div className="flex flex-col gap-1">
-                                <p className={cn("text-sm font-semibold", strongTextClass)}>{formattedStartDate} - {formattedStopDate}</p>
-                                <p className={cn("text-sm font-medium", mutedTextClass)}>{formattedStartTime} - {formattedStopTime}</p>
+                                <p className="text-sm font-semibold text-foreground">{formattedStartDate} - {formattedStopDate}</p>
+                                <p className="text-sm font-medium text-muted-foreground">{formattedStartTime} - {formattedStopTime}</p>
                             </div>
                         </EventSingleContentText>
                         <EventSingleContentText
@@ -453,10 +453,10 @@ export const SingleEventDetails = ({
                                     `?prev=${encodeURIComponent(`/m/events/${event.id}`)}` +
                                     `&type=EVENT`
                                 )}>
-                                    <p className={cn("font-semibold text-2xl", strongTextClass)}>
+                                    <p className="font-semibold text-2xl text-foreground">
                                         {event.totalComments}
                                     </p>
-                                    <p className={cn("text-md", mutedTextClass)}>
+                                    <p className="text-md text-muted-foreground">
                                         comments
                                     </p>
                                 </div>
@@ -465,20 +465,20 @@ export const SingleEventDetails = ({
                                     `?prev=${encodeURIComponent(`/m/events/${event.id}`)}` +
                                     `&type=EVENT`
                                 )}>
-                                    <p className={cn("font-semibold text-2xl", strongTextClass)}>
+                                    <p className="font-semibold text-2xl text-foreground">
                                         {event.totalLikes}
                                     </p>
-                                    <p className={cn("text-md", mutedTextClass)}>
+                                    <p className="text-md text-muted-foreground">
                                         likes
                                     </p>
                                 </div>
                                 <div className="w-full flex flex-col gap-1 items-center cursor-pointer" onClick={() => setActiveScreen!("event-earnings")}>
-                                    <p className={cn("font-semibold text-2xl", strongTextClass)}>
+                                    <p className="font-semibold text-2xl text-foreground">
                                         {event.tickets.reduce((sum: number, ticket: { purchasedQuantity: number }) => {
                                             return sum + ticket.purchasedQuantity
                                         }, 0)}
                                     </p>
-                                    <p className={cn("text-md", mutedTextClass)}>
+                                    <p className="text-md text-muted-foreground">
                                         tickets sold
                                     </p>
                                 </div>
@@ -501,14 +501,14 @@ export const SingleEventDetails = ({
                             </div>
                         </EventSingleContentText>
                         <EventSingleContentText isLine={false} headText={"Minimum Age:"} className="shadow-xl items-start">
-                            <h2 className={cn("text-xl font-semibold", strongTextClass)}>
+                            <h2 className="text-xl font-semibold text-foreground">
                                 {event.ageRestricted ? event.minimumAge : "No age restrictions"}
                             </h2>
                         </EventSingleContentText>
                         <EventSingleContentText isLine={false} headText="Event Description" className="flex-col shadow-xl">
                             <ExpandableDescription
                                 text={event.description}
-                                className={cn("text-sm w-full text-left font-semibold", strongTextClass)}
+                                className="text-sm w-full text-left font-semibold text-foreground"
                             />
                         </EventSingleContentText>
                         <EventSingleContentText headText={"Event Screenshots"} isLine={false} className="flex-col shadow-xl">
@@ -529,7 +529,7 @@ export const SingleEventDetails = ({
                                 />
                             ))}
                             {event.hostCollaborationStatus == "HOST" && (
-                                <div className={cn("w-full flex flex-row gap-8 items-center text-sm my-4 overflow-x-auto no-scrollbar px-2", strongTextClass)}>
+                                <div className="w-full flex flex-row gap-8 items-center text-sm text-foreground my-4 overflow-x-auto no-scrollbar px-2">
                                     <p
                                         className={cn("whitespace-nowrap font-bold underline-offset-3 cursor-pointer transition-colors px-4 py-2 border rounded-full", isLightSurface ? "border-neutral-400" : "border-white/30")}
                                         onClick={() => setActiveScreen!('co-host-manage')}
