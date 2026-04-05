@@ -57,7 +57,7 @@ export const SingleEventHeader = ({
     if (isCoHost) {
         return (
             <div className={cn(
-                "w-full border-b flex flex-col gap-3 justify-center",
+                "w-full border-b flex flex-col gap-3 justify-center bg-background text-foreground",
                 headerBorderClass,
                 className
             )} style={headerStyle} {...props}>
@@ -83,7 +83,7 @@ export const SingleEventHeader = ({
 
     return (
         <div className={cn(
-            "w-full border-b flex h-28 flex-col justify-between gap-5",
+            "w-full border-b flex h-28 flex-col justify-between gap-5 bg-background text-foreground",
             headerBorderClass,
             className
         )} style={headerStyle} {...props}>

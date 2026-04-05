@@ -48,7 +48,7 @@ export const SingleEventFooter = ({
         // This footer section is kept minimal for bottom spacing
         return (
             <div className={cn(
-                "fixed inset-x-0 bottom-0 z-60 border-t border-border",
+                "fixed inset-x-0 bottom-0 z-60 border-t border-border bg-background text-foreground",
                 "safe-area-inset-bottom flex justify-center",
                 className
             )}
@@ -68,7 +68,7 @@ export const SingleEventFooter = ({
 
     return (
         <div className={cn(
-            "fixed inset-x-0 bottom-0 z-60 border-t border-border",
+            "fixed inset-x-0 bottom-0 z-60 border-t border-border bg-background text-foreground",
             "safe-area-inset-bottom",
             className
         )}
