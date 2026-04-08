@@ -8,6 +8,7 @@ import { EventTagsProvider } from "@/hooks/event-tags-providers";
 import { useTheme } from 'next-themes';
 import { Toaster } from '@/components/ui/sonner';
 import { AppearanceProvider } from '@/components/appearance/appearance-provider';
+import { DobOnboardingOverlay } from '@/components/auth/dob-onboarding-overlay';
 
 
 interface ClientProvidersProps {
@@ -22,6 +23,7 @@ function AppProviders({ children }: ClientProvidersProps) {
             <AuthProvider>
                 <EventTagsProvider>
                     {children}
+                    <DobOnboardingOverlay />
                     <ToastContainer
                         position="top-right"
                         autoClose={3000}
