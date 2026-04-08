@@ -15,7 +15,8 @@ interface AuthState {
     isAuthenticated: boolean;
     isLoading: boolean;
     hasTriedRefresh: boolean;
-    locationPublic: LocationPublic
+    locationPublic: LocationPublic;
+    showDobOnboarding: boolean;
 }
 
 export interface LoginCredentials {
@@ -30,6 +31,7 @@ export interface AuthResponse {
     refreshToken: string;
     message: string | null;
     "2fa": boolean;
+    newUser?: boolean;
 }
 
 interface AuthStore extends AuthState {
@@ -44,6 +46,7 @@ interface AuthStore extends AuthState {
     clearAuth: () => void;
     setLoading: (loading: boolean) => void;
     setLocationPublic: (locationPublic: LocationPublic) => void;
+    setShowDobOnboarding: (show: boolean) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -58,6 +61,7 @@ export const useAuthStore = create<AuthStore>()(
             locationPublic: {
                 state: null, city: null,
             },
+            showDobOnboarding: false,
 
             login: async (credentials: LoginCredentials) => {
                 try {
@@ -99,7 +103,9 @@ export const useAuthStore = create<AuthStore>()(
                     const response = await api.post('/auth/google', {
                         googleIdToken: credentials,
                     });
-                    const { user, accessToken, refreshToken } = response.data.data
+                    const { user, accessToken, refreshToken, newUser } = response.data.data
+
+                    const needsDobOnboarding = newUser === true && (!user.dob || user.dob === null);
 
                     set({
                         user,
@@ -107,6 +113,7 @@ export const useAuthStore = create<AuthStore>()(
                         refreshToken,
                         isAuthenticated: true,
                         isLoading: false,
+                        showDobOnboarding: needsDobOnboarding,
                     })
                 } catch (error) {
                     set({ isLoading: false });
@@ -123,7 +130,9 @@ export const useAuthStore = create<AuthStore>()(
                         firstName: credentials.givenName,
                         lastName: credentials.familyName
                     });
-                    const { user, accessToken, refreshToken } = response.data.data
+                    const { user, accessToken, refreshToken, newUser } = response.data.data
+
+                    const needsDobOnboarding = newUser === true && (!user.dob || user.dob === null);
 
                     set({
                         user,
@@ -131,6 +140,7 @@ export const useAuthStore = create<AuthStore>()(
                         refreshToken,
                         isAuthenticated: true,
                         isLoading: false,
+                        showDobOnboarding: needsDobOnboarding,
                     })
                 } catch (error) {
                     set({ isLoading: false });
@@ -202,6 +212,8 @@ export const useAuthStore = create<AuthStore>()(
             setLoading: (isLoading: boolean) => set({ isLoading }),
 
             setLocationPublic: (locationPublic: LocationPublic) => set({ locationPublic }),
+
+            setShowDobOnboarding: (show: boolean) => set({ showDobOnboarding: show }),
         }),
         {
             name: 'auth-storage',
