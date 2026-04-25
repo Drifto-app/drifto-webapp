@@ -172,6 +172,7 @@ export const useAuthStore = create<AuthStore>()(
 
                     set({
                         accessToken: response.data.data.accessToken,
+                        refreshToken: response.data.data.refreshToken,
                         user: response.data.data.user,
                         isAuthenticated: true,
                     });
