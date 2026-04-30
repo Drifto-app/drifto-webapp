@@ -3,7 +3,6 @@
 import { authApi } from "@/lib/axios";
 import { ArrowLeft, Download, Inbox, Loader2 } from "lucide-react";
 import Image from "next/image";
-import driftoLogo from "@/assests/logo.png";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
@@ -14,15 +13,12 @@ import { ScreenProvider } from "@/components/screen/screen-provider";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoutes";
 import { useAuthStore } from "@/store/auth-store";
 import { showTopToast } from "@/components/toast/toast-util";
-import { BookingDetailsPageSkeleton } from "@/components/ui/page-skeletons";
 
 export default function Page() {
   const [tickets, setTickets] = useState<any[]>();
   const [eventDetails, setEventDetails] = useState<any>();
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const params = useParams<{ id: string }>();
-  const id = params?.id;
+  const { id } = useParams();
   const { user } = useAuthStore();
 
   const fetchTickets = async () => {
@@ -32,7 +28,7 @@ export default function Page() {
 
     const data = response.data.data.data;
     setTickets(data);
-
+    console.log(data);
   };
   const fetchEventDetails = async () => {
     const response = await authApi.get("/event/" + id, {
@@ -41,30 +37,12 @@ export default function Page() {
 
     const data = response.data.data;
     setEventDetails(data);
-
+    console.log(data);
   };
   useEffect(() => {
-    const loadPage = async () => {
-      setLoading(true);
-      try {
-        await Promise.all([fetchTickets(), fetchEventDetails()]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPage();
+    fetchTickets();
+    fetchEventDetails();
   }, []);
-
-  if (loading) {
-    return (
-      <ProtectedRoute>
-        <ScreenProvider>
-          <BookingDetailsPageSkeleton />
-        </ScreenProvider>
-      </ProtectedRoute>
-    );
-  }
   return (
     <ProtectedRoute>
       <ScreenProvider>
@@ -91,12 +69,12 @@ export default function Page() {
                 );
               })}
           </div>
-          <div className=" w-full fixed bottom-0 bg-background border-t border-t-neutral-400 py-4 flex justify-center">
+          <div className=" w-full fixed bottom-0 bg-white border-t border-t-neutral-400 py-4 flex justify-center">
             <button
               onClick={() => {
                 router.push(`/m/refund/${id}?prev=${encodeURIComponent(`/m/bookings/${id}`)}`);
               }}
-              className="outline-none border-none bg-background text-blue-700 text-sm font-md"
+              className="outline-none border-none bg-white text-blue-700 text-sm font-md"
             >
               Request a refund
             </button>
@@ -115,16 +93,16 @@ function DetailsHeader({ title }: headerProp) {
   return (
     <div
       className={cn(
-        "w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center"
+        "w-full border-b-1 border-b-neutral-300 flex flex-col gap-3 h-20 justify-center"
       )}
     >
       <div className="flex flex-row items-center px-8">
         <FaArrowLeft
           size={16}
           onClick={() => router.push("/?screen=plans")}
-          className="cursor-pointer hover:text-muted-foreground transition-colors"
+          className="cursor-pointer hover:text-neutral-700 transition-colors"
         />
-        <p className="font-semibold text-foreground text-sm w-full text-center capitalize truncate ml-4">
+        <p className="font-semibold text-neutral-950 text-sm w-full text-center capitalize truncate ml-4">
           {title}
         </p>
       </div>
@@ -201,11 +179,11 @@ function TicketCard({
   return (
     <div>
       <div className="flex justify-end gap-3 mb-2">
-        <div className=" text-blue-600 px-3  flex items-center justify-center rounded-full border border-foreground text-xs">
+        <div className=" text-blue-600 px-3  flex items-center justify-center rounded-full border border-black text-xs">
           <span>{used ? "Used" : "Not Used"}</span>
         </div>
         <button
-          className=" px-2 py-1 border border-foreground rounded-full"
+          className=" px-2 py-1 border border-black rounded-full"
           onClick={() =>
             router.push(
               `/m/events/${eventId}?prev=${encodeURIComponent(
@@ -217,7 +195,7 @@ function TicketCard({
           <Inbox size={18} />
         </button>
         <button
-          className="p-2 border border-foreground rounded-full flex items-center justify-center"
+          className="p-2 border border-black rounded-full flex items-center justify-center"
           onClick={handleDownload}
           disabled={downloading}
         >
@@ -226,7 +204,7 @@ function TicketCard({
       </div>
 
       {/* Capturable ticket section */}
-      <div ref={cardRef} className="shadow-2xl rounded-b-2xl bg-background">
+      <div ref={cardRef} className="shadow-2xl rounded-b-2xl bg-white">
         <Image
           className="rounded-t-2xl w-full h-48 object-cover"
           alt={title.toString()}
@@ -262,29 +240,14 @@ function TicketCard({
             </div>
           </div>
           <div className="flex gap-2 items-center">
-            <div className="border-t border-foreground w-full"></div>
+            <div className="border-t border-black w-full"></div>
             <div className="w-fit break-normal whitespace-nowrap">
               {index + 1} of {noOfTickets}
             </div>
-            <div className="border-t border-foreground w-full"></div>
+            <div className="border-t border-black w-full"></div>
           </div>
           <div className="flex justify-center py-8">
-            <div className="relative inline-block select-none pointer-events-none [-webkit-touch-callout:none] [-webkit-tap-highlight-color:transparent]">
-              <QRCode size={128} value={ticketReference.toString()} />
-              {/* Logo overlay */}
-              <div
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background pl-1.5 pr-2"
-                style={{ width: '19%', height: '19%', minWidth: 30, minHeight: 30 }}
-              >
-                <Image
-                  src={driftoLogo}
-                  alt="Drifto"
-                  width={32}
-                  height={32}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-            </div>
+            <QRCode size={128} value={ticketReference.toString()} />
           </div>
         </div>
       </div>
