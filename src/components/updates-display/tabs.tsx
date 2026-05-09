@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { cn } from "@/lib/utils";
+import * as React from 'react';
+import { cn } from '@/lib/utils';
 
-type TabValue = "requests" | "notifications";
+type TabValue = 'requests' | 'notifications';
 // | "inbox";
 
 interface TabsProps {
   active: TabValue | null;
   onClick?: (value: TabValue | null) => void;
+  variant?: 'mobile' | 'desktop';
 }
 
 interface TabOption {
@@ -18,14 +19,36 @@ interface TabOption {
 
 const TAB_OPTIONS: TabOption[] = [
   //   { label: "Inbox", value: "inbox" },
-  { label: "Notifications", value: "notifications" },
-  { label: "Requests", value: "requests" },
+  { label: 'Notifications', value: 'notifications' },
+  { label: 'Requests', value: 'requests' },
 ];
 
-export function Tabs({ active, onClick }: TabsProps) {
+export function Tabs({ active, onClick, variant = 'mobile' }: TabsProps) {
   const handleTabClick = (value: TabValue) => {
     onClick?.(value);
   };
+
+  if (variant === 'desktop') {
+    return (
+      <div className="inline-flex rounded-full border border-border bg-background p-1 shadow-sm">
+        {TAB_OPTIONS.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={() => handleTabClick(tab.value)}
+            className={cn(
+              'rounded-full px-5 py-2.5 text-sm font-black transition',
+              active === tab.value
+                ? 'bg-blue-800 text-white shadow-sm'
+                : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <ul className="flex flex-row flex-nowrap justify-center w-full gap-6 overflow-x-auto px-4 mt-4 no-scrollbar">
@@ -55,18 +78,18 @@ function Tab({ label, value, isActive, onClick }: TabProps) {
       <div
         onClick={() => onClick(value)}
         className={cn(
-          "flex flex-col items-center border-b-3 cursor-pointer px-4 transition-all gap-1",
+          'flex flex-col items-center border-b-3 cursor-pointer px-4 transition-all gap-1',
           isActive
-            ? "pb-2 border-b-neutral-800 dark:border-b-blue-500 opacity-100"
-            : "pb-0 opacity-60 border-transparent"
+            ? 'pb-2 border-b-neutral-800 dark:border-b-blue-500 opacity-100'
+            : 'pb-0 opacity-60 border-transparent',
         )}
       >
         <span
           className={cn(
-            "mt-1 whitespace-nowrap",
+            'mt-1 whitespace-nowrap',
             isActive
-              ? "text-md font-bold text-foreground dark:text-white"
-              : "text-[15px] text-muted-foreground dark:text-neutral-400"
+              ? 'text-md font-bold text-foreground dark:text-white'
+              : 'text-[15px] text-muted-foreground dark:text-neutral-400',
           )}
         >
           {label}

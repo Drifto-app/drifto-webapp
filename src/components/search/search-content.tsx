@@ -5,7 +5,11 @@ import {ProtectedRoute} from "@/components/auth/ProtectedRoutes";
 import {ScreenProvider} from "@/components/screen/screen-provider";
 import {SearchDetails} from "@/components/search/search-details";
 
-export default function SearchContent () {
+interface SearchContentProps {
+    variant?: "mobile" | "desktop";
+}
+
+export default function SearchContent ({ variant = "mobile" }: SearchContentProps) {
 
     const searchParams = useSearchParams();
 
@@ -15,7 +19,7 @@ export default function SearchContent () {
         <ProtectedRoute>
             <ScreenProvider>
                 <div className="w-full">
-                    <SearchDetails prev={prev} />
+                    <SearchDetails prev={prev} variant={variant} />
                 </div>
             </ScreenProvider>
         </ProtectedRoute>

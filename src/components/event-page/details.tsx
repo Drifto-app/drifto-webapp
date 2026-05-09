@@ -4,12 +4,11 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import driftoLogo from "@/assests/logo.png";
-import { FaHeart, FaHotjar, FaRegCalendar } from "react-icons/fa";
+import { FaHeart, FaRegCalendar } from "react-icons/fa";
 import { IoMdHeartEmpty, IoMdSearch } from "react-icons/io";
-import { IoLocationOutline, IoPizzaOutline, IoShareSocialOutline } from "react-icons/io5";
+import { IoLocationOutline, IoShareSocialOutline } from "react-icons/io5";
 import { Download, QrCode, Pencil, Trash2, Share2 } from "lucide-react";
 import { EventSingleContent, EventSingleContentText } from "@/components/ui/content";
-import { TbTicketOff } from "react-icons/tb";
 import { HiMiniUsers } from "react-icons/hi2";
 import { SnapshotCarousel } from "@/components/event-page/image-silder";
 import { authApi } from "@/lib/axios";
@@ -38,6 +37,7 @@ import { useTheme } from "next-themes";
 import { useShare } from "@/hooks/share-option";
 import { ShareDialog } from "@/components/share-button/share-option";
 import { showTopToast } from "@/components/toast/toast-util";
+import { getEventDisplayStatusMeta } from "@/lib/event-status";
 import { CoverVideoSection } from "./cover-video-section";
 import { useAuthStore } from '@/store/auth-store';
 import { ReportDrawer } from "@/components/report/report-drawer";
@@ -218,15 +218,8 @@ export const SingleEventDetails = ({
         hour12: true,
     });
 
-    let eventDisplayDetails: {
-        icon: React.ReactNode
-        value: string
-        description: string
-    } = {
-        icon: <IoPizzaOutline size={22} />,
-        value: event.eventDisplayStatus,
-        description: `This event is now ${event.eventDisplayStatus}`
-    }
+    const eventDisplayDetails = getEventDisplayStatusMeta(event.eventDisplayStatus);
+    const EventStatusIcon = eventDisplayDetails.Icon;
 
     const eventUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/event/${event.slug}`;
     const {
@@ -261,26 +254,6 @@ export const SingleEventDetails = ({
             setIsLiked(!isLiked);
         } finally {
             setIsLikedLoading(false);
-        }
-    }
-
-    if (event.eventDisplayStatus === "ACTIVE") {
-        eventDisplayDetails = {
-            icon: <IoPizzaOutline size={22} />,
-            value: "active",
-            description: `Tickets are now available`
-        }
-    } else if (event.eventDisplayStatus === "HOT") {
-        eventDisplayDetails = {
-            icon: <FaHotjar size={16} className="text-orange-600" />,
-            value: "hot",
-            description: `Tickets are almost sold out`
-        }
-    } else if (event.eventDisplayStatus === "SOLD_OUT") {
-        eventDisplayDetails = {
-            icon: <TbTicketOff size={18} className="text-red-600" />,
-            value: "sold out",
-            description: `Tickets are sold out`
         }
     }
 
@@ -657,9 +630,12 @@ export const SingleEventDetails = ({
                         }
                     </EventSingleContent>
                     <EventSingleContent>
-                        {eventDisplayDetails.icon}
+                        <EventStatusIcon
+                            size={eventDisplayDetails.iconSize}
+                            className={eventDisplayDetails.iconClassName}
+                        />
                         <div className="flex flex-col">
-                            <p className="text-sm font-semibold normal-case">This event is {eventDisplayDetails.value}</p>
+                            <p className="text-sm font-semibold normal-case">This event is {eventDisplayDetails.label}</p>
                             <p className="text-sm font-medium text-neutral-400">{eventDisplayDetails.description}</p>
                         </div>
                     </EventSingleContent>

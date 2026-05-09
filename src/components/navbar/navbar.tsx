@@ -1,11 +1,10 @@
 import * as React from "react";
 import {NavMenu} from "@/components/navbar/nav-menu";
-import Image from "next/image";
 import ProfileMenu from "@/components/dropdown-menu/profile-menu";
+import { ThemedLogo } from "@/components/ui/themed-logo";
+import { cn } from "@/lib/utils";
 
-interface NavbarProps extends  React.ComponentProps<"nav"> {
-
-}
+type NavbarProps = React.ComponentProps<"nav">;
 
 export const Navbar = ({
     className,
@@ -13,14 +12,12 @@ export const Navbar = ({
 }: NavbarProps) => {
 
     return (
-        <nav className="h-16 bg-neutral-200 border-b overflow-y-hidden hidden md:block" {...props}>
+        <nav className={cn("h-16 bg-neutral-200 border-b overflow-y-hidden hidden md:block", className)} {...props}>
             <div className="h-full flex items-center justify-between max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-2">
                 <div className="relative w-25 h-25">
-                    <Image
-                        src="/logo-extend.png"
-                        alt="Logo Extend"
+                    <ThemedLogo
                         fill
-                        className="object-contain"
+                        alt="Logo Extend"
                     />
                 </div>
 

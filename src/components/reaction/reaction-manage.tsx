@@ -1,18 +1,19 @@
 "use client"
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as React from "react";
 import {cn} from "@/lib/utils";
 import {useRouter} from "next/navigation";
 import {FaArrowLeft} from "react-icons/fa";
-import {CommentCard} from "@/components/comment/comment-card";
 import {authApi} from "@/lib/axios";
-import {toast} from "react-toastify";
 import {Loader} from "@/components/ui/loader";
 import {useEffect, useRef, useCallback} from "react";
 import {Button} from "@/components/ui/button";
 import {UserSinglePlaceholder} from "@/components/ui/user-placeholder";
 import {showTopToast} from "@/components/toast/toast-util";
 import { UserListSkeleton } from "@/components/ui/page-skeletons";
+import { ArrowLeft, Heart } from "lucide-react";
 
 interface ReactionManageProps extends React.ComponentProps<"div">{
     entityId: string;
@@ -20,12 +21,14 @@ interface ReactionManageProps extends React.ComponentProps<"div">{
     onBackClick?: () => void;
     prev: string | null;
     currentPathUrl: string
+    variant?: "mobile" | "desktop";
 }
 
 export default function ReactionManagePage(
-    {entityId, currentPathUrl, onBackClick, prev, type, className, ...props}: ReactionManageProps
+    {entityId, currentPathUrl, onBackClick, prev, type, variant = "mobile", className, ...props}: ReactionManageProps
 ) {
     const router = useRouter();
+    void currentPathUrl;
 
     // State for infinite scroll
     const [users, setUsers] = React.useState<any[]>([]);
@@ -134,6 +137,63 @@ export default function ReactionManagePage(
         }
     }
 
+    if (variant === "desktop") {
+        return (
+            <main className={cn("min-h-screen bg-background text-foreground", className)} {...props}>
+                <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur">
+                    <div className="desktop-page-header-inner flex h-20 items-center gap-4">
+                        <Button variant="ghost" size="icon" className="rounded-full" onClick={handleBackClick}>
+                            <ArrowLeft size={20} />
+                        </Button>
+                        <div className="min-w-0">
+                            <p className="text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
+                                Social activity
+                            </p>
+                            <h1 className="truncate text-xl font-black">{title || "Reactions"}</h1>
+                        </div>
+                    </div>
+                </header>
+                <div className="desktop-page-container py-8">
+                    <section className="rounded-2xl border border-border bg-card">
+                        <div className="border-b border-border p-5">
+                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
+                                <Heart size={20} />
+                            </span>
+                            <h2 className="mt-4 text-2xl font-black">{title || "Reactions"}</h2>
+                            <p className="mt-1 text-sm text-muted-foreground">{users.length} loaded</p>
+                        </div>
+                        {initialLoading ? (
+                            <div className="p-5">
+                                <UserListSkeleton count={5} />
+                            </div>
+                        ) : error && users.length === 0 ? (
+                            <div className="flex min-h-72 items-center justify-center p-8 text-center">
+                                <p className="font-black">Unable to load reactions</p>
+                            </div>
+                        ) : users.length === 0 ? (
+                            <div className="flex min-h-72 items-center justify-center p-8 text-center text-muted-foreground">
+                                No user reaction found
+                            </div>
+                        ) : (
+                            <div className="grid gap-3 p-5">
+                                {users.map((user) => (
+                                    <div key={user.id} className="rounded-2xl border border-border bg-background px-4 py-4">
+                                        <UserSinglePlaceholder user={user} variant="desktop" />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {loading && !initialLoading && (
+                            <div className="flex justify-center py-4">
+                                <Loader className="h-8 w-8" />
+                            </div>
+                        )}
+                    </section>
+                </div>
+            </main>
+        );
+    }
+
     // Loading state for initial load
     if (initialLoading) {
         return (
@@ -217,7 +277,7 @@ export default function ReactionManagePage(
             <div className="w-full flex flex-col gap-6 px-4 py-4">
                 {users.map((user) => (
                     <div key={user.id} className="rounded-lg border-1 px-4 py-4 border-neutral-800">
-                        <UserSinglePlaceholder user={user}  />
+                        <UserSinglePlaceholder user={user} variant={variant} />
                     </div>
                 ))}
             </div>

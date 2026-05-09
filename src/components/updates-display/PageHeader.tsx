@@ -1,7 +1,18 @@
-import { Settings } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Settings } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { DESKTOP_ROUTES } from '@/lib/routes';
 
-export default function PageHeader({ headerTitle, prev }: any) {
+interface PageHeaderProps {
+  headerTitle: string;
+  prev: string;
+  variant?: 'mobile' | 'desktop';
+}
+
+export default function PageHeader({
+  headerTitle,
+  prev,
+  variant = 'mobile',
+}: PageHeaderProps) {
   const router = useRouter();
 
   return (
@@ -10,7 +21,9 @@ export default function PageHeader({ headerTitle, prev }: any) {
         <h2 className="text-xl">{headerTitle}</h2>
         <span
           onClick={() =>
-            router.push(`/m/settings?prev=${encodeURIComponent(prev)}`)
+            router.push(
+              `${variant === 'desktop' ? DESKTOP_ROUTES.settings : '/m/settings'}?prev=${encodeURIComponent(prev)}`,
+            )
           }
         >
           <Settings size={20} />

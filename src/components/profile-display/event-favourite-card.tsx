@@ -1,5 +1,7 @@
 "use client"
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {ComponentProps, useState} from "react";
 import {cn} from "@/lib/utils";
 import Image from "next/image";
@@ -9,17 +11,20 @@ import {FaHeart} from "react-icons/fa";
 import {IoMdHeartEmpty} from "react-icons/io";
 import {authApi} from "@/lib/axios";
 import {showTopToast} from "@/components/toast/toast-util";
+import { DESKTOP_ROUTES } from "@/lib/routes";
 
 
 interface EventFavouriteCardProps extends ComponentProps<"div"> {
     eventContent: {[key: string]: any};
     onUnReact: (eventId: string) => void;
+    variant?: "mobile" | "desktop";
 }
 
 export const EventFavouriteCard = ({
-    eventContent, onUnReact, className, ...props
+    eventContent, onUnReact, variant = "mobile", className, ...props
 }: EventFavouriteCardProps) => {
     const router = useRouter();
+    const isDesktop = variant === "desktop";
 
     const [isLiked, setIsLiked] = useState<boolean>(true);
     const [isLikedLoading, setIsLikedLoading] = useState<boolean>(false);
@@ -48,20 +53,28 @@ export const EventFavouriteCard = ({
         <div
             className={cn(
                 "w-full",
+                isDesktop && "overflow-hidden rounded-2xl border border-border bg-card p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-800/30 hover:shadow-md",
                 className,
             )}
             {...props}
         >
             <div className="w-full flex flex-col gap-4">
-                <div className="relative w-full max-h-[30vh] overflow-hidden">
+                <div className={cn("relative w-full overflow-hidden", isDesktop ? "aspect-[16/10] rounded-xl" : "max-h-[30vh]")}>
                     <Image
                         src={eventContent.titleFileUrl}
                         alt={eventContent.title}
-                        width={800}
-                        height={500}
-                        className="w-full h-auto object-cover rounded-lg"
-                        style={{ maxHeight: "30vh" }}
-                        onClick={() => {router.push(`/m/events/${eventContent.eventId}?prev=${encodeURIComponent(`/?screen=profile`)}`)}}
+                        fill={isDesktop}
+                        width={isDesktop ? undefined : 800}
+                        height={isDesktop ? undefined : 500}
+                        className={cn("object-cover cursor-pointer", isDesktop ? "h-full w-full rounded-xl" : "w-full h-auto rounded-lg")}
+                        style={isDesktop ? undefined : { maxHeight: "30vh" }}
+                        onClick={() => {
+                            const path = isDesktop
+                                ? DESKTOP_ROUTES.eventDetail(eventContent.eventId)
+                                : `/m/events/${eventContent.eventId}`;
+
+                            router.push(`${path}?prev=${encodeURIComponent(`/?screen=profile`)}`)
+                        }}
                     />
                     {eventContent.original && <span className="absolute top-4 left-2 rounded-full bg-background py-2 px-2 text-xs shadow-md font-semibold text-foreground">
                             Drifto Original
@@ -82,7 +95,7 @@ export const EventFavouriteCard = ({
                         </button>
                     </div>
                 </div>
-                <div className="font-black text-lg capitalize leading-tight line-clamp-2">{eventContent.title}</div>
+                <div className={cn("font-black capitalize leading-tight line-clamp-2", isDesktop ? "px-1 pb-1 text-base" : "text-lg")}>{eventContent.title}</div>
             </div>
         </div>
     )

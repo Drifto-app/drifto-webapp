@@ -1,4 +1,6 @@
-import { ComponentProps, useEffect, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { ComponentProps, useState } from "react";
 import { cn } from "@/lib/utils";
 import { authApi } from "@/lib/axios";
 import { showTopToast } from "@/components/toast/toast-util";
@@ -13,16 +15,26 @@ import { SlOptionsVertical } from "react-icons/sl";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { MdDeleteOutline } from "react-icons/md";
 import { ReportDrawer } from "@/components/report/report-drawer";
+import { DESKTOP_ROUTES } from "@/lib/routes";
+import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface PostCardProps extends ComponentProps<"div"> {
     postContent: { [key: string]: any };
     disabled?: boolean;
     isForUser?: boolean;
     onDelete?: (postId: string) => void;
+    variant?: "mobile" | "desktop";
 }
 
 export const PostCard = ({
-    postContent, disabled = false, isForUser = false, onDelete, className, ...props
+    postContent, disabled = false, isForUser = false, onDelete, variant = "mobile", className, ...props
 }: PostCardProps) => {
     const router = useRouter();
 
@@ -40,6 +52,21 @@ export const PostCard = ({
     const [selectedMediaIndex, setSelectedMediaIndex] = useState<number>(0);
     const [isReportDrawerOpen, setIsReportDrawerOpen] = useState<boolean>(false);
     const prevUrl = pathname + "?" + searchParams;
+    const isDesktop = variant === "desktop";
+    const postDetailPath = isDesktop
+        ? `${DESKTOP_ROUTES.postDetail(postContent.id)}?prev=${encodeURIComponent(prevUrl)}`
+        : `/m/post/${postContent.id}?prev=${encodeURIComponent(prevUrl)}`;
+    const userHref = (id: string) =>
+        isDesktop
+            ? `${DESKTOP_ROUTES.userDetail(id)}?prev=${encodeURIComponent(prevUrl)}`
+            : `/m/user/${id}?prev=${encodeURIComponent(prevUrl)}`;
+    const eventHref = (id: string) =>
+        isDesktop
+            ? `${DESKTOP_ROUTES.eventDetail(id)}?prev=${encodeURIComponent(prevUrl)}`
+            : `/m/events/${id}?prev=${encodeURIComponent(prevUrl)}`;
+    const reactionPath = isDesktop
+        ? `${DESKTOP_ROUTES.reactionDetail(postContent.id)}?prev=${encodeURIComponent(prevUrl)}&type=POST`
+        : `/m/reaction/${postContent.id}?prev=${encodeURIComponent(prevUrl)}&type=POST`;
 
     const handleReaction = async () => {
         if (isLikedLoading) return;
@@ -81,7 +108,7 @@ export const PostCard = ({
             setDrawerOpen(false);
             onDelete?.(postContent.id);
             showTopToast("success", "Post deleted successfully.");
-        } catch (error: any) {
+        } catch {
             showTopToast("error", "Error deleting post");
         } finally {
             setIsDeleteLoading(false);
@@ -92,91 +119,127 @@ export const PostCard = ({
         <>
             <div
                 className={cn(
-                    "w-full py-4 border-b-1 border-border",
+                    "w-full border-border",
+                    isDesktop ? "rounded-2xl border bg-card p-5 shadow-sm" : "border-b-1 py-4",
                     className,
                 )}
                 {...props}
             >
-                <div className="w-full flex flex-col gap-6 px-4">
+                <div className={cn("w-full flex flex-col gap-6", isDesktop ? "px-0" : "px-4")}>
                     <div className="flex items-center justify-between">
-                        <UserSinglePlaceholder user={postContent.userPlaceHolder} prev={prevUrl} />
+                        <UserSinglePlaceholder user={postContent.userPlaceHolder} prev={prevUrl} variant={variant} />
                         <span className="inline-flex items-center justify-center">
                             <p
                                 className="text-sm text-neutral-500 cursor-pointer"
                                 onClick={() => {
                                     if (!disabled) {
-                                        router.push(
-                                            `/m/post/${postContent.id}` +
-                                            `?prev=${encodeURIComponent(prevUrl)}`
-                                        )
+                                        router.push(postDetailPath)
                                     }
                                 }}
                             >
                                 {new Date(postContent.createdAt).toLocaleDateString()}
                             </p>
-                            {disabled || <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-                                <DrawerTrigger asChild>
-                                    <button
-                                        className="bg-none pl-5"
-                                        onClick={() => setDrawerOpen(true)}
-                                    >
-                                        <SlOptionsVertical className="text-neutral-500" />
-                                    </button>
-                                </DrawerTrigger>
-
-                                <DrawerContent className="z-99999">
-                                    <div className="w-full px-4 pb-4">
-                                        <DrawerHeader>
-                                            <DrawerTitle>Action</DrawerTitle>
-                                        </DrawerHeader>
-
+                            {disabled || (isDesktop ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button
+                                            type="button"
+                                            className="bg-none pl-5"
+                                            aria-label="Post actions"
+                                        >
+                                            <SlOptionsVertical className="text-neutral-500" />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" sideOffset={10} className="w-48 rounded-xl p-2">
+                                        <DropdownMenuLabel className="px-3 text-xs font-black uppercase tracking-[0.16em] text-muted-foreground">
+                                            Action
+                                        </DropdownMenuLabel>
                                         {isForUser ? (
-                                            <button
-                                                className="flex gap-2 items-center py-4 text-red-600"
-                                                onClick={handleDelete}
+                                            <DropdownMenuItem
+                                                variant="destructive"
+                                                className="rounded-lg px-3 py-2.5 font-semibold"
                                                 disabled={isDeleteLoading}
-                                            >
-                                                <MdDeleteOutline size={16} />
-                                                <span className="font-semibold">
-                                                    {isDeleteLoading ? "Deleting..." : "Delete"}
-                                                </span>
-                                            </button>
-                                        ) : (
-                                            <button
-                                                className="flex gap-2 items-center py-4"
-                                                onClick={() => {
-                                                    setDrawerOpen(false);
-                                                    setIsReportDrawerOpen(true);
+                                                onSelect={(event) => {
+                                                    event.preventDefault();
+                                                    void handleDelete();
                                                 }}
                                             >
+                                                <MdDeleteOutline size={16} />
+                                                {isDeleteLoading ? "Deleting..." : "Delete"}
+                                            </DropdownMenuItem>
+                                        ) : (
+                                            <DropdownMenuItem
+                                                className="rounded-lg px-3 py-2.5 font-semibold"
+                                                onSelect={() => setIsReportDrawerOpen(true)}
+                                            >
                                                 <FaFlag />
-                                                <span className="font-semibold">Report</span>
-                                            </button>
+                                                Report
+                                            </DropdownMenuItem>
                                         )}
-                                    </div>
-                                </DrawerContent>
-                            </Drawer>}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+                                    <DrawerTrigger asChild>
+                                        <button
+                                            className="bg-none pl-5"
+                                            onClick={() => setDrawerOpen(true)}
+                                        >
+                                            <SlOptionsVertical className="text-neutral-500" />
+                                        </button>
+                                    </DrawerTrigger>
+
+                                    <DrawerContent className="z-99999">
+                                        <div className="w-full px-4 pb-4">
+                                            <DrawerHeader>
+                                                <DrawerTitle>Action</DrawerTitle>
+                                            </DrawerHeader>
+
+                                            {isForUser ? (
+                                                <button
+                                                    className="flex gap-2 items-center py-4 text-red-600"
+                                                    onClick={handleDelete}
+                                                    disabled={isDeleteLoading}
+                                                >
+                                                    <MdDeleteOutline size={16} />
+                                                    <span className="font-semibold">
+                                                        {isDeleteLoading ? "Deleting..." : "Delete"}
+                                                    </span>
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className="flex gap-2 items-center py-4"
+                                                    onClick={() => {
+                                                        setDrawerOpen(false);
+                                                        setIsReportDrawerOpen(true);
+                                                    }}
+                                                >
+                                                    <FaFlag />
+                                                    <span className="font-semibold">Report</span>
+                                                </button>
+                                            )}
+                                        </div>
+                                    </DrawerContent>
+                                </Drawer>
+                            ))}
                         </span>
                     </div>
                     <div
                         className="w-full flex flex-col gap-2 cursor-pointer"
                         onClick={() => {
                             if (!disabled) {
-                                router.push(
-                                    `/m/post/${postContent.id}` +
-                                    `?prev=${encodeURIComponent(prevUrl)}`
-                                )
+                                router.push(postDetailPath)
                             }
                         }}
                     >
                         <span className="flex flex-col gap-2">
-                            <Linkify text={postContent.content} className="text-sm text-foreground" />
+                            <Linkify text={postContent.content} className={cn("text-foreground", isDesktop ? "text-base leading-7" : "text-sm")} />
                             <span className="flex flex-wrap gap-1 text-blue-600" onClick={(e) => e.stopPropagation()}>
                                 {postContent.taggedUsers.map((tagUser: { [key: string]: any }) => (
                                     <a
                                         key={tagUser.id}
                                         className="leading-tight"
-                                        href={`/m/user/${tagUser.id}?prev=${encodeURIComponent(prevUrl)}`}
+                                        href={userHref(tagUser.id)}
                                     >
                                         @{tagUser.username}
                                     </a>
@@ -187,7 +250,7 @@ export const PostCard = ({
                                     <a
                                         key={tagEvent.eventId}
                                         className="leading-tight"
-                                        href={`/m/events/${tagEvent.eventId}?prev=${encodeURIComponent(prevUrl)}`}
+                                        href={eventHref(tagEvent.eventId)}
                                     >
                                         #{tagEvent.title}
                                     </a>
@@ -205,7 +268,15 @@ export const PostCard = ({
                     </div>
                     <div className="flex items-center justify-between text-neutral-400 font-bold">
                         <div className="flex items-center gap-2">
-                            <span className="text-sm">{totalReactions}</span>
+                            <button
+                                type="button"
+                                className="text-sm"
+                                onClick={() => {
+                                    if (!disabled) router.push(reactionPath);
+                                }}
+                            >
+                                {totalReactions}
+                            </button>
                             <button
                                 onClick={handleReaction}
                                 disabled={isLikedLoading}
@@ -226,27 +297,32 @@ export const PostCard = ({
 
                         <div className="flex items-center gap-2" onClick={() => {
                             if (!disabled) {
-                                router.push(
-                                    `/m/post/${postContent.id}` +
-                                    `?prev=${encodeURIComponent(prevUrl)}`
-                                )
+                                router.push(postDetailPath)
                             }
                         }}>
                             <span className="text-sm">{postContent.totalComments}</span>
                             <FaRegComment className="w-5 h-5" />
                         </div>
 
-                        <AiOutlineSend
-                            className="w-5 h-5 cursor-pointer"
-                            onClick={() => {
-                                if (!disabled) {
-                                    router.push(
-                                        `/m/post/${postContent.id}` +
-                                        `?prev=${encodeURIComponent(prevUrl)}`
-                                    )
-                                }
-                            }}
-                        />
+                        {isDesktop ? (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className="h-9 rounded-full px-3 text-muted-foreground"
+                                onClick={() => {
+                                    if (!disabled) router.push(postDetailPath)
+                                }}
+                            >
+                                Open thread
+                            </Button>
+                        ) : (
+                            <AiOutlineSend
+                                className="w-5 h-5 cursor-pointer"
+                                onClick={() => {
+                                    if (!disabled) router.push(postDetailPath)
+                                }}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

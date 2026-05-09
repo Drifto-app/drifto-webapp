@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Search, QrCode, CheckCircle } from "lucide-react";
@@ -25,12 +27,14 @@ import { UserVerificationBadge } from "@/components/ui/user-placeholder";
 
 interface FindAttendeesProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
+    variant?: "mobile" | "desktop";
 }
 
 export const FindAttendees = ({
-    event, className, ...props
+    event, variant = "mobile", className, ...props
 }: FindAttendeesProps) => {
     const [tickets, setTickets] = useState<any[]>([]);
+    const [totalTickets, setTotalTickets] = useState(0);
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
@@ -49,29 +53,35 @@ export const FindAttendees = ({
 
         try {
             const params: { [key: string]: string | number } = {
-                pageSize: '20',
-                dir: 'desc',
+                pageSize: 20,
+                dir: "desc",
                 pageNumber: pageNum.toString(),
-                ...(search && { search: search.trim() })
+                ...(search.trim() && { search: search.trim() })
             };
 
             const response = await authApi.get(`/userTicket/event/${event.id}`, { params });
 
-            const data = response.data.data.data;
+            const pageData = response.data.data;
+            const data = pageData.data || [];
 
             setLoading(false);
+            setTotalTickets(pageData.totalElements || 0);
+            setHasMore(pageData.isLast === false);
 
-            // Check if there are more pages
-            if (response.data.data.isLast === false) {
-                setHasMore(false);
-            }
-
-            return data;
+            return {
+                tickets: data,
+                isLast: pageData.isLast,
+                totalElements: pageData.totalElements || 0,
+            };
         } catch (error) {
             console.error('Error fetching tickets:', error);
             setLoading(false);
             // Return empty array on error
-            return [];
+            return {
+                tickets: [],
+                isLast: true,
+                totalElements: 0,
+            };
         }
     };
 
@@ -94,24 +104,28 @@ export const FindAttendees = ({
     }, [searchQuery]);
 
     const loadInitialTickets = async () => {
-        const initialTickets = await fetchTickets(1);
-        setTickets(initialTickets);
+        const initialPage = await fetchTickets(1);
+        setTickets(initialPage.tickets);
+        setTotalTickets(initialPage.totalElements);
         setPage(2);
-        setHasMore(true);
+        setHasMore(initialPage.isLast === false);
     };
 
     const handleSearch = async () => {
         const searchResults = await fetchTickets(1, searchQuery);
-        setTickets(searchResults);
+        setTickets(searchResults.tickets);
+        setTotalTickets(searchResults.totalElements);
         setPage(2);
-        setHasMore(searchQuery === "");
+        setHasMore(searchResults.isLast === false);
     };
 
     const loadMoreTickets = async () => {
         if (loading || !hasMore) return;
 
-        const newTickets = await fetchTickets(page, searchQuery);
-        setTickets(prev => [...prev, ...newTickets]);
+        const nextPage = await fetchTickets(page, searchQuery);
+        setTickets(prev => [...prev, ...nextPage.tickets]);
+        setTotalTickets(nextPage.totalElements);
+        setHasMore(nextPage.isLast === false);
         setPage(prev => prev + 1);
     };
 
@@ -180,6 +194,206 @@ export const FindAttendees = ({
 
         setMarkingUsed(false);
     };
+
+    if (variant === "desktop") {
+        const usedCount = tickets.filter((ticket) => ticket.markedUsed).length;
+
+        return (
+            <div className={cn("w-full", className)} {...props}>
+                <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+                    <section className="min-w-0 rounded-2xl border border-border bg-card p-6">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                            <div>
+                                <p className="text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                                    Check-in desk
+                                </p>
+                                <h2 className="mt-1 text-2xl font-black">Attendees and tickets</h2>
+                                <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+                                    Search guests, inspect ticket references, and mark admissions as used from one desktop view.
+                                </p>
+                            </div>
+                            <Button
+                                onClick={() => setScannerOpen(true)}
+                                className="h-11 rounded-full"
+                            >
+                                <QrCode className="h-4 w-4" />
+                                Scan ticket
+                            </Button>
+                        </div>
+
+                        <div className="mt-6 grid gap-3 md:grid-cols-3">
+                            <div className="rounded-2xl border border-border bg-background p-4">
+                                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                                    {searchQuery.trim() ? "Matches" : "Total tickets"}
+                                </p>
+                                <p className="mt-2 text-3xl font-black">{totalTickets}</p>
+                            </div>
+                            <div className="rounded-2xl border border-border bg-background p-4">
+                                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Checked in</p>
+                                <p className="mt-2 text-3xl font-black text-green-700 dark:text-green-300">{usedCount}</p>
+                            </div>
+                            <div className="rounded-2xl border border-border bg-background p-4">
+                                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Remaining</p>
+                                <p className="mt-2 text-3xl font-black">{Math.max(totalTickets - usedCount, 0)}</p>
+                            </div>
+                        </div>
+
+                        <div className="relative mt-6">
+                            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                                type="text"
+                                placeholder="Search username, email, or ticket reference"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="h-12 rounded-full bg-background pl-11"
+                            />
+                        </div>
+
+                        <div
+                            ref={scrollRef}
+                            className="mt-5 max-h-[620px] overflow-y-auto rounded-2xl border border-border"
+                        >
+                            <div className="grid grid-cols-[minmax(220px,1.2fr)_minmax(140px,0.8fr)_minmax(180px,1fr)_120px] border-b border-border bg-muted/40 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-muted-foreground">
+                                <span>Guest</span>
+                                <span>Ticket</span>
+                                <span>Reference</span>
+                                <span className="text-right">Status</span>
+                            </div>
+
+                            {tickets.length === 0 && !loading ? (
+                                <div className="flex min-h-56 items-center justify-center p-8 text-center text-muted-foreground">
+                                    {searchQuery ? "No matching tickets found." : "No tickets have been booked yet."}
+                                </div>
+                            ) : (
+                                tickets.map((ticket) => (
+                                    <button
+                                        key={ticket.id}
+                                        type="button"
+                                        onClick={() => setSelectedTicket(ticket)}
+                                        className={cn(
+                                            "grid w-full grid-cols-[minmax(220px,1.2fr)_minmax(140px,0.8fr)_minmax(180px,1fr)_120px] items-center gap-4 border-b border-border px-4 py-4 text-left transition last:border-b-0 hover:bg-accent/60",
+                                            selectedTicket?.id === ticket.id && "bg-blue-800/5",
+                                        )}
+                                    >
+                                        <span className="flex min-w-0 items-center gap-3">
+                                            <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-muted">
+                                                <Image
+                                                    src={ticket.userPlaceHolderResponse?.profileImageUrl || defaultImage}
+                                                    alt={ticket.userPlaceHolderResponse?.username || "User"}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </span>
+                                            <span className="min-w-0">
+                                                <span className="flex items-center gap-1 font-black">
+                                                    <span className="truncate">{ticket.userPlaceHolderResponse?.username ?? "Guest"}</span>
+                                                    <UserVerificationBadge user={ticket.userPlaceHolderResponse} />
+                                                </span>
+                                                <span className="block truncate text-sm text-muted-foreground">
+                                                    {ticket.userPlaceHolderResponse?.email ?? "No email"}
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span className="truncate text-sm font-bold">{ticket.ticketName}</span>
+                                        <span className="truncate text-sm font-mono text-muted-foreground">{ticket.ticketReference}</span>
+                                        <span className="text-right">
+                                            {ticket.markedUsed ? (
+                                                <span className="inline-flex items-center gap-1 rounded-full bg-green-700/10 px-3 py-1 text-xs font-black text-green-700 dark:text-green-300">
+                                                    <CheckCircle className="h-3.5 w-3.5" />
+                                                    Used
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex rounded-full bg-blue-800/10 px-3 py-1 text-xs font-black text-blue-800 dark:text-blue-300">
+                                                    Valid
+                                                </span>
+                                            )}
+                                        </span>
+                                    </button>
+                                ))
+                            )}
+
+                            {loading && (
+                                <div className="flex justify-center py-5">
+                                    <Loader />
+                                </div>
+                            )}
+
+                            {!hasMore && tickets.length > 0 && (
+                                <div className="py-4 text-center text-sm text-muted-foreground">
+                                    No more tickets to load
+                                </div>
+                            )}
+                        </div>
+                    </section>
+
+                    <aside className="h-fit rounded-2xl border border-border bg-card p-5">
+                        <p className="text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                            Ticket details
+                        </p>
+                        {selectedTicket ? (
+                            <div className="mt-5 space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="relative h-14 w-14 overflow-hidden rounded-full bg-muted">
+                                        <Image
+                                            src={selectedTicket.userPlaceHolderResponse?.profileImageUrl || defaultImage}
+                                            alt={selectedTicket.userPlaceHolderResponse?.username || "User"}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="truncate font-black">{selectedTicket.userPlaceHolderResponse?.username}</p>
+                                        <p className="truncate text-sm text-muted-foreground">{selectedTicket.userPlaceHolderResponse?.email}</p>
+                                    </div>
+                                </div>
+                                {[
+                                    ["Ticket", selectedTicket.ticketName],
+                                    ["Reference", selectedTicket.ticketReference],
+                                    ["Status", selectedTicket.markedUsed ? "Already used" : "Valid for entry"],
+                                ].map(([label, value]) => (
+                                    <div key={label} className="rounded-xl border border-border bg-background p-4">
+                                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
+                                        <p className="mt-1 break-words text-sm font-bold">{value}</p>
+                                    </div>
+                                ))}
+                                {!selectedTicket.markedUsed ? (
+                                    <Button
+                                        onClick={() => confirmMarkAsUsed()}
+                                        disabled={markingUsed}
+                                        className="h-12 w-full rounded-full"
+                                    >
+                                        {markingUsed ? <LoaderSmall /> : "Mark as used"}
+                                    </Button>
+                                ) : (
+                                    <div className="rounded-xl bg-green-700/10 p-4 text-center text-sm font-black text-green-700 dark:text-green-300">
+                                        Ticket already used
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="mt-5 rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+                                Select a ticket to inspect guest and reference details.
+                            </div>
+                        )}
+                    </aside>
+                </div>
+
+                <QrScannerDialog
+                    open={scannerOpen}
+                    onOpenChange={setScannerOpen}
+                    onResult={(ticketReference: string) => {
+                        setTickets(tickets =>
+                            tickets.map(ticket =>
+                                ticket.ticketReference === ticketReference
+                                    ? { ...ticket, markedUsed: true }
+                                    : ticket
+                            )
+                        );
+                    }}
+                />
+            </div>
+        );
+    }
 
     return (
         <div

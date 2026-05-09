@@ -1,8 +1,6 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { FaPlay } from "react-icons/fa";
-import Image from "next/image";
 import { MdCancel } from "react-icons/md";
-import { EventSingleContentText } from '@/components/ui/content';
 import { ComponentProps, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Dialog } from '@headlessui/react';
@@ -24,13 +22,15 @@ export const CoverVideoSection = ({
       <div
         className={cn(
           'w-full cursor-pointer',
+          className,
         )}
         onClick={() => setIsOpen(true)}
+        {...props}
       >
         <AspectRatio ratio={16 / 9}>
           <video
             src={coverVideo}
-            // poster={poster}
+            poster={poster}
             className="h-full w-full object-cover rounded-lg"
             playsInline
           />

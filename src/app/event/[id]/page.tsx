@@ -1,9 +1,10 @@
 import {Metadata} from 'next'
-import {notFound, redirect} from 'next/navigation'
+import {notFound} from 'next/navigation'
 import {headers} from 'next/headers'
 import {api} from "@/lib/axios";
 import {Linkify} from "@/lib/linkify";
 import Image from "next/image";
+import {DesktopEventPage} from "@/components/event-page/desktop-event-page";
 
 interface Event {
     slug: string;
@@ -42,32 +43,13 @@ function optimizeCloudinaryUrl(url: string): string {
     return url.replace('/upload/', '/upload/w_1200,h_630,c_fill,f_auto,q_auto/')
 }
 
-// Helper function to safely convert searchParams to query string
-function createQueryString(searchParams: { [key: string]: string | string[] | undefined }): string {
-    const params = new URLSearchParams()
-
-    Object.entries(searchParams).forEach(([key, value]) => {
-        if (value !== undefined) {
-            if (Array.isArray(value)) {
-                // Handle array values by adding each value separately
-                value.forEach(v => params.append(key, v))
-            } else {
-                // Handle single string values
-                params.set(key, value)
-            }
-        }
-    })
-
-    return params.toString()
-}
-
 // Generate dynamic metadata for SEO and social sharing
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { id } = await params
     const event = await getPublicEvent(id)
     if (!event) return { title: 'Event Not Found', description: 'The requested event could not be found.' }
     const optimizedImage = optimizeCloudinaryUrl(event.titleFileUrl)
-    const eventUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/m/events/${event.slug}`
+    const eventUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/event/${event.slug}`
 
 
     return {
@@ -237,11 +219,10 @@ function isBotRequest(userAgent: string): boolean {
 }
 
 // Main server component
-export default async function EventPage({ params, searchParams }: PageProps) {
+export default async function EventPage({ params }: PageProps) {
     const headersList = await headers()
     const userAgent = headersList.get('user-agent') || ''
     const resolvedParams = await params
-    const resolvedSearchParams = await searchParams
 
     const isBot = isBotRequest(userAgent)
 
@@ -260,7 +241,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                             "description": event.description,
                             "image": optimizeCloudinaryUrl(event.titleFileUrl),
                             "startDate": new Date(event.startTime).toLocaleDateString(),
-                            "url": `${process.env.NEXT_PUBLIC_BASE_URL}/m/events/${event.id}`
+                            "url": `${process.env.NEXT_PUBLIC_BASE_URL}/event/${event.slug}`
                         })
                     }}
                 />
@@ -287,6 +268,5 @@ export default async function EventPage({ params, searchParams }: PageProps) {
         )
     }
 
-    const queryString = createQueryString(resolvedSearchParams)
-    redirect(`/m/events/${resolvedParams.id}${queryString ? `?${queryString}` : ''}`)
+    return <DesktopEventPage eventId={resolvedParams.id} />
 }

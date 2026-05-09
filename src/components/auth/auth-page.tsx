@@ -13,6 +13,7 @@ import { FaArrowLeftLong } from 'react-icons/fa6';
 import * as React from 'react';
 import loginSidePic from "@/assests/login-side-pic.jpeg"
 import logo from "@/assests/logo.png"
+import Link from "next/link";
 
 type View = "login" | "signup" | "forgot";
 
@@ -28,9 +29,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/");
+      router.replace(next ?? "/");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, next, router]);
 
   if (isAuthenticated) return null;
 
@@ -62,14 +63,34 @@ export default function LoginPage() {
 
   return (
     <ScreenProvider>
-      <div className="grid min-h-svh lg:grid-cols-2">
+      <div className="grid min-h-svh bg-background text-foreground lg:grid-cols-[minmax(0,0.9fr)_minmax(520px,1.1fr)]">
         <div className="flex flex-col gap-4 p-6 md:p-10">
-          <div className="flex flex-1 items-center justify-center">
-            <div className="w-full max-w-sm flex flex-col gap-12">
-              <div className="">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="relative h-11 w-11">
+                <Image
+                  src={logo}
+                  alt="Drifto logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              <span className="text-lg font-black tracking-tight">Drifto</span>
+            </Link>
+
+            <Button asChild variant="outline" className="hidden rounded-full md:flex">
+              <Link href="/">Continue as guest</Link>
+            </Button>
+          </div>
+
+          <div className="flex flex-1 items-center justify-center py-8 lg:min-h-0">
+            <div className="flex w-full max-w-md flex-col rounded-[2rem] border border-border bg-card p-6 shadow-sm md:p-8 lg:max-h-[calc(100svh-11rem)] lg:min-h-0">
+              <div className="mb-8 min-h-10 flex-shrink-0">
                 {view !== "login" &&
                   <Button
-                    variant={'outline'}
+                    variant="outline"
+                    className="rounded-full"
                     onClick={() => {
                       setView("login");
                     }}
@@ -79,24 +100,32 @@ export default function LoginPage() {
                   </Button>
                 }
               </div>
-              <div className="relative w-12 h-12">
-                <Image
-                  src={logo}
-                  alt="Logo"
-                  fill
-                  className="object-contain"
-                />
+              <div className="min-h-0 lg:overflow-y-auto lg:pr-2">
+                {renderForm()}
               </div>
-              {renderForm()}
             </div>
           </div>
         </div>
-        <div className="bg-muted relative hidden lg:block">
+
+        <div className="relative hidden overflow-hidden border-l border-border bg-muted lg:block">
           <Image
             src={loginSidePic}
-            alt="Image"
+            alt="People at a Drifto experience"
             className="absolute inset-0 h-full w-full object-cover"
+            priority
           />
+          <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/55 to-blue-950/75" />
+          <div className="absolute inset-x-10 bottom-10 rounded-[2rem] border border-white/15 bg-background/80 p-8 text-foreground shadow-2xl backdrop-blur">
+            <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue-700 dark:text-blue-300">
+              Discover, host, connect
+            </p>
+            <h2 className="mt-4 max-w-xl text-4xl font-black leading-tight tracking-tight">
+              Sign in to manage plans, create experiences, and stay connected.
+            </h2>
+            <p className="mt-4 max-w-lg text-sm leading-6 text-muted-foreground">
+              Desktop auth now supports the same account flow as mobile while keeping Drifto&apos;s existing theme and navigation direction.
+            </p>
+          </div>
         </div>
       </div>
     </ScreenProvider>

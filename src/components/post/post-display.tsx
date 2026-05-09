@@ -1,26 +1,32 @@
 "use client"
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { ComponentProps, useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 import { FiPlus, FiSettings } from 'react-icons/fi';
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { authApi } from "@/lib/axios";
 import { showTopToast } from "@/components/toast/toast-util";
 import { Loader } from "@/components/ui/loader";
-import { FaPlus } from "react-icons/fa";
 import { PostCard } from "@/components/post/post-card";
 import { Button } from "@/components/ui/button";
 import { PostFeedSkeleton } from "@/components/ui/page-skeletons";
+import { DESKTOP_ROUTES } from "@/lib/routes";
+import { MessageSquareText, Plus, Sparkles } from "lucide-react";
 
-interface PostDisplayProps extends ComponentProps<"div"> { }
+interface PostDisplayProps extends ComponentProps<"div"> {
+    variant?: "mobile" | "desktop";
+}
 
-export const PostDisplay = ({ className, ...props }: PostDisplayProps) => {
+export const PostDisplay = ({ variant = "mobile", className, ...props }: PostDisplayProps) => {
 
     const router = useRouter();
+    const isDesktop = variant === "desktop";
 
     const [posts, setPosts] = useState<Array<{ [key: string]: any }>>([]);
-    const [hasMore, setHasMore] = useState(true);
+    const [, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -118,6 +124,94 @@ export const PostDisplay = ({ className, ...props }: PostDisplayProps) => {
         }
     }, [loading, error, loadPosts]);
 
+
+    if (isDesktop) {
+        return (
+            <div
+                className={cn("min-h-full bg-background text-foreground", className)}
+                {...props}
+            >
+                <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_clamp(20rem,22vw,24rem)]">
+                    <section className="min-w-0">
+                        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+                            <div>
+                                <p className="text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
+                                    Social
+                                </p>
+                                <h1 className="mt-1 text-4xl font-black tracking-tight">Posts</h1>
+                                <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+                                    Follow event updates, creator notes, and tagged conversations from the Drifto community.
+                                </p>
+                            </div>
+                            <Button
+                                className="h-11 rounded-full"
+                                onClick={() => router.push(`${DESKTOP_ROUTES.createPost}?prev=${encodeURIComponent("/?screen=posts")}`)}
+                            >
+                                <Plus size={17} />
+                                Create post
+                            </Button>
+                        </div>
+
+                        {loading && posts.length === 0 ? (
+                            <div className="rounded-2xl border border-border bg-card p-4">
+                                <PostFeedSkeleton />
+                            </div>
+                        ) : error && posts.length === 0 ? (
+                            <div className="rounded-2xl border border-border bg-card p-10 text-center">
+                                <p className="font-black">Unable to load posts</p>
+                                <p className="mt-1 text-sm text-muted-foreground">{error}</p>
+                                <Button className="mt-5 rounded-full" onClick={() => loadPosts(true)}>
+                                    Try again
+                                </Button>
+                            </div>
+                        ) : posts.length === 0 ? (
+                            <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+                                <MessageSquareText className="mx-auto text-muted-foreground" size={36} />
+                                <p className="mt-4 font-black">No posts yet</p>
+                                <p className="mt-1 text-sm text-muted-foreground">Create the first post for your community feed.</p>
+                            </div>
+                        ) : (
+                            <div className="grid gap-5">
+                                {posts.map((post) => (
+                                    <PostCard key={post.id} postContent={post} variant="desktop" />
+                                ))}
+                            </div>
+                        )}
+
+                        {loading && posts.length > 0 && (
+                            <div className="flex items-center justify-center py-8">
+                                <Loader className="h-8 w-8" />
+                            </div>
+                        )}
+
+                        <div ref={sentinelRef} aria-hidden className="h-8" />
+                    </section>
+
+                    <aside className="hidden xl:block">
+                        <div className="sticky top-8 space-y-4">
+                            <div className="rounded-2xl border border-border bg-card p-5">
+                                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-800/10 text-blue-800 dark:bg-blue-400/10 dark:text-blue-300">
+                                    <Sparkles size={21} />
+                                </span>
+                                <h2 className="mt-4 text-xl font-black">Share what is happening.</h2>
+                                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                                    Tag users with @ and events with # to connect posts to the right people and experiences.
+                                </p>
+                                <Button
+                                    className="mt-5 h-11 w-full rounded-full"
+                                    onClick={() => router.push(`${DESKTOP_ROUTES.createPost}?prev=${encodeURIComponent("/?screen=posts")}`)}
+                                >
+                                    <Plus size={17} />
+                                    New post
+                                </Button>
+                            </div>
+                           
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div

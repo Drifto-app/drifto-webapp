@@ -18,7 +18,8 @@ export default function Page() {
   const [tickets, setTickets] = useState<any[]>();
   const [eventDetails, setEventDetails] = useState<any>();
   const router = useRouter();
-  const { id } = useParams();
+  const params = useParams<{ id: string }>();
+  const id = params?.id;
   const { user } = useAuthStore();
 
   const fetchTickets = async () => {

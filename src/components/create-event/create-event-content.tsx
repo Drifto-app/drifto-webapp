@@ -6,9 +6,6 @@ import { ReactNode, useCallback, useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import {
-  IoCashOutline,
-  IoEarthOutline,
-  IoGiftOutline,
   IoLocationOutline,
   IoPlanetOutline,
   IoWalletOutline,
@@ -27,9 +24,7 @@ import { v4 as uuidv4 } from "uuid";
 import { FiTrash2 } from "react-icons/fi";
 import { GoCalendar, GoTag } from "react-icons/go";
 import { TbUsers } from "react-icons/tb";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
-import { CiCalendar, CiClock2 } from "react-icons/ci";
 import { LuClock } from "react-icons/lu";
 import { SnapshotCarousel } from "@/components/event-page/image-silder";
 import { Switch } from "@/components/ui/switch";
@@ -37,7 +32,7 @@ import { LoaderSmall } from "@/components/ui/loader";
 import { authApi } from "@/lib/axios";
 import { showTopToast } from "@/components/toast/toast-util";
 import { CreateEventSuccess } from "@/components/create-event/create-success";
-import { useShare } from "@/hooks/share-option";
+import { getErrorMessage } from "@/lib/error-message";
 import { CoverVideoUploader } from "../ui/cover-video";
 import { Linkify } from "@/lib/linkify";
 import {
@@ -47,9 +42,11 @@ import {
   isEventThemeLight,
 } from '@/lib/event-theme';
 import { useTheme } from 'next-themes';
+import createEventImage from "@/assests/createeventpic.jpg";
 
 interface CreateEventContentProps extends React.ComponentProps<"div"> {
   prev: string | null;
+  variant?: "mobile" | "desktop";
 }
 
 type ActiveScreenType = "intro" | "details" | "ticket" | "preview" | "success";
@@ -91,15 +88,29 @@ interface TicketDataType {
   quantityError: boolean;
 }
 
+type CreatedEventResponse = Record<string, unknown>;
+
+interface LocationResult {
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+  address?: string;
+  city?: string;
+  state?: string;
+}
+
 export const CreateEventContent = ({
   prev,
+  variant = "mobile",
   className,
   ...props
 }: CreateEventContentProps) => {
   const { resolvedTheme } = useTheme();
   const router = useRouter();
+  const isDesktop = variant === "desktop";
 
-  const [event, setEvent] = useState<{ [key: string]: any } | null>(null);
+  const [event, setEvent] = useState<CreatedEventResponse | null>(null);
   const [activeScreen, setActiveScreen] = useState<ActiveScreenType>("intro");
   const [loading, setLoading] = useState<boolean>(false);
   const [submitDisabled, setSubmitDisabled] = useState<boolean>(false);
@@ -143,7 +154,7 @@ export const CreateEventContent = ({
   const [minimumAge, setMinimumAge] = useState<string>(String(""));
   const [eventTags, setEventTags] = useState<string[]>([]);
   const [screenshots, setScreenshots] = useState<string[]>([]);
-  const [tickets, setTickets] = useState<any[]>([]);
+  const [tickets, setTickets] = useState<TicketDataType[]>([]);
   const [eventTheme, setEventTheme] = useState<EventThemeColors>(DEFAULT_EVENT_THEME);
 
   useEffect(() => {
@@ -188,6 +199,27 @@ export const CreateEventContent = ({
   const createScreenCardClass = isLightEventSurface
     ? "border-black/10 bg-white/24"
     : "border-white/12 bg-black/18";
+  const isDesktopThemePreview =
+    isDesktop &&
+    Boolean(detailsContainerStyle) &&
+    (activeScreen === "details" || activeScreen === "preview");
+  const desktopThemeTextClass = isDesktopThemePreview ? createScreenTextClass : "text-foreground";
+  const desktopThemeMutedTextClass = isDesktopThemePreview ? createScreenMutedTextClass : "text-muted-foreground";
+  const desktopThemePanelClass = isDesktopThemePreview
+    ? isLightEventSurface
+      ? "border-black/10 bg-white/80 text-black"
+      : "border-white/12 bg-black/35 text-white"
+    : "border-border bg-card text-card-foreground";
+  const desktopThemeSubPanelClass = isDesktopThemePreview
+    ? isLightEventSurface
+      ? "border-black/10 bg-white/55 text-black"
+      : "border-white/10 bg-black/25 text-white"
+    : "border-border bg-background";
+  const desktopThemeHeaderClass = isDesktopThemePreview
+    ? isLightEventSurface
+      ? "border-black/10 bg-white/30"
+      : "border-white/10 bg-black/25"
+    : "border-border bg-background/90";
 
   const handleBackClick = () => {
     if (activeScreen === "details") {
@@ -213,7 +245,7 @@ export const CreateEventContent = ({
     setCoverVideo(newUrl);
   }, []);
 
-  const handleLocationChange = (locationData: { [key: string]: any }) => {
+  const handleLocationChange = (locationData: LocationResult) => {
     setCoordinates({
       latitude: locationData.coordinates.lat,
       longitude: locationData.coordinates.lng,
@@ -297,7 +329,7 @@ export const CreateEventContent = ({
   const handleTicketAdd = (newTicket: TicketDataType) => {
     let hasErrors = false;
     const errors: string[] = [];
-    let updatedTicket = { ...newTicket };
+    const updatedTicket = { ...newTicket };
 
     // Validate name
     if (!newTicket.name.trim()) {
@@ -492,8 +524,8 @@ export const CreateEventContent = ({
       setEvent(response.data.data);
       showTopToast("success", "Create experience successfully");
       setActiveScreen("success");
-    } catch (error: any) {
-      showTopToast("error", error.response?.data?.description);
+    } catch (error: unknown) {
+      showTopToast("error", getErrorMessage(error, "Failed to create event"));
     } finally {
       setLoading(false);
     }
@@ -509,6 +541,590 @@ export const CreateEventContent = ({
         return "Pricing & Capacity";
       case "preview":
         return "Preview & Settings";
+    }
+  };
+
+  const desktopSteps: Array<{
+    value: ActiveScreenType;
+    title: string;
+    description: string;
+  }> = [
+    { value: "intro", title: "Start", description: "Hosting brief" },
+    { value: "details", title: "Details", description: "Media, time, place" },
+    { value: "ticket", title: "Tickets", description: "Pricing and capacity" },
+    { value: "preview", title: "Review", description: "Publish settings" },
+  ];
+
+  const currentStepIndex = Math.max(
+    desktopSteps.findIndex((step) => step.value === activeScreen),
+    0,
+  );
+
+  const canOpenDesktopStep = (step: ActiveScreenType) => {
+    if (step === "intro" || step === "details") return true;
+    if (step === "ticket") return !isDetailsInValid;
+    if (step === "preview") return !isDetailsInValid && tickets.length > 0;
+    return false;
+  };
+
+  const isPreviewDataInvalid =
+    !title ||
+    !description ||
+    !startTime ||
+    !stopTime ||
+    !titleImage ||
+    !address ||
+    !city ||
+    !state ||
+    !coordinates?.latitude ||
+    !coordinates?.longitude ||
+    (isAgeRestricted && !minimumAge) ||
+    eventTags.length <= 0 ||
+    eventTheme.length < 2 ||
+    tickets.length === 0;
+
+  const renderDesktopSummary = () => (
+    <aside className="sticky top-8 flex h-fit flex-col gap-4">
+      <div className={cn("overflow-hidden rounded-2xl border", desktopThemePanelClass)}>
+        <div className="relative aspect-[16/10] bg-muted">
+          <Image
+            src={titleImage || createEventImage}
+            alt={title || "Event preview"}
+            fill
+            sizes="360px"
+            className="object-cover"
+          />
+        </div>
+        <div className="space-y-4 p-5">
+          <div>
+            <p className={cn("text-xs font-bold uppercase tracking-[0.2em]", desktopThemeMutedTextClass)}>
+              Draft preview
+            </p>
+            <h2 className="mt-2 line-clamp-2 text-xl font-black capitalize">
+              {title || "Untitled event"}
+            </h2>
+            <p className={cn("mt-1 line-clamp-2 text-sm", desktopThemeMutedTextClass)}>
+              {description || "Add a short description to help guests understand the experience."}
+            </p>
+          </div>
+
+          <div className="grid gap-3 text-sm">
+            <div className="flex items-center justify-between gap-4">
+              <span className={desktopThemeMutedTextClass}>Tickets</span>
+              <span className="font-bold">{tickets.length}</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className={desktopThemeMutedTextClass}>Visibility</span>
+              <span className="font-bold">{isPublic ? "Public" : "Private"}</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className={desktopThemeMutedTextClass}>Location</span>
+              <span className="max-w-40 truncate text-right font-bold">
+                {city && state ? `${city}, ${state}` : "Not set"}
+              </span>
+            </div>
+          </div>
+
+          {activeScreen === "details" && (
+            <Button
+              className="h-12 w-full rounded-full"
+              disabled={isDetailsInValid}
+              onClick={() => setActiveScreen("ticket")}
+              type="button"
+            >
+              Continue to tickets
+            </Button>
+          )}
+          {activeScreen === "ticket" && (
+            <Button
+              className="h-12 w-full rounded-full"
+              disabled={tickets.length === 0}
+              onClick={() => setActiveScreen("preview")}
+              type="button"
+            >
+              Review event
+            </Button>
+          )}
+          {activeScreen === "preview" && (
+            <Button
+              className="h-12 w-full rounded-full"
+              disabled={loading || isPreviewDataInvalid}
+              onClick={handleSubmit}
+              type="submit"
+            >
+              {loading ? <LoaderSmall /> : "Publish event"}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div className={cn("rounded-2xl border p-5", desktopThemePanelClass)}>
+        <p className="font-black">Required before publishing</p>
+        <div className="mt-4 grid gap-3 text-sm">
+          {[
+            ["Event details", !isDetailsInValid],
+            ["At least one ticket", tickets.length > 0],
+            ["Preview reviewed", activeScreen === "preview"],
+          ].map(([label, done]) => (
+            <div key={String(label)} className="flex items-center justify-between gap-3">
+              <span className={desktopThemeMutedTextClass}>{label}</span>
+              <span className={cn("font-bold", done ? "text-green-700" : "text-muted-foreground")}>
+                {done ? "Done" : "Open"}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </aside>
+  );
+
+  const renderDesktopIntro = () => (
+    <div className="grid min-h-[calc(100vh-88px)] gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
+      <section className="flex flex-col justify-center">
+        <p className="text-xs font-bold uppercase tracking-[0.28em] text-muted-foreground">
+          Host workspace
+        </p>
+        <h1 className="mt-4 max-w-3xl text-6xl font-black leading-[0.95] tracking-tight">
+          Build the event guests will remember.
+        </h1>
+        <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
+          Create a polished experience page, define tickets, and review the guest-facing presentation before publishing.
+        </p>
+
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          {intoObjects.map((item) => (
+            <div key={item.title} className="rounded-2xl border border-border bg-card p-5">
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-800/10">
+                {item.icon}
+              </span>
+              <h3 className="mt-4 font-black">{item.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.text}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 flex items-center gap-3">
+          <Button
+            className="h-12 rounded-full px-7"
+            onClick={() => setActiveScreen("details")}
+            type="button"
+          >
+            Create event
+          </Button>
+          <Button
+            variant="outline"
+            className="h-12 rounded-full px-7"
+            onClick={handleBackClick}
+            type="button"
+          >
+            Cancel
+          </Button>
+        </div>
+      </section>
+
+      <aside className="flex items-center">
+        <div className="w-full overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+          <div className="relative aspect-[4/5] bg-muted">
+            <Image
+              src={createEventImage}
+              alt="Create event"
+              fill
+              priority
+              sizes="420px"
+              className="object-cover"
+            />
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+
+  const renderDesktopDetails = () => (
+    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <section className="grid gap-6">
+        <div className={cn("rounded-2xl border p-6", desktopThemePanelClass)}>
+          <div className="mb-5">
+            <p className={cn("text-xs font-bold uppercase tracking-[0.22em]", desktopThemeMutedTextClass)}>Media</p>
+            <h2 className="mt-1 text-2xl font-black">Cover and gallery</h2>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <CoverImageUploader
+              imageValue={titleImage}
+              onImageValueChange={handleTitleImageChange}
+              mediaFileType={"EVENT_HEADER"}
+              setSubmitDisabled={setSubmitDisabled}
+            />
+            <div className="grid gap-4">
+              <CoverVideoUploader
+                videoValue={coverVideo}
+                onVideoValueChange={handleCoverVideoChange}
+                mediaFileType={"EVENT_COVER_VIDEO"}
+                setSubmitDisabled={setSubmitDisabled}
+              />
+              <ImageSnapshots
+                setSubmitDisabled={setSubmitDisabled}
+                initialImages={screenshots}
+                maxImages={20}
+                onImageAdd={setScreenshots}
+                onImageRemove={setScreenshots}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className={cn("rounded-2xl border p-6", desktopThemePanelClass)}>
+          <div className="mb-5">
+            <p className={cn("text-xs font-bold uppercase tracking-[0.22em]", desktopThemeMutedTextClass)}>Basics</p>
+            <h2 className="mt-1 text-2xl font-black">Event information</h2>
+          </div>
+          <div className="grid gap-5">
+            <div className="grid gap-2">
+              <Label htmlFor="desktop-title">Title</Label>
+              <Input
+                id="desktop-title"
+                type="text"
+                placeholder="Event title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className={cn("h-12", isDesktopThemePreview ? createScreenFieldClass : "bg-background")}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="desktop-description">Description</Label>
+              <textarea
+                id="desktop-description"
+                placeholder="Describe the experience"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={7}
+                className={cn(
+                  "rounded-md border px-3 py-3 text-sm outline-none transition focus:border-blue-700",
+                  isDesktopThemePreview ? createScreenFieldClass : "border-border bg-background",
+                )}
+                required
+              />
+            </div>
+            <div className="grid gap-5 md:grid-cols-2">
+              <div>
+                <DateTimePicker date={startTime} setDate={handleStartDateChange} label="start date & time" />
+                {startDateError && <p className="mt-2 text-xs text-red-600">{startDateError}</p>}
+              </div>
+              <div>
+                <DateTimePicker date={stopTime} setDate={handleStopDateChange} label="stop date & time" />
+                {stopDateError && <p className="mt-2 text-xs text-red-600">{stopDateError}</p>}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className={cn("rounded-2xl border p-6", desktopThemePanelClass)}>
+            <p className={cn("text-xs font-bold uppercase tracking-[0.22em]", desktopThemeMutedTextClass)}>Location</p>
+            <h2 className="mt-1 text-2xl font-black">Where guests meet</h2>
+            <div className="mt-5">
+              <LocationSearchDialog
+                currentLocation={{ coordinates, address, city, state }}
+                onLocationUpdate={handleLocationChange}
+                googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
+              />
+            </div>
+            <div className={cn("mt-4 rounded-xl border p-4", desktopThemeSubPanelClass)}>
+              <p className="text-sm font-semibold">{address || "No location selected"}</p>
+              <p className={cn("mt-1 text-sm", desktopThemeMutedTextClass)}>
+                {[city, state].filter(Boolean).join(", ") || "Choose a location to continue"}
+              </p>
+            </div>
+          </div>
+
+          <div className={cn("rounded-2xl border p-6", desktopThemePanelClass)}>
+            <p className={cn("text-xs font-bold uppercase tracking-[0.22em]", desktopThemeMutedTextClass)}>Discovery</p>
+            <h2 className="mt-1 text-2xl font-black">Tags and rules</h2>
+            <div className="mt-5 grid gap-5">
+              <EventTagDialog
+                currentEventTags={eventTags}
+                onTagAdd={(tag: string) => setEventTags([...eventTags, tag])}
+                onTagRemove={(tag: string) => setEventTags((value) => value.filter((i) => i !== tag))}
+              />
+              <EventThemeSelector currentEventTheme={eventTheme} setEventTheme={setEventTheme} />
+              <div className="grid gap-2">
+                <Label htmlFor="desktop-min-age">Minimum age</Label>
+                <Input
+                  id="desktop-min-age"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="\d*"
+                  placeholder="No restriction"
+                  value={minimumAge}
+                  onChange={(e) => handleMinimumAgeChange(e.target.value)}
+                  className={cn("h-12", isDesktopThemePreview ? createScreenFieldClass : "bg-background")}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {renderDesktopSummary()}
+    </div>
+  );
+
+  const renderDesktopTickets = () => (
+    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <section className="grid gap-6 lg:grid-cols-[420px_minmax(0,1fr)]">
+        <div className={cn("h-fit rounded-2xl border p-6", desktopThemePanelClass)}>
+          <p className={cn("text-xs font-bold uppercase tracking-[0.22em]", desktopThemeMutedTextClass)}>Ticket builder</p>
+          <h2 className="mt-1 text-2xl font-black">Pricing and capacity</h2>
+
+          <div className={cn("mt-6 grid grid-cols-2 rounded-full border p-1", desktopThemeSubPanelClass)}>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSelectedTicketPaid(true);
+                setCurrentTicketData((prev) => ({ ...prev, priceError: false }));
+              }}
+              className={cn(
+                "rounded-full px-4 py-2 text-sm font-bold transition",
+                isSelectedTicketPaid ? "bg-blue-800 text-white" : cn(desktopThemeMutedTextClass, "hover:opacity-80")
+              )}
+            >
+              Paid
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSelectedTicketPaid(false);
+                setCurrentTicketData((prev) => ({ ...prev, price: "", priceError: false }));
+              }}
+              className={cn(
+                "rounded-full px-4 py-2 text-sm font-bold transition",
+                !isSelectedTicketPaid ? "bg-blue-800 text-white" : cn(desktopThemeMutedTextClass, "hover:opacity-80")
+              )}
+            >
+              Free
+            </button>
+          </div>
+
+          <div className="mt-6 grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="desktop-ticket-name">Ticket name</Label>
+              <Input
+                id="desktop-ticket-name"
+                value={currentTicketData.name}
+                onChange={(e) =>
+                  setCurrentTicketData({ ...currentTicketData, name: e.target.value, nameError: false })
+                }
+                className={cn("h-12", isDesktopThemePreview ? createScreenFieldClass : "bg-background")}
+                placeholder="General admission"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="desktop-ticket-description">Description</Label>
+              <textarea
+                id="desktop-ticket-description"
+                value={currentTicketData.description}
+                onChange={(e) =>
+                  setCurrentTicketData({ ...currentTicketData, description: e.target.value, descriptionError: false })
+                }
+                rows={4}
+                className={cn(
+                  "rounded-md border px-3 py-3 text-sm outline-none transition focus:border-blue-700",
+                  isDesktopThemePreview ? createScreenFieldClass : "border-border bg-background",
+                )}
+                placeholder="What this ticket includes"
+              />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {isSelectedTicketPaid && (
+                <div className="grid gap-2">
+                  <Label htmlFor="desktop-ticket-price">Price</Label>
+                  <Input
+                    id="desktop-ticket-price"
+                    value={currentTicketData.price}
+                    onChange={(e) => handleTicketPriceChange(e.target.value)}
+                    className={cn("h-12", isDesktopThemePreview ? createScreenFieldClass : "bg-background")}
+                    placeholder="0.00"
+                  />
+                </div>
+              )}
+              <div className="grid gap-2">
+                <Label htmlFor="desktop-ticket-quantity">Quantity</Label>
+                <Input
+                  id="desktop-ticket-quantity"
+                  value={currentTicketData.quantity}
+                  onChange={(e) => handleTicketQuantityChange(e.target.value)}
+                  className={cn("h-12", isDesktopThemePreview ? createScreenFieldClass : "bg-background")}
+                  placeholder="100"
+                />
+              </div>
+            </div>
+            <Button
+              className="h-12 rounded-full"
+              onClick={() => handleTicketAdd(currentTicketData)}
+              type="button"
+              disabled={
+                !currentTicketData.name.trim() ||
+                !currentTicketData.description.trim() ||
+                !currentTicketData.quantity.trim() ||
+                parseInt(currentTicketData.quantity) <= 0 ||
+                (isSelectedTicketPaid && (!currentTicketData.price.trim() || parseFloat(currentTicketData.price) <= 0))
+              }
+            >
+              Add ticket
+            </Button>
+          </div>
+        </div>
+
+        <div className={cn("rounded-2xl border p-6", desktopThemePanelClass)}>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className={cn("text-xs font-bold uppercase tracking-[0.22em]", desktopThemeMutedTextClass)}>Inventory</p>
+              <h2 className="mt-1 text-2xl font-black">Created tickets</h2>
+            </div>
+            <span className="rounded-full bg-blue-800/10 px-3 py-1 text-sm font-bold text-blue-800">
+              {tickets.length} total
+            </span>
+          </div>
+
+          {tickets.length === 0 ? (
+            <div className={cn("mt-8 rounded-2xl border border-dashed p-10 text-center", desktopThemeSubPanelClass)}>
+              <p className="font-bold">No tickets yet</p>
+              <p className={cn("mt-1 text-sm", desktopThemeMutedTextClass)}>Create at least one ticket to continue.</p>
+            </div>
+          ) : (
+            <div className="mt-6 grid gap-3">
+              {tickets.map((ticket) => (
+                <div key={ticket.id} className={cn("rounded-2xl border p-4", desktopThemeSubPanelClass)}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="font-black capitalize">{ticket.name}</h3>
+                      <p className={cn("mt-1 line-clamp-2 text-sm", desktopThemeMutedTextClass)}>{ticket.description}</p>
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="rounded-full text-red-600 hover:text-red-700"
+                      onClick={() => handleTicketRemove(ticket.id)}
+                      type="button"
+                    >
+                      <FiTrash2 />
+                    </Button>
+                  </div>
+                  <div className="mt-4 flex items-center gap-4 text-sm">
+                    <span className="font-bold">{ticket.price ? `₦ ${ticket.price}` : "Free"}</span>
+                    <span className={desktopThemeMutedTextClass}>Qty {ticket.quantity}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {renderDesktopSummary()}
+    </div>
+  );
+
+  const renderDesktopPreview = () => (
+    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+        <div className={cn("overflow-hidden rounded-2xl border", desktopThemePanelClass)}>
+          <div className="relative aspect-[16/10] bg-muted">
+            <Image
+              src={titleImage || "/createeventpic.jpg"}
+              alt={title || "Event preview"}
+              fill
+              className="object-cover"
+              sizes="720px"
+            />
+          </div>
+          <div className="p-6">
+            <div className="flex flex-wrap gap-2">
+              {eventTags.map((item) => (
+                <span key={item} className="rounded-full bg-blue-800/10 px-3 py-1 text-sm font-bold text-blue-800">
+                  {item}
+                </span>
+              ))}
+            </div>
+            <h2 className="mt-4 text-4xl font-black capitalize tracking-tight">{title || "Untitled event"}</h2>
+            <p className={cn("mt-3 text-base leading-7", desktopThemeMutedTextClass)}>{description}</p>
+          </div>
+        </div>
+
+        <div className="grid gap-4">
+          <div className={cn("rounded-2xl border p-5", desktopThemePanelClass)}>
+            <p className="font-black">Event details</p>
+            <div className="mt-4 grid gap-3 text-sm">
+              <div className="flex items-center gap-2">
+                <GoCalendar />
+                <span>
+                  {startTime?.toLocaleString("en-US", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                  }) || "Start time not set"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <IoLocationOutline />
+                <span>{[address, city, state].filter(Boolean).join(", ") || "Location not set"}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className={cn("rounded-2xl border p-5", desktopThemePanelClass)}>
+            <p className="font-black">Tickets</p>
+            <div className="mt-4 grid gap-3">
+              {tickets.map((ticket) => (
+                <div key={ticket.id} className={cn("rounded-xl border p-4", desktopThemeSubPanelClass)}>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="font-bold capitalize">{ticket.name}</span>
+                    <span className="font-bold text-blue-800">{ticket.price ? `₦ ${ticket.price}` : "Free"}</span>
+                  </div>
+                  <p className={cn("mt-1 text-sm", desktopThemeMutedTextClass)}>Quantity: {ticket.quantity}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className={cn("rounded-2xl border p-5", desktopThemePanelClass)}>
+            <p className="font-black">Publish settings</p>
+            <div className="mt-4 grid gap-3">
+              {[
+                { label: "Pass fees to ticket buyer", checked: isFeeOnUser, onChange: () => setFeeOnUser(!isFeeOnUser) },
+                { label: "Secure exact location", checked: locationSecure, onChange: () => setLocationSecure(!locationSecure) },
+                { label: "Public event", checked: isPublic, onChange: () => setIsPublic(!isPublic) },
+              ].map((setting) => (
+                <label key={setting.label} className={cn("flex items-center justify-between gap-4 rounded-xl border p-4", desktopThemeSubPanelClass)}>
+                  <span className="font-semibold">{setting.label}</span>
+                  <Switch
+                    size="medium"
+                    checked={setting.checked}
+                    onCheckedChange={setting.onChange}
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {renderDesktopSummary()}
+    </div>
+  );
+
+  const renderDesktopContent = () => {
+    switch (activeScreen) {
+      case "details":
+        return renderDesktopDetails();
+      case "ticket":
+        return renderDesktopTickets();
+      case "preview":
+        return renderDesktopPreview();
+      default:
+        return renderDesktopIntro();
     }
   };
 
@@ -1053,11 +1669,14 @@ export const CreateEventContent = ({
               ))}
             </div>
             <div className="w-full mt-auto mt-8 pb-6">
-              <Button
-                className="w-full rounded-xl py-6 text-[1.05rem] font-semibold bg-blue-700 hover:bg-blue-800 text-white"
-                onClick={() => setActiveScreen("details")}
-                type="button"
-              >
+      <Button
+        className={cn(
+          "rounded-xl py-6 text-[1.05rem] font-semibold bg-blue-700 hover:bg-blue-800 text-white",
+          isDesktop ? "w-auto px-8" : "w-full"
+        )}
+        onClick={() => setActiveScreen("details")}
+        type="button"
+      >
                 Create Event
               </Button>
             </div>
@@ -1066,9 +1685,133 @@ export const CreateEventContent = ({
     }
   };
 
+  if (isDesktop) {
+    if (activeScreen === "success") {
+      return (
+        <div className={cn("min-h-screen bg-background", className)} {...props}>
+          <CreateEventSuccess
+            onContinue={() => {
+              router.push("/?screen=plans");
+            }}
+            event={event!}
+            variant="desktop"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <main
+        className={cn(
+          "min-h-screen",
+          isDesktopThemePreview ? desktopThemeTextClass : "bg-background text-foreground",
+          className,
+        )}
+        style={isDesktopThemePreview ? detailsContainerStyle : undefined}
+        {...props}
+      >
+        <header className={cn("sticky top-0 z-50 border-b backdrop-blur", desktopThemeHeaderClass)}>
+          <div className="desktop-page-header-inner flex h-20 items-center justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-4">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
+                onClick={handleBackClick}
+                aria-label="Back"
+              >
+                <FaArrowLeft size={16} />
+              </Button>
+              <div className="min-w-0">
+                <p className={cn("text-xs font-bold uppercase tracking-[0.24em]", desktopThemeMutedTextClass)}>
+                  Create event
+                </p>
+                <h1 className="truncate text-xl font-black">
+                  {activeScreen === "intro" ? "Host a new experience" : headerTitle()}
+                </h1>
+              </div>
+            </div>
+
+            {activeScreen !== "intro" && (
+              <div className="hidden items-center gap-2 lg:flex">
+                {desktopSteps.map((step, index) => {
+                  const isActive = activeScreen === step.value;
+                  const isComplete = index < currentStepIndex;
+
+                  return (
+                    <button
+                      key={step.value}
+                      type="button"
+                      disabled={!canOpenDesktopStep(step.value)}
+                      onClick={() => setActiveScreen(step.value)}
+                      className={cn(
+                        "flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-40",
+                        isActive
+                          ? "border-blue-800 bg-blue-800 text-white"
+                          : isComplete
+                            ? "border-green-700/30 bg-green-700/10 text-green-700"
+                            : isDesktopThemePreview
+                              ? isLightEventSurface
+                                ? "border-black/10 bg-white/55 text-black/65 hover:text-black"
+                                : "border-white/10 bg-black/25 text-white/70 hover:text-white"
+                              : "border-border bg-card text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-background/20 text-xs">
+                        {index + 1}
+                      </span>
+                      {step.title}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </header>
+
+        <div className="desktop-page-container py-8">
+          {activeScreen !== "intro" && (
+            <div className="mb-8 grid gap-3 lg:hidden">
+              {desktopSteps.map((step, index) => (
+                <button
+                  key={step.value}
+                  type="button"
+                  disabled={!canOpenDesktopStep(step.value)}
+                  onClick={() => setActiveScreen(step.value)}
+                  className={cn(
+                    "flex items-center justify-between rounded-2xl border px-4 py-3 text-left disabled:opacity-40",
+                    activeScreen === step.value
+                      ? "border-blue-800 bg-blue-800 text-white"
+                      : isDesktopThemePreview
+                        ? desktopThemePanelClass
+                        : "border-border bg-card",
+                  )}
+                >
+                  <span>
+                    <span className="block text-sm font-black">{step.title}</span>
+                    <span className={cn("block text-xs", activeScreen === step.value ? "text-white/65" : desktopThemeMutedTextClass)}>
+                      {step.description}
+                    </span>
+                  </span>
+                  <span className="text-sm font-black">{index + 1}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          <form>{renderDesktopContent()}</form>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <div
-      className={cn("w-full min-h-[100dvh] flex flex-col bg-background text-foreground", className)}
+      className={cn(
+        "w-full min-h-[100dvh] flex flex-col bg-background text-foreground",
+        isDesktop && "border-x border-border shadow-sm",
+        className
+      )}
       style={activeScreen === "details" ? detailsContainerStyle : undefined}
       {...props}
     >

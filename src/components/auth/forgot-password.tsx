@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { cn, passwordRegex } from "@/lib/utils";
-import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -15,9 +14,10 @@ import {
     InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { showTopToast } from "@/components/toast/toast-util";
+import { getErrorMessage } from "@/lib/error-message";
 
 interface ForgotPasswordProps extends React.ComponentProps<"form"> {
     loginPrincipal: string;
@@ -42,6 +42,93 @@ export const ForgotPassword = ({
 
     const delay: number = 30000
 
+    const handleShowPassword = () => {
+        setIsPasswordShow(!isPasswordShow)
+    }
+
+    const passwordsMatch = password === confirmPassword;
+    const isPasswordValid = password != null && password != "" && passwordRegex.test(password);
+    const showPasswordMismatchMessage = password && confirmPassword && !passwordsMatch;
+    const showPasswordRequirementsMessage = password && !isPasswordValid;
+
+    const handleForgotSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            if (emailRegex.test(principal)) {
+                await api.post("/auth/forgotPassword", {
+                    email: principal,
+                });
+            } else {
+                await api.post("/auth/forgotPassword", {
+                    username: principal,
+                });
+            }
+
+            setLoading(false);
+            setIsVerifyForgotPassword(true);
+        } catch (err: unknown) {
+            setLoading(false);
+            showTopToast("error", getErrorMessage(err, 'Request failed'));
+        }
+    };
+
+    const handleResendOtp = async () => {
+        setIsResendVisible(false);
+        setLoading(true);
+
+        try {
+            if (emailRegex.test(principal)) {
+                await api.post("/auth/forgotPassword", {
+                    email: principal,
+                });
+            } else {
+                await api.post("/auth/forgotPassword", {
+                    username: principal,
+                });
+            }
+
+            setLoading(false);
+        } catch (err: unknown) {
+            setLoading(false);
+            showTopToast("error", getErrorMessage(err, 'Request failed'));
+
+        }
+    }
+
+    const handleVerifySubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await submitOtp()
+    }
+
+    const submitOtp = useCallback(async () => {
+        setLoading(true);
+
+        try {
+            if (emailRegex.test(principal)) {
+                await api.post("/auth/verify/forgotPassword", {
+                    email: principal,
+                    token: otpValue,
+                });
+            } else {
+                await api.post("/auth/verify/forgotPassword", {
+                    username: principal,
+                    token: otpValue,
+                });
+            }
+
+            setLoading(false);
+            setIsVerifyForgotPassword(false);
+            setIsResetPassword(true);
+            setOtpValue("");
+        } catch (err: unknown) {
+            setLoading(false);
+            showTopToast("error", getErrorMessage(err, 'Request failed'));
+            setOtpValue("");
+        }
+    }, [otpValue, principal])
+
     useEffect(() => {
         if (!isVerifyForgotPassword || isResendVisible) return;
 
@@ -60,96 +147,7 @@ export const ForgotPassword = ({
         if (otpValue.length === 6) {
             submitOtp();
         }
-    }, [otpValue, isVerifyForgotPassword]);
-
-    const handleShowPassword = () => {
-        setIsPasswordShow(!isPasswordShow)
-    }
-
-    const passwordsMatch = password === confirmPassword;
-    const isPasswordValid = password != null && password != "" && passwordRegex.test(password);
-    const showPasswordMismatchMessage = password && confirmPassword && !passwordsMatch;
-    const showPasswordRequirementsMessage = password && !isPasswordValid;
-
-    const handleForgotSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-
-        try {
-            let response = null;
-            if (emailRegex.test(principal)) {
-                response = await api.post("/auth/forgotPassword", {
-                    email: principal,
-                });
-            } else {
-                response = await api.post("/auth/forgotPassword", {
-                    username: principal,
-                });
-            }
-
-            setLoading(false);
-            setIsVerifyForgotPassword(true);
-        } catch (err: any) {
-            setLoading(false);
-            showTopToast("error", err.response?.data?.description || 'Request failed');
-        }
-    };
-
-    const handleResendOtp = async () => {
-        setIsResendVisible(false);
-        setLoading(true);
-
-        try {
-            let response = null
-            if (emailRegex.test(principal)) {
-                response = await api.post("/auth/forgotPassword", {
-                    email: principal,
-                });
-            } else {
-                response = await api.post("/auth/forgotPassword", {
-                    username: principal,
-                });
-            }
-
-            setLoading(false);
-        } catch (err: any) {
-            setLoading(false);
-            showTopToast("error", err.response?.data?.description || 'Request failed');
-
-        }
-    }
-
-    const handleVerifySubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        await submitOtp()
-    }
-
-    const submitOtp = async () => {
-        setLoading(true);
-
-        try {
-            let response = null;
-            if (emailRegex.test(principal)) {
-                response = await api.post("/auth/verify/forgotPassword", {
-                    email: principal,
-                });
-            } else {
-                response = await api.post("/auth/verify/forgotPassword", {
-                    username: principal,
-                    token: otpValue,
-                });
-            }
-
-            setLoading(false);
-            setIsVerifyForgotPassword(false);
-            setIsResetPassword(true);
-            setOtpValue("");
-        } catch (err: any) {
-            setLoading(false);
-            showTopToast("error", err.response?.data?.description || 'Request failed');
-            setOtpValue("");
-        }
-    }
+    }, [otpValue, isVerifyForgotPassword, submitOtp]);
 
     const handleResetPasswordSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -167,15 +165,14 @@ export const ForgotPassword = ({
         setLoading(true);
 
         try {
-            let response = null;
             if (emailRegex.test(principal)) {
-                response = await api.post("/auth/resetPassword", {
+                await api.post("/auth/resetPassword", {
                     email: principal,
                     newPassword: password,
                     confirmPassword: confirmPassword,
                 });
             } else {
-                response = await api.post("/auth/resetPassword", {
+                await api.post("/auth/resetPassword", {
                     username: principal,
                     newPassword: password,
                     confirmPassword: confirmPassword,
@@ -186,9 +183,9 @@ export const ForgotPassword = ({
             setPassword("")
             setConfirmPassword("")
             setForgotPassword(true);
-        } catch (err: any) {
+        } catch (err: unknown) {
             setLoading(false);
-            showTopToast("error", err.response?.data?.description || 'Reset failed');
+            showTopToast("error", getErrorMessage(err, 'Reset failed'));
         }
     }
 

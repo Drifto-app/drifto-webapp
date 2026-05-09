@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { NavMenu } from "./nav-menu";
-import Image from "next/image";
 import * as React from "react";
+import { ThemedLogo } from "@/components/ui/themed-logo";
 
 export const NavigationSheet = () => {
   return (
@@ -15,11 +15,9 @@ export const NavigationSheet = () => {
       </SheetTrigger>
       <SheetContent>
           <div className="relative w-22 h-22">
-              <Image
-                  src="/logo-extend.png"
-                  alt="Logo Extend"
+              <ThemedLogo
                   fill
-                  className="object-contain"
+                  alt="Logo Extend"
               />
           </div>
         <NavMenu orientation="vertical" className="mt-12" />

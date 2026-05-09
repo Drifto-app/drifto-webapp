@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {ComponentProps, useCallback, useEffect, useRef, useState} from "react";
 import {cn} from "@/lib/utils";
-import {useRouter} from "next/navigation";
 import {IoSearchSharp} from "react-icons/io5";
 import {Input} from "@/components/ui/input";
 import * as React from "react";
@@ -13,14 +14,16 @@ import { EventCardSkeleton } from "@/components/ui/page-skeletons";
 interface UserEventsProps extends ComponentProps<"div"> {
     user: {[key:string]: any};
     isForUser?: boolean;
+    variant?: "mobile" | "desktop";
 }
 
 export const UserEvents = ({
-    user, isForUser = false, className, ...props
+    user, isForUser = false, variant = "mobile", className, ...props
 }: UserEventsProps) => {
+    const isDesktop = variant === "desktop";
     const [searchText, setSearchText] = useState<string>("");
     const [events, setEvents] = useState<Array<{[key: string]: any}>>([]);
-    const [hasMore, setHasMore] = useState(true);
+    const [, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -77,7 +80,7 @@ export const UserEvents = ({
                 loadingRef.current = false;
             }
         },
-        [user]
+        [user, isForUser]
     );
 
     // Initial load
@@ -105,15 +108,15 @@ export const UserEvents = ({
                 ) loadEvents(searchText);
             },
             {
-                root: scrollRootRef.current ?? null,
-                rootMargin: "80px",
+                root: isDesktop ? null : scrollRootRef.current ?? null,
+                rootMargin: isDesktop ? "160px" : "80px",
                 threshold: 0,
             }
         );
 
         observer.observe(sentinel);
         return () => observer.disconnect();
-    }, [loadEvents, error, searchText]);
+    }, [loadEvents, error, searchText, isDesktop]);
 
     useEffect(() => {
         const debounceTimer = setTimeout(() => {
@@ -128,6 +131,64 @@ export const UserEvents = ({
 
         return () => clearTimeout(debounceTimer);
     }, [searchText, loadEvents]);
+
+    if (isDesktop) {
+        return (
+            <div
+                className={cn("w-full space-y-5", className)}
+                {...props}
+            >
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                    <div className="flex h-12 items-center rounded-full border border-border bg-background px-4">
+                        <IoSearchSharp size={22} className="text-muted-foreground" />
+                        <Input
+                            name="search"
+                            type="search"
+                            inputMode="search"
+                            enterKeyHint="search"
+                            className="h-full border-none bg-transparent shadow-none placeholder:text-muted-foreground focus-visible:ring-0"
+                            placeholder={`Search ${user.username}'s experiences`}
+                            aria-label="Search experiences"
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                {loading && events.length === 0 ? (
+                    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                        {Array.from({ length: 6 }).map((_, index) => (
+                            <EventCardSkeleton key={index} />
+                        ))}
+                    </div>
+                ) : error && events.length === 0 ? (
+                    <div className="rounded-2xl border border-border bg-card p-10 text-center">
+                        <p className="font-black">Unable to load experiences</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{error}</p>
+                    </div>
+                ) : events.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+                        <p className="font-black">No experiences yet</p>
+                        <p className="mt-1 text-sm text-muted-foreground">Hosted events will appear here.</p>
+                    </div>
+                ) : (
+                    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                        {events.map((event) => (
+                            <UserEventCard event={event} key={event.id} variant="desktop" />
+                        ))}
+                    </div>
+                )}
+
+                <div ref={sentinelRef} aria-hidden className="h-8" />
+
+                {loading && events.length > 0 && (
+                    <div className="flex justify-center py-6">
+                        <Loader className="h-8 w-8" />
+                    </div>
+                )}
+            </div>
+        )
+    }
 
     return (
         <div

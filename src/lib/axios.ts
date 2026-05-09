@@ -1,5 +1,6 @@
 import axios, {AxiosError, AxiosResponse, InternalAxiosRequestConfig} from "axios";
 import {useAuthStore} from "@/store/auth-store";
+import { ApiStatusBody, isInvalidAuthStatus } from "@/lib/auth-status";
 
 export const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -36,11 +37,18 @@ authApi.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
         const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+        const responseBody = error.response?.data as ApiStatusBody | undefined;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (
+            (
+                isInvalidAuthStatus(error.response?.status) ||
+                isInvalidAuthStatus(responseBody?.status)
+            ) &&
+            !originalRequest._retry
+        ) {
             originalRequest._retry = true;
 
-            const { refreshAccessToken, clearAuth } = useAuthStore.getState();
+            const { refreshAccessToken } = useAuthStore.getState();
 
             try {
                 const success = await refreshAccessToken();
@@ -50,12 +58,8 @@ authApi.interceptors.response.use(
                     originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                     return authApi(originalRequest);
                 }
-            } catch (refreshError) {
-                clearAuth();
-                // Redirect to login page
-                if (typeof window !== 'undefined') {
-                    window.location.href = '/login';
-                }
+            } catch {
+                return Promise.reject(error);
             }
         }
 

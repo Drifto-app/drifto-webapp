@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Plus, X } from "lucide-react";
-import { authApi } from "@/lib/axios";
 import { Dialog } from "@headlessui/react";
 import Image from "next/image";
 import {cn, MAX_IMAGE_SIZE, uploadMedia} from "@/lib/utils";
@@ -18,6 +17,8 @@ interface ImageSnapshotsProps {
     onImageRemove?: (images: string[]) => void;
     maxImages?: number;
     setSubmitDisabled: (loading: boolean) => void;
+    variant?: "mobile" | "desktop";
+    className?: string;
 }
 
 export const ImageSnapshots = ({
@@ -26,6 +27,8 @@ export const ImageSnapshots = ({
                                    setSubmitDisabled,
                                    onImageRemove,
                                    maxImages = 10,
+                                   variant = "mobile",
+                                   className,
                                }: ImageSnapshotsProps) => {
     const [images, setImages] = useState<string[]>(initialImages);
     const [isUploading, setIsUploading] = useState(false);
@@ -42,31 +45,13 @@ export const ImageSnapshots = ({
             }
 
             return response ?? null;
-        } catch (error: any) {
+        } catch {
             showTopToast(
                 "error",
-                error?.response?.data?.description || "Upload failed. Please try again."
+                "Upload failed. Please try again."
             );
             return null;
         }
-    };
-
-    // (kept) single add API, now uses helper
-    const handleImageAdd = async (file: File) => {
-        if (images.length >= maxImages) {
-            showTopToast("error", `Maximum ${maxImages} images allowed`);
-            return;
-        }
-        setIsUploading(true);
-        setSubmitDisabled(true);
-        const url = await uploadSingle(file);
-        if (url) {
-            const next = [...images, url];
-            setImages(next);
-            onImageAdd?.(next);
-        }
-        setIsUploading(false);
-        setSubmitDisabled(false);
     };
 
     // NEW: batch add multiple files at once
@@ -143,8 +128,11 @@ export const ImageSnapshots = ({
 
     if (images.length === 0 && !isUploading) {
         return (
-            <div className="w-full bg-background rounded-lg p-4">
-                <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/40 transition">
+            <div className={cn("w-full rounded-lg bg-background p-4", className)}>
+                <label className={cn(
+                    "flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed cursor-pointer transition hover:bg-accent/40",
+                    variant === "desktop" ? "h-36" : "h-48",
+                )}>
                     <Plus className="w-10 h-10 text-gray-400 mb-2" />
                     <span className="text-gray-500">Add Snapshot</span>
                     <input
@@ -164,11 +152,16 @@ export const ImageSnapshots = ({
 
     return (
         <>
-            <div className="w-full rounded-lg">
-                <div className="w-full overflow-x-auto no-scrollbar">
-                    <div className="flex gap-3">
+            <div className={cn("w-full min-w-0 rounded-lg", className)}>
+                <div
+                    className={cn(
+                        "w-full min-w-0 overflow-x-auto overscroll-x-contain",
+                        variant === "mobile" && "no-scrollbar",
+                    )}
+                >
+                    <div className="flex w-max min-w-full gap-3 pb-2">
                         {images.map((src, idx) => (
-                            <div key={src} className="w-[60%] flex-none relative">
+                            <div key={src} className={cn("relative flex-none", variant === "desktop" ? "w-48" : "w-[60%]")}>
                                 <Card
                                     className="overflow-hidden cursor-pointer py-0"
                                     onClick={() => openModal(src)}
@@ -203,7 +196,7 @@ export const ImageSnapshots = ({
 
                         {/* Add-button slide */}
                         {images.length < maxImages && (
-                            <div className="w-[60%] flex-none relative">
+                            <div className={cn("relative flex-none", variant === "desktop" ? "w-48" : "w-[60%]")}>
                                 <Card className="overflow-hidden p-0">
                                     <CardContent className="p-0">
                                         <AspectRatio ratio={4 / 3}>
