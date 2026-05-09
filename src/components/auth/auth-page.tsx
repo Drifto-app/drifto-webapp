@@ -122,9 +122,9 @@ export default function LoginPage() {
             <h2 className="mt-4 max-w-xl text-4xl font-black leading-tight tracking-tight">
               Sign in to manage plans, create experiences, and stay connected.
             </h2>
-            <p className="mt-4 max-w-lg text-sm leading-6 text-muted-foreground">
-              Desktop auth now supports the same account flow as mobile while keeping Drifto&apos;s existing theme and navigation direction.
-            </p>
+            {/*<p className="mt-4 max-w-lg text-sm leading-6 text-muted-foreground">*/}
+            {/*  Desktop auth now supports the same account flow as mobile while keeping Drifto&apos;s existing theme and navigation direction.*/}
+            {/*</p>*/}
           </div>
         </div>
       </div>
