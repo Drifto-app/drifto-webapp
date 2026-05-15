@@ -3,6 +3,7 @@
 import { authApi } from "@/lib/axios";
 import { ArrowLeft, Download, Inbox, Loader2 } from "lucide-react";
 import Image from "next/image";
+import driftoLogo from "@/assests/logo.png";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
