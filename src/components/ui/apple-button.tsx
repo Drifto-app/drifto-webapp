@@ -1,17 +1,35 @@
 "use client";
-import { useEffect, useState } from "react";
 import AppleSignin from "react-apple-signin-auth";
+import type { ButtonHTMLAttributes } from "react";
 import { showTopToast } from "@/components/toast/toast-util";
 import { FaApple } from "react-icons/fa";
 
+export interface AppleAuthResponse {
+    identityToken?: string | null;
+    givenName?: string | null;
+    familyName?: string | null;
+    email?: string | null;
+}
+
+interface AppleSigninResponse {
+    authorization?: {
+        id_token?: string;
+    };
+    user?: {
+        name?: {
+            firstName?: string;
+            lastName?: string;
+        };
+        email?: string;
+    };
+}
+
 interface AppleButtonProps {
-    onSuccess: (response: any) => Promise<void>;
+    onSuccess: (response: AppleAuthResponse) => Promise<void>;
 }
 
 export default function AppleButton({ onSuccess }: AppleButtonProps) {
-    const [isHovered, setIsHovered] = useState(false);
-
-    const handleAppleResponse = async (response: any) => {
+    const handleAppleResponse = async (response: AppleSigninResponse) => {
         // Map Web Apple Sign In response to the format expected by auth-store/backend
         // Web Response: { authorization: { id_token, ... }, user: { name: { firstName, lastName }, ... } }
         // Expected: { identityToken, givenName, familyName }
@@ -34,11 +52,7 @@ export default function AppleButton({ onSuccess }: AppleButtonProps) {
     };
 
     return (
-        <div
-            className="w-full flex justify-center items-center"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
+        <div className="w-full flex justify-center items-center">
             <AppleSignin
                 authOptions={authOptions}
                 uiType="dark"
@@ -46,50 +60,19 @@ export default function AppleButton({ onSuccess }: AppleButtonProps) {
                 noDefaultStyle={false}
                 buttonExtraChildren="Continue with Apple"
                 onSuccess={handleAppleResponse}
-                onError={(error: any) => {
+                onError={(error: unknown) => {
                     console.error(error);
                     showTopToast("error", 'Apple Auth failed');
                 }}
-                render={(props: any) => (
+                render={(props: ButtonHTMLAttributes<HTMLButtonElement>) => (
                     <button
                         {...props}
-                        style={{
-                            width: "100%",
-                            height: 40,
-                            border: "1px solid #dadce0",
-                            borderRadius: "4px",
-                            backgroundColor: "#fff",
-                            color: "#3c4043",
-                            fontSize: "14px",
-                            fontWeight: 500,
-                            fontFamily: "'Google Sans', arial, sans-serif",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "pointer",
-                            position: "relative",
-                            overflow: "hidden",
-                            padding: "0 12px",
-                        }}
+                        className="relative flex h-10 w-full cursor-pointer items-center justify-center overflow-hidden rounded border border-border bg-background px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent"
                     >
-                        {/* Hover Overlay */}
-                        {isHovered && (
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100%",
-                                    height: "100%",
-                                    backgroundColor: "rgba(60, 64, 67, 0.04)",
-                                    pointerEvents: "none"
-                                }}
-                            />
-                        )}
-                        <div style={{ marginRight: 10, display: "flex", alignItems: "center" }}>
+                        <div className="mr-2 flex items-center">
                             <FaApple size={18} />
                         </div>
-                        <span style={{ whiteSpace: "nowrap" }}>Continue with Apple</span>
+                        <span className="whitespace-nowrap">Continue with Apple</span>
                     </button>
                 )}
             />

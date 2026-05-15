@@ -1,14 +1,16 @@
 "use client"
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa";
-import { FiBell, FiPhone } from "react-icons/fi";
+import { FiPhone } from "react-icons/fi";
 import { IoCardOutline } from "react-icons/io5";
 import { TbArrowsLeftRight } from "react-icons/tb";
-import { AiOutlineQrcode } from "react-icons/ai";
 import { BsBank, BsGrid3X3Gap } from "react-icons/bs";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PayButton } from "@/components/payment/pay-button";
 import { useAuthStore } from "@/store/auth-store";
@@ -24,6 +26,7 @@ interface PaymentContentProps extends React.ComponentProps<"div"> {
     orderContent: { [key: string]: any };
     setOrderContent: (content: { [key: string]: any }) => void;
     prev: string | null;
+    variant?: "mobile" | "desktop";
 }
 
 interface PaymentOptions {
@@ -41,9 +44,11 @@ const paymentsOptions: PaymentOptions[] = [
 ]
 
 export const PaymentContent = ({
-    order, orderContent, setOrderContent, prev, className, ...props
+    order, orderContent, setOrderContent, prev, variant = "mobile", className, ...props
 }: PaymentContentProps) => {
     const router = useRouter();
+
+    const isDesktop = variant === "desktop";
 
     const { user } = useAuthStore()
 
@@ -116,7 +121,7 @@ export const PaymentContent = ({
 
     if (isSuccess) {
         return (
-            <OrderSuccessDetails />
+            <OrderSuccessDetails variant={variant} />
         )
     }
 
@@ -246,6 +251,74 @@ export const PaymentContent = ({
                     </div>
                 )
         }
+    }
+
+    if (isDesktop) {
+        return (
+            <div className={cn("w-full min-h-screen bg-background", className)} {...props}>
+                <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
+                    <div className="desktop-page-header-inner flex h-20 items-center gap-4">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={handleBackClick}
+                            aria-label="Back"
+                        >
+                            <ArrowLeft size={20} />
+                        </Button>
+                        <p className="truncate text-base font-semibold capitalize">
+                            {title}
+                        </p>
+                    </div>
+                </header>
+
+                <div className="desktop-page-container desktop-two-column-page grid gap-10 py-10">
+                    <section className="min-w-0">
+                        <div className="rounded-3xl border border-border bg-card">
+                            {render()}
+                        </div>
+                    </section>
+
+                    <aside className="min-w-0">
+                        <div className="sticky top-28 flex flex-col gap-4">
+                            <div className="rounded-2xl border border-border bg-card p-5">
+                                <p className="text-sm font-semibold capitalize text-muted-foreground">
+                                    Order summary
+                                </p>
+                                <ul className="mt-4 flex flex-col gap-2 text-sm">
+                                    {orderContent.orderItems?.map((item: { [key: string]: any }) => (
+                                        <li key={item.ticketId} className="flex items-start justify-between gap-3">
+                                            <span className="capitalize">
+                                                {item.ticketName}
+                                                <span className="ml-2 text-muted-foreground">x{item.amount}</span>
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+                                    <span className="text-sm text-muted-foreground">Total</span>
+                                    <span className="text-xl font-black">₦ {orderContent.totalPrice}</span>
+                                </div>
+                                {orderContent.referralCode && (
+                                    <p className="mt-3 text-xs font-semibold text-green-700">
+                                        Referral code applied
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4">
+                                <ShieldCheck size={20} className="mt-0.5 text-blue-700" />
+                                <div className="text-sm text-muted-foreground">
+                                    Drifto secures your payment with end-to-end encryption.
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        );
     }
 
     return (

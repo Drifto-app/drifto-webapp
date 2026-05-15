@@ -1,25 +1,37 @@
-import React, {useEffect, useState} from "react";
+"use client";
 
-export const ScreenProvider= ({ children }: { children: React.ReactNode }) => {
-    const [isMobile, setIsMobile] = useState<boolean>(true);
+import React, { createContext, useContext, useEffect, useState } from "react";
+
+interface ScreenContextValue {
+    isDesktop: boolean;
+    isMobile: boolean;
+}
+
+const ScreenContext = createContext<ScreenContextValue>({
+    isDesktop: false,
+    isMobile: true,
+});
+
+export const useScreen = () => useContext(ScreenContext);
+
+export const ScreenProvider = ({ children }: { children: React.ReactNode }) => {
+    const [isDesktop, setIsDesktop] = useState<boolean>(false);
 
     useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 1024);
+        const mediaQuery = window.matchMedia("(min-width: 1024px)");
+
+        const handleChange = () => {
+            setIsDesktop(mediaQuery.matches);
         };
 
-        handleResize();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+        handleChange();
+        mediaQuery.addEventListener("change", handleChange);
+        return () => mediaQuery.removeEventListener("change", handleChange);
     }, []);
 
-    if (!isMobile) {
-        return (
-            <div className="w-full h-screen flex items-center justify-center">
-                <h3>Desktop is not supported</h3>
-            </div>
-        )
-    }
-
-    return <>{children}</>;
+    return (
+        <ScreenContext.Provider value={{ isDesktop, isMobile: !isDesktop }}>
+            {children}
+        </ScreenContext.Provider>
+    );
 }

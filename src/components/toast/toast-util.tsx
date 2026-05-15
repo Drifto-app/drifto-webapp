@@ -13,6 +13,8 @@ export const showTopToast = (type: ToastType, text: string) => {
     const config = {
         icon: type === "error" ? <MdOutlineError size={20} className="text-red-600" /> :  type === "info" ? <IoIosInformationCircleOutline size={20} className="text-blue-800" /> : <FaCheckCircle size={20} className="text-green-600" />,
         style: {
+            background: 'var(--popover)',
+            color: 'var(--popover-foreground)',
             border: type === "error" ? '1px solid #dc2626' : type === "info" ?  '1px solid #3b82f6 ' : '1px solid #16a34a',
             padding: '16px',
             gap: '8px',

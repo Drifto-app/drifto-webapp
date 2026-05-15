@@ -4,18 +4,20 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { ComponentProps, forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { authApi } from "@/lib/axios";
-import { EventCard } from "@/components/event-display/event-card";
+import { EventCard, type EventSummary } from "@/components/event-display/event-card";
 import { Loader } from "@/components/ui/loader";
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Tabs } from "@/components/event-display/tabs";
 import { useAuthStore } from '@/store/auth-store';
-import { BiCalendarAlt } from 'react-icons/bi';
 import { PiFireSimpleBold } from 'react-icons/pi';
 import { EventCardSkeleton } from "@/components/ui/page-skeletons";
+import { getErrorMessage } from "@/lib/error-message";
 
 interface EventDisplayProps extends ComponentProps<"div"> {
     location: string | null;
+    showCreateButton?: boolean;
+    variant?: "mobile" | "desktop";
 }
 
 interface EventDisplayRef {
@@ -23,7 +25,7 @@ interface EventDisplayRef {
 }
 
 export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
-    location, className, ...props
+    location, showCreateButton = true, variant = "mobile", className, ...props
 }, ref) => {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -32,7 +34,7 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
     const { isAuthenticated } = useAuthStore();
 
     const [activeEventItem, setActiveEventItem] = useState<string | null>(null);
-    const [events, setEvents] = useState<any[]>([]);
+    const [events, setEvents] = useState<EventSummary[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
@@ -81,7 +83,7 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
                 });
             }
 
-            const newEvents = response.data.data.data;
+            const newEvents = response.data.data.data as EventSummary[];
 
             if (resetData) {
                 setEvents(newEvents);
@@ -95,21 +97,14 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
             setHasMore(!isLast);
             hasMoreRef.current = !isLast;
 
-        } catch (err: any) {
-            const errorMessage = err?.response?.data?.message || err?.message || "Error loading events";
-
-            // Only show toast for pagination errors, not initial load errors
-            // if (!resetData) {
-            //     toast.error(errorMessage);
-            // }
-
-            setError(errorMessage);
+        } catch (err: unknown) {
+            setError(getErrorMessage(err, "Error loading events"));
         } finally {
             setLoading(false);
             setInitialLoading(false);
             loadingRef.current = false;
         }
-    }, [location, activeEventItem]);
+    }, [location, activeEventItem, isAuthenticated]);
 
     // Expose refresh method via ref
     useImperativeHandle(ref, () => ({
@@ -167,15 +162,23 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
         return (
             <div
                 className={cn(
-                    "w-full flex flex-col items-center justify-center pb-20",
+                    "w-full flex flex-col",
+                    variant === "desktop" ? "pb-8" : "items-center justify-center pb-20",
                     className
                 )}
                 {...props}
             >
-                <Tabs active={activeEventItem} />
+                <Tabs active={activeEventItem} variant={variant} />
 
-                <div className="flex w-full flex-col gap-8 px-4 py-4">
-                    {Array.from({ length: 3 }).map((_, index) => (
+                <div
+                    className={cn(
+                        "w-full py-4",
+                        variant === "desktop"
+                            ? "grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6"
+                            : "flex flex-col gap-8 px-4"
+                    )}
+                >
+                    {Array.from({ length: variant === "desktop" ? 8 : 3 }).map((_, index) => (
                         <EventCardSkeleton key={index} />
                     ))}
                 </div>
@@ -188,14 +191,15 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
         return (
             <div
                 className={cn(
-                    "w-full flex flex-col items-center justify-center pb-20",
+                    "w-full flex flex-col",
+                    variant === "desktop" ? "pb-8" : "items-center justify-center pb-20",
                     className
                 )}
                 {...props}
             >
-                <Tabs active={activeEventItem} onClick={setActiveEventItem} />
+                <Tabs active={activeEventItem} onClick={setActiveEventItem} variant={variant} />
 
-                <div className="flex flex-col items-center justify-center py-8 px-4w-full">
+                <div className="flex w-full flex-col items-center justify-center px-4 py-8">
                     <Button
                         onClick={handleRetry}
                         variant="outline"
@@ -211,29 +215,45 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
     return (
         <div
             className={cn(
-                "w-full flex flex-col items-center justify-center pb-20",
+                "w-full flex flex-col",
+                variant === "desktop" ? "pb-8" : "items-center justify-center pb-20",
                 className
             )}
             {...props}
         >
-            <Tabs active={activeEventItem} onClick={setActiveEventItem} />
+            <Tabs active={activeEventItem} onClick={setActiveEventItem} variant={variant} />
 
-            <div className="flex flex-col gap-10 px-4 mt-4 w-full max-w-7xl ">
-                {events.map((evt, index) => (
-                    <EventCard key={evt.id} isAuthenticated={isAuthenticated} event={evt} currentPathUrl={pathname + "?" + searchParams} />
+            <div
+                className={cn(
+                    "mt-5 w-full",
+                    variant === "desktop"
+                        ? "grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6 overflow-visible py-2"
+                        : "flex max-w-7xl flex-col gap-10 px-4"
+                )}
+            >
+                {events.map((evt) => (
+                    <EventCard
+                        key={evt.id}
+                        isAuthenticated={isAuthenticated}
+                        event={evt}
+                        variant={variant}
+                        currentPathUrl={pathname + "?" + searchParams}
+                    />
                 ))}
             </div>
 
-            <Button
-                size="lg"
-                className={cn(
-                    'fixed rounded-full z-1000 bg-blue-800',
-                    isAuthenticated ? "bottom-20" : "bottom-8"
-                )}
-                onClick={() => router.push(`/m/event-create?prev=${encodeURIComponent(pathname + "?" + searchParams)}`)}
-            >
-                Create Experience
-            </Button>
+            {showCreateButton && (
+                <Button
+                    size="lg"
+                    className={cn(
+                        'fixed left-1/2 z-1000 -translate-x-1/2 rounded-full bg-blue-800',
+                        isAuthenticated ? "bottom-20" : "bottom-8"
+                    )}
+                    onClick={() => router.push(`/m/event-create?prev=${encodeURIComponent(pathname + "?" + searchParams)}`)}
+                >
+                    Create Experience
+                </Button>
+            )}
 
             {/* Loading indicator for pagination */}
             {loading && !initialLoading && (
@@ -289,3 +309,5 @@ export const EventDisplay = forwardRef<EventDisplayRef, EventDisplayProps>(({
         </div>
     );
 });
+
+EventDisplay.displayName = "EventDisplay";

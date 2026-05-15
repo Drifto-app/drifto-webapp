@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import * as React from "react";
 import {cn} from "@/lib/utils";
 import {CommentCard} from "@/components/comment/comment-card";
 import {authApi} from "@/lib/axios";
-import {toast} from "react-toastify";
 import {Loader, LoaderSmall} from "@/components/ui/loader";
 import {useEffect, useRef, useCallback, useState} from "react";
 import {Button} from "@/components/ui/button";
@@ -12,22 +12,22 @@ import {Input} from "@/components/ui/input";
 import { IoChatbubbleEllipsesOutline, IoSend } from 'react-icons/io5';
 import { showTopToast } from "../toast/toast-util";
 import { useAuthStore } from '@/store/auth-store';
-import { FaRegCommentDots } from 'react-icons/fa';
 import { CommentThreadSkeleton } from "@/components/ui/page-skeletons";
 
 interface SingleEventReviewsProps extends React.ComponentProps<"div">{
     event: {[key: string]: any};
     currentPathUrl: string;
+    variant?: "mobile" | "desktop";
 }
 
 export const SingleEventReviews = ({
-  event, currentPathUrl, className, ...props}: SingleEventReviewsProps) => {
+  event, currentPathUrl, variant = "mobile", className, ...props}: SingleEventReviewsProps) => {
     const { isAuthenticated, isLoading } = useAuthStore();
+    const isDesktop = variant === "desktop";
 
     // State for infinite scroll
     const [comments, setComments] = useState<any[]>([]);
     const [numOfComments, setNumOfComments] = useState<number>(0);
-    const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -118,7 +118,6 @@ export const SingleEventReviews = ({
             }
 
             const isLast = response.data.data.isLast;
-            setHasMore(!isLast);
             hasMoreRef.current = !isLast;
 
         } catch (err: any) {
@@ -129,7 +128,7 @@ export const SingleEventReviews = ({
             setInitialLoading(false);
             loadingRef.current = false;
         }
-    }, [event.id]);
+    }, [event.id, isAuthenticated, isLoading]);
 
     useEffect(() => {
         if (!window.visualViewport || !inputRef.current) return;
@@ -162,7 +161,6 @@ export const SingleEventReviews = ({
     // Initial load
     useEffect(() => {
         setComments([]);
-        setHasMore(true);
         pageRef.current = 1;
         hasMoreRef.current = true;
         setError(null);
@@ -191,7 +189,8 @@ export const SingleEventReviews = ({
     if (initialLoading) {
         return (
             <div className={cn(
-                "w-full flex flex-col items-center justify-center min-h-[85vh]",
+                "w-full flex flex-col items-center justify-center",
+                isDesktop ? "min-h-64" : "min-h-[85vh]",
                 className,
                 event.eventTheme !== null ? "" : "bg-muted/40",
             )} {...props}>
@@ -206,7 +205,8 @@ export const SingleEventReviews = ({
     if (error && comments.length === 0) {
         return (
             <div className={cn(
-                "w-full flex flex-col items-center justify-center min-h-[85vh]",
+                "w-full flex flex-col items-center justify-center",
+                isDesktop ? "min-h-64" : "min-h-[85vh]",
                 className,
                 event.eventTheme !== null ? "" : "bg-muted/40",
             )} {...props}>
@@ -219,18 +219,19 @@ export const SingleEventReviews = ({
 
     return (
         <div className={cn(
-            "w-full min-h-[85vh] pb-20",
+            "w-full",
+            isDesktop ? "min-h-0 pb-0" : "min-h-[85vh] pb-20",
             className,
             event.eventTheme !== null ? "" : "bg-muted/40",
         )} {...props}>
 
-            <div className="w-full flex flex-col gap-4 px-4">
-                <h1 className="text-md font-semibold text-foreground pt-4">
+            <div className={cn("w-full flex flex-col gap-4", isDesktop ? "px-0" : "px-4")}>
+                <h1 className={cn("font-semibold text-foreground", isDesktop ? "text-lg" : "text-md pt-4")}>
                     Event Reviews ({numOfComments})
                 </h1>
             </div>
 
-            <div className="w-full flex flex-col gap-6 px-4 py-4">
+            <div className={cn("w-full flex flex-col gap-6 py-4", isDesktop ? "px-0" : "px-4")}>
                 {comments.map((c) => (
                     <CommentCard
                         key={c.id}
@@ -245,9 +246,14 @@ export const SingleEventReviews = ({
             {isAuthenticated &&
               <form
                 onSubmit={handleCommentSubmit}
-                className="fixed inset-x-0 z-60 border-t bg-background border-border safe-area-inset-bottom flex flex-row"
+                className={cn(
+                    "border-t bg-background border-border flex flex-row",
+                    isDesktop
+                        ? "sticky bottom-0 mt-2 rounded-b-2xl"
+                        : "fixed inset-x-0 z-60 safe-area-inset-bottom"
+                )}
                 style={{
-                    bottom: keyboardOffset,
+                    bottom: isDesktop ? undefined : keyboardOffset,
                     transition: "bottom 0.2s ease",
                 }}
               >

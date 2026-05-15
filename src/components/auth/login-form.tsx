@@ -9,13 +9,13 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuthStore } from "@/store/auth-store";
 import { useRouter } from "next/navigation";
 import { LoaderSmall } from "@/components/ui/loader";
-import { toast } from "react-toastify";
 import * as React from "react";
 import { emailRegex } from "@/lib/utils";
 
 import GoogleButton from "@/components/ui/google-button";
 import AppleButton from "@/components/ui/apple-button";
 import { showTopToast } from "@/components/toast/toast-util";
+import { getErrorMessage } from "@/lib/error-message";
 
 interface LoginFormProps extends React.ComponentProps<"form"> {
   setLoginPrincipal: (value: string) => void;
@@ -38,8 +38,6 @@ export function LoginForm({
   const [isPasswordShow, setIsPasswordShow] = useState<boolean>(false)
   const [principal, setPrincipal] = useState<string>("");
   const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
-
   const handleShowPassword = () => {
     setIsPasswordShow(!isPasswordShow)
   }
@@ -51,7 +49,6 @@ export function LoginForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
     try {
       if (emailRegex.test(principal)) {
@@ -61,9 +58,8 @@ export function LoginForm({
       }
 
       router.push(nextUrl ?? '/');
-    } catch (err: any) {
-      setError(err.response?.data?.description || 'Login failed');
-      showTopToast("error", err.response?.data?.description || 'Login failed')
+    } catch (err: unknown) {
+      showTopToast("error", getErrorMessage(err, 'Login failed'))
     }
   };
 
@@ -127,18 +123,16 @@ export function LoginForm({
               const idToken = credentialResponse.credential;
               await googleLogin(idToken!);
               router.push(nextUrl ?? '/');
-            } catch (err: any) {
-              setError(err.response?.data?.description || 'Google Auth failed');
-              showTopToast("error", err.response?.data?.description || 'Google Auth failed')
+            } catch (err: unknown) {
+              showTopToast("error", getErrorMessage(err, 'Google Auth failed'))
             }
           }} />
           <AppleButton onSuccess={async (response) => {
             try {
               await appleLogin(response);
               router.push(nextUrl ?? '/');
-            } catch (err: any) {
-              setError(err.response?.data?.description || 'Apple Auth failed');
-              showTopToast("error", err.response?.data?.description || 'Apple Auth failed')
+            } catch (err: unknown) {
+              showTopToast("error", getErrorMessage(err, 'Apple Auth failed'))
             }
           }} />
         </div>

@@ -1,25 +1,34 @@
 "use client"
 
-import {usePathname, useRouter, useSearchParams} from "next/navigation";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import {useRouter, useSearchParams} from "next/navigation";
 import {ProtectedRoute} from "@/components/auth/ProtectedRoutes";
 import {ScreenProvider} from "@/components/screen/screen-provider";
 import {ComponentProps, useCallback, useEffect, useRef, useState} from "react";
 import {cn} from "@/lib/utils";
 import {FaArrowLeft} from "react-icons/fa";
+import {ArrowLeft} from "lucide-react";
 import * as React from "react";
 import {authApi} from "@/lib/axios";
 import {showTopToast} from "@/components/toast/toast-util";
 import {Loader} from "@/components/ui/loader";
 import {RefundCard} from "@/components/refund/refund-history-card";
+import {Button} from "@/components/ui/button";
+import { DESKTOP_ROUTES, MOBILE_ROUTES } from "@/lib/routes";
 
-export const RefundHistoryPageContent = () => {
+interface RefundHistoryPageContentProps {
+    variant?: "mobile" | "desktop";
+}
+
+export const RefundHistoryPageContent = ({ variant = "mobile" }: RefundHistoryPageContentProps = {}) => {
     const searchParams = useSearchParams();
     const prev = searchParams?.get("prev") ?? null
 
     return (
         <ProtectedRoute>
             <ScreenProvider>
-                <RefundHistoryContent prev={prev} />
+                <RefundHistoryContent prev={prev} variant={variant} />
             </ScreenProvider>
         </ProtectedRoute>
     )
@@ -27,11 +36,13 @@ export const RefundHistoryPageContent = () => {
 
 interface RefundHistoryContentProps extends ComponentProps<"div"> {
     prev: string | null;
+    variant?: "mobile" | "desktop";
 }
 
 export const RefundHistoryContent = ({
-                                         prev, className, ...props
+                                         prev, variant = "mobile", className, ...props
                                      }: RefundHistoryContentProps) => {
+    const isDesktop = variant === "desktop";
     const router = useRouter();
 
     const [totalRefunds, setTotalRefunds] = useState<number>(0);
@@ -63,7 +74,7 @@ export const RefundHistoryContent = ({
                     pageNumber: currentPage,
                 };
 
-                const response = await authApi.get('/refund', params);
+                const response = await authApi.get('/refund', { params });
 
                 const newRefunds = response.data.data.data as Array<Record<string, any>>;
 
@@ -93,7 +104,7 @@ export const RefundHistoryContent = ({
     );
 
     const handleBackClick = () => {
-        router.push(prev ?? "/m/settings");
+        router.push(prev ?? (isDesktop ? DESKTOP_ROUTES.bookings : MOBILE_ROUTES.settings));
     };
 
     useEffect(() => {
@@ -129,6 +140,68 @@ export const RefundHistoryContent = ({
         observer.observe(sentinel);
         return () => observer.disconnect();
     }, [loadRefunds, error]);
+
+    if (isDesktop) {
+        return (
+            <div
+                className={cn("min-h-screen bg-background", className)}
+                {...props}
+            >
+                <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
+                    <div className="desktop-page-header-inner flex h-20 items-center gap-4">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={handleBackClick}
+                            aria-label="Back"
+                        >
+                            <ArrowLeft size={20} />
+                        </Button>
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                Account
+                            </p>
+                            <h1 className="text-lg font-black">Refund history</h1>
+                        </div>
+                    </div>
+                </header>
+
+                <div className="desktop-page-container py-10">
+                    <div className="mb-6 flex items-center justify-between">
+                        <h2 className="text-xl font-black">All refunds ({totalRefunds})</h2>
+                    </div>
+
+                    {refunds.length === 0 && !loading && !hasMore ? (
+                        <div className="rounded-3xl border border-dashed border-border bg-card p-16 text-center">
+                            <p className="text-lg font-semibold">No refund history yet</p>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                                Refunds you request will appear here.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                            {refunds.map((item) => (
+                                <RefundCard
+                                    key={item.id}
+                                    refundContent={item}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    <div ref={sentinelRef} aria-hidden className="h-1" />
+
+                    {loading && (
+                        <div className="flex justify-center py-6">
+                            <Loader className="h-8 w-8" />
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div

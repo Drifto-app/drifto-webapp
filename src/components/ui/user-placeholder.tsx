@@ -1,24 +1,24 @@
 "use client"
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
-import { MdDeleteOutline, MdVerified } from "react-icons/md";
+import { MdVerified } from "react-icons/md";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { GoDash } from "react-icons/go";
 import { useState } from "react";
 import { LoaderSmall } from "@/components/ui/loader";
-import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { SlOptionsVertical } from "react-icons/sl";
-import { FaFlag } from "react-icons/fa";
-import { IoIosInformationCircle } from "react-icons/io";
 import defaultImage from "@/assests/default.jpeg";
+import { DESKTOP_ROUTES } from "@/lib/routes";
 
 interface UserPlaceholderProps extends React.ComponentProps<"div"> {
     user: { [key: string]: any };
     prev?: string;
+    variant?: "mobile" | "desktop";
 }
 
 interface UserEventSinglePlaceholderProps extends UserPlaceholderProps {
@@ -82,7 +82,7 @@ function UserVerificationBadge({ user, isClickable = false }: { user: { [key: st
     return null;
 }
 
-function UserEventSinglePlaceholder({ user, isHost, removeClick, prev, className, ...props }: UserEventSinglePlaceholderProps) {
+function UserEventSinglePlaceholder({ user, isHost, removeClick, prev, variant = "mobile", className, ...props }: UserEventSinglePlaceholderProps) {
     const router = useRouter();
 
     const [loading, setLoading] = useState<boolean>(false);
@@ -96,7 +96,7 @@ function UserEventSinglePlaceholder({ user, isHost, removeClick, prev, className
 
         try {
             await removeClick!(username);
-        } catch (error: any) {
+        } catch {
 
         } finally {
             setLoading(false);
@@ -104,7 +104,12 @@ function UserEventSinglePlaceholder({ user, isHost, removeClick, prev, className
     }
 
     const handleUserClick = () => {
-        router.push(`/m/user/${user.id}?prev=${encodeURIComponent(prev || "/")}`);
+        const userId = user.id ?? user.userId;
+        const path = variant === "desktop"
+            ? DESKTOP_ROUTES.userDetail(userId)
+            : `/m/user/${userId}`;
+
+        router.push(`${path}?prev=${encodeURIComponent(prev || "/")}`);
     }
 
     if (removeClick) {
@@ -171,8 +176,12 @@ function UserEventSinglePlaceholder({ user, isHost, removeClick, prev, className
     )
 }
 
-function UserSinglePlaceholder({ user, prev, className, ...props }: UserPlaceholderProps) {
+function UserSinglePlaceholder({ user, prev, variant = "mobile", className, ...props }: UserPlaceholderProps) {
     const router = useRouter();
+    const userId = user.id ?? user.userId;
+    const path = variant === "desktop"
+        ? DESKTOP_ROUTES.userDetail(userId)
+        : `/m/user/${userId}`;
 
     return (
         <div
@@ -181,7 +190,7 @@ function UserSinglePlaceholder({ user, prev, className, ...props }: UserPlacehol
                 className
             )}
             {...props}
-            onClick={() => router.push(`/m/user/${user.id}?prev=${encodeURIComponent(prev || "/")}`)}
+            onClick={() => router.push(`${path}?prev=${encodeURIComponent(prev || "/")}`)}
         >
             <div className="w-7 h-7 flex flex-row items-center">
                 <AspectRatio ratio={1}>

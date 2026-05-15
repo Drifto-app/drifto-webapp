@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import * as React from "react";
@@ -9,7 +10,6 @@ import { useLoadScript } from "@react-google-maps/api";
 import {Loader} from "@/components/ui/loader";
 import {renderToStaticMarkup} from "react-dom/server";
 import {RiMapPin2Fill} from "react-icons/ri";
-import {CiLock} from "react-icons/ci";
 import {MdLockOutline} from "react-icons/md";
 
 // Move libraries array outside component to prevent reloading
@@ -22,10 +22,11 @@ interface GoogleMapComponentProps {
     onToggleFullscreen?: () => void;
     eventTitle?: string;
     eventAddress?: string;
+    minHeight?: string;
 }
 
 const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
-    center, markerPosition, isFullscreen = false, onToggleFullscreen, eventTitle, eventAddress
+    center, markerPosition, isFullscreen = false, onToggleFullscreen, eventTitle, eventAddress, minHeight
 }) => {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<google.maps.Map | null>(null);
@@ -144,7 +145,7 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
                     isFullscreen ? 'rounded-none' : 'rounded-lg'
                 }`}
                 style={{
-                    minHeight: isFullscreen ? '85vh' : '50vh',
+                    minHeight: isFullscreen ? '85vh' : minHeight ?? '50vh',
                 }}
             />
         </div>
@@ -154,12 +155,14 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
 interface SingleEventMapProps extends React.ComponentProps<"div"> {
     event: { [key: string]: any };
     googleMapsApiKey: string;
+    variant?: "mobile" | "desktop";
 }
 
 export const SingleEventMap = ({
-   event, className, googleMapsApiKey, ...props
+   event, className, googleMapsApiKey, variant = "mobile", ...props
 }: SingleEventMapProps) => {
     const [isMapFullscreen, setIsMapFullscreen] = useState(false);
+    const isDesktop = variant === "desktop";
 
     // Detect mobile device
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -212,7 +215,8 @@ export const SingleEventMap = ({
         return (
             <div
                 className={cn(
-                    "w-full min-h-[85vh] flex items-start",
+                    "w-full flex items-start",
+                    isDesktop ? "min-h-32" : "min-h-[85vh]",
                     className,
                     event.eventTheme !== null ? "" : "bg-muted/40",
                 )}
@@ -233,7 +237,8 @@ export const SingleEventMap = ({
         return (
             <div
                 className={cn(
-                    "w-full min-h-[85vh] flex items-center justify-center",
+                    "w-full flex items-center justify-center",
+                    isDesktop ? "min-h-64" : "min-h-[85vh]",
                     className,
                     event.eventTheme !== null ? "" : "bg-muted/40",
                 )}
@@ -253,7 +258,8 @@ export const SingleEventMap = ({
         return (
             <div
                 className={cn(
-                    "w-full min-h-[85vh] flex items-center justify-center",
+                    "w-full flex items-center justify-center",
+                    isDesktop ? "min-h-64" : "min-h-[85vh]",
                     className,
                     event.eventTheme !== null ? "" : "bg-muted/40",
                 )}
@@ -309,13 +315,14 @@ export const SingleEventMap = ({
     return (
         <div
             className={cn(
-                "w-full min-h-[87vh] relative flex justify-center",
+                "w-full relative flex justify-center",
+                isDesktop ? "min-h-0" : "min-h-[87vh]",
                 className,
                 event.eventTheme !== null ? "" : "bg-muted/40",
             )}
             {...props}
         >
-            <div className="w-full px-4 pt-4">
+            <div className={cn("w-full", isDesktop ? "px-0 pt-0" : "px-4 pt-4")}>
                 <GoogleMapComponent
                     center={mapCenter}
                     markerPosition={markerPosition}
@@ -323,6 +330,7 @@ export const SingleEventMap = ({
                     onToggleFullscreen={handleToggleFullscreen}
                     eventTitle={eventTitle}
                     eventAddress={eventAddress}
+                    minHeight={isDesktop ? "360px" : undefined}
                 />
             </div>
         </div>

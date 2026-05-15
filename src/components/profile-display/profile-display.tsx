@@ -13,17 +13,19 @@ export type TabType = "profile" | "favourites";
 
 interface ProfileDisplayProps {
     handleScreenChange: (value: string) => void;
+    variant?: "mobile" | "desktop";
 }
 
-export type ActiveScreenType = "profile" | "subscribers" | "posts" | "orders"
+export type ActiveScreenType = "profile" | "subscribers" | "posts" | "orders" | "events"
 
 const titleText: { value: string, screen: ActiveScreenType }[] = [
     { screen: "subscribers", value: "subscribers" },
     { screen: "posts", value: "Posts" },
     { screen: "orders", value: "Orders" },
+    { screen: "events", value: "Experiences" },
 ]
 
-export const ProfileDisplay = ({ handleScreenChange }: ProfileDisplayProps) => {
+export const ProfileDisplay = ({ handleScreenChange, variant = "mobile" }: ProfileDisplayProps) => {
 
 
     const [currentTab, setCurrentTab] = useState<TabType>("profile")
@@ -31,18 +33,68 @@ export const ProfileDisplay = ({ handleScreenChange }: ProfileDisplayProps) => {
     const [activeScreen, setActiveScreen] = useState<ActiveScreenType>("profile");
 
     const title = titleText.find((item) => item.screen === activeScreen)?.value
+    const isDesktop = variant === "desktop";
 
     const render = () => {
         switch (currentTab) {
             case "favourites":
                 return (
-                    <UserEventFavourites handleScreenChange={handleScreenChange}/>
+                    <UserEventFavourites handleScreenChange={handleScreenChange} variant={variant} />
                 )
             default:
                 return (
-                    <UserProfile handleScreenChange={handleScreenChange} activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
+                    <UserProfile
+                        handleScreenChange={handleScreenChange}
+                        activeScreen={activeScreen}
+                        setActiveScreen={setActiveScreen}
+                        variant={variant}
+                    />
                 )
         }
+    }
+
+    if (isDesktop) {
+        return (
+            <div className="min-h-full w-full bg-background text-foreground">
+                <div className="desktop-page-container py-6">
+                    {activeScreen === "profile" ? (
+                        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+                            <div>
+                                <p className="text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
+                                    Account
+                                </p>
+                                <h1 className="mt-1 text-4xl font-black tracking-tight">Profile</h1>
+                                <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+                                    Manage your public presence, posts, subscribers, favourites, and hosting activity.
+                                </p>
+                            </div>
+                            <div className="w-full max-w-sm">
+                                <ProfileTabs active={currentTab} onClick={setCurrentTab} variant="desktop" />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="mb-6 flex items-center gap-4">
+                            <button
+                                type="button"
+                                onClick={() => setActiveScreen("profile")}
+                                className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card transition hover:bg-accent"
+                                aria-label="Back to profile"
+                            >
+                                <FaArrowLeft size={14} />
+                            </button>
+                            <div>
+                                <p className="text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
+                                    Profile
+                                </p>
+                                <h1 className="text-3xl font-black capitalize tracking-tight">{title}</h1>
+                            </div>
+                        </div>
+                    )}
+
+                    {render()}
+                </div>
+            </div>
+        );
     }
 
     return (

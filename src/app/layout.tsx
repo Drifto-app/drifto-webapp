@@ -1,4 +1,3 @@
-import { Plus_Jakarta_Sans, Poppins } from 'next/font/google';
 import "./globals.css";
 import 'react-toastify/dist/ReactToastify.css';
 import {ClientProviders} from "@/components/client-providers";
@@ -14,12 +13,6 @@ import {SpeedInsights} from "@vercel/speed-insights/next";
 //   variable: "--font-geist-mono",
 //   subsets: ["latin"],
 // });
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-plus-jakarta-sans",
-});
 
 export default function RootLayout({
   children,
@@ -39,7 +32,7 @@ export default function RootLayout({
               <meta property="og:type" content="website" />
               <meta property="og:image" content="/logo-white.svg" />
           </head>
-          <body className={`${plusJakartaSans.variable} font-sans`}>
+          <body className="font-sans">
           <ClientProviders>
               <main>{children}</main>
               <Analytics />

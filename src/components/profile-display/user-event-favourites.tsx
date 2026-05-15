@@ -1,5 +1,7 @@
 "use client"
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {ComponentProps, useCallback, useEffect, useRef, useState} from "react";
 import {cn} from "@/lib/utils";
 import {authApi} from "@/lib/axios";
@@ -7,22 +9,22 @@ import {showTopToast} from "@/components/toast/toast-util";
 import {Loader} from "@/components/ui/loader";
 import * as React from "react";
 import {EventFavouriteCard} from "@/components/profile-display/event-favourite-card";
-import { PiFireSimpleBold } from 'react-icons/pi';
-import { CiHeart } from 'react-icons/ci';
 import { FaRegHeart } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { EventCardSkeleton } from "@/components/ui/page-skeletons";
 
 interface UserEventFavouritesProps extends ComponentProps<"div"> {
     handleScreenChange: (value: string) => void;
+    variant?: "mobile" | "desktop";
 }
 
 export const UserEventFavourites = ({
-    handleScreenChange, className, ...props
+    handleScreenChange, variant = "mobile", className, ...props
 }: UserEventFavouritesProps) => {
+    const isDesktop = variant === "desktop";
 
     const [events, setEvents] = useState<Array<{[key: string]: any}>>([]);
-    const [hasMore, setHasMore] = useState(true);
+    const [, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -102,15 +104,72 @@ export const UserEventFavourites = ({
                 )  loadEvents();
             },
             {
-                root: scrollRootRef.current ?? null,
-                rootMargin: "80px",
+                root: isDesktop ? null : scrollRootRef.current ?? null,
+                rootMargin: isDesktop ? "160px" : "80px",
                 threshold: 0,
             }
         );
 
         observer.observe(sentinel);
         return () => observer.disconnect();
-    }, [loadEvents, error]);
+    }, [loadEvents, error, isDesktop]);
+
+    if (isDesktop) {
+        return (
+            <div
+                className={cn("w-full space-y-5", className)}
+                {...props}
+            >
+                {loading && events.length === 0 ? (
+                    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                        {Array.from({ length: 6 }).map((_, index) => (
+                            <EventCardSkeleton key={index} />
+                        ))}
+                    </div>
+                ) : error && events.length === 0 ? (
+                    <div className="rounded-2xl border border-border bg-card p-10 text-center">
+                        <p className="font-black">Unable to load favourites</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{error}</p>
+                    </div>
+                ) : events.length === 0 ? (
+                    <div className="flex min-h-80 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+                        <FaRegHeart size={38} className="text-blue-800" />
+                        <p className="mt-4 font-black">No liked events yet</p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            Explore Drifto for experiences worth saving.
+                        </p>
+                        <Button
+                            onClick={() => handleScreenChange("events")}
+                            className="mt-5 rounded-full"
+                        >
+                            Find events
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                        {events.map((event) => (
+                            <EventFavouriteCard
+                                eventContent={event}
+                                key={event.eventId}
+                                variant="desktop"
+                                onUnReact={(eventId: string) => {
+                                    setEvents((items) => items.filter(i => i.eventId !== eventId));
+                                }}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                <div ref={sentinelRef} aria-hidden className="h-8" />
+
+                {loading && events.length > 0 && (
+                    <div className="flex justify-center py-6">
+                        <Loader className="h-8 w-8"/>
+                    </div>
+                )}
+            </div>
+        )
+    }
 
 
     return (
@@ -133,6 +192,7 @@ export const UserEventFavourites = ({
                         <EventFavouriteCard
                             eventContent={event}
                             key={event.eventId}
+                            variant={variant}
                             onUnReact={(eventId: string) => {
                                 setEvents((items) => items.filter(i => i.eventId !== eventId));
                             }}

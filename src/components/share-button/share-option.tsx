@@ -8,6 +8,7 @@ import { FaCopy, FaWhatsapp, FaLinkedin, FaTelegram } from "react-icons/fa";
 import { canUseNativeShare, shareViaWeb, copyToClipboard, openSocialShare } from "@/lib/share-utils";
 import {FaXTwitter} from "react-icons/fa6";
 import {showTopToast} from "@/components/toast/toast-util";
+import {cn} from "@/lib/utils";
 
 interface ShareDialogProps {
     isOpen: boolean;
@@ -100,63 +101,62 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({
         <Dialog
             open={isOpen}
             onClose={onClose}
-            className="fixed inset-0 z-99 flex items-center sm:items-center justify-center"
+            className="fixed inset-0 z-99 flex items-end justify-center px-0 sm:items-center sm:px-4"
         >
-            {/* Backdrop */}
-            <div className="fixed inset-0 bg-black opacity-70" onClick={onClose} />
+            <div className="fixed inset-0 bg-black/65 backdrop-blur-[2px]" onClick={onClose} />
 
-            {/* Panel */}
             <Dialog.Panel
-                className="relative bg-background w-full max-w-md mx-4 mb-0 sm:mb-4
-               rounded-t-2xl sm:rounded-2xl shadow-xl
-               max-h-[80vh] flex flex-col"
+                className="relative flex max-h-[86vh] w-full flex-col overflow-hidden rounded-t-2xl border border-border bg-background shadow-2xl sm:mb-4 sm:max-w-xl sm:rounded-2xl"
             >
-                {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-border">
+                <div className="flex items-center justify-between border-b border-border p-5">
                     <div className="flex items-center gap-3">
-                        <IoShareSocialOutline size={24} className="text-muted-foreground" />
-                        <Dialog.Title className="text-lg font-semibold text-gray-900">Share Event</Dialog.Title>
+                        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-800/10 text-blue-800 dark:bg-blue-400/10 dark:text-blue-300">
+                            <IoShareSocialOutline size={22} />
+                        </span>
+                        <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                                Share
+                            </p>
+                            <Dialog.Title className="text-xl font-black text-foreground">Share event</Dialog.Title>
+                        </div>
                     </div>
-                    <button onClick={onClose} className="p-1 rounded-full hover:bg-muted transition-colors">
-                        <MdCancel size={24} className="text-gray-500" />
+                    <button onClick={onClose} className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground">
+                        <MdCancel size={24} />
                     </button>
                 </div>
 
-                {/* Scrollable content */}
-                <div className="flex-1 min-h-0 overflow-y-auto">
-                    {/* Event Preview */}
-                    <div className="p-4 border-b border-gray-100">
-                        <h3 className="font-semibold text-gray-900 text-sm mb-1 capitalize">{title}</h3>
-                        <p className="text-xs text-gray-500 break-all">{url}</p>
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                    <div className="border-b border-border bg-card/60 p-5">
+                        <h3 className="mb-1 line-clamp-2 text-sm font-black capitalize text-foreground">{title}</h3>
+                        <p className="break-all text-xs leading-5 text-muted-foreground">{url}</p>
                     </div>
 
-                    {/* Share Options */}
-                    <div className="p-4 space-y-3">
+                    <div className="grid gap-3 p-5 sm:grid-cols-2">
                         {isNativeShareSupported && (
                             <button
                                 onClick={handleNativeShare}
-                                className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-accent/40 transition-colors"
+                                className="flex w-full items-center gap-4 rounded-xl border border-border bg-card p-3 text-left transition hover:bg-accent"
                             >
-                                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-800">
                                     <IoShareSocialOutline size={24} className="text-white" />
                                 </div>
-                                <div className="text-left">
-                                    <p className="font-medium text-gray-900">Quick Share</p>
-                                    <p className="text-sm text-gray-500">Share via system apps</p>
+                                <div>
+                                    <p className="font-bold text-foreground">Quick share</p>
+                                    <p className="text-sm text-muted-foreground">System apps</p>
                                 </div>
                             </button>
                         )}
 
                         <button
                             onClick={handleCopyLink}
-                            className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-accent/40 transition-colors"
+                            className="flex w-full items-center gap-4 rounded-xl border border-border bg-card p-3 text-left transition hover:bg-accent"
                         >
-                            <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-neutral-700">
                                 <FaCopy size={20} className="text-white" />
                             </div>
-                            <div className="text-left">
-                                <p className="font-medium text-gray-900">Copy Link</p>
-                                <p className="text-sm text-gray-500">Copy to clipboard</p>
+                            <div>
+                                <p className="font-bold text-foreground">Copy link</p>
+                                <p className="text-sm text-muted-foreground">Clipboard</p>
                             </div>
                         </button>
 
@@ -164,23 +164,22 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({
                             <button
                                 key={option.name}
                                 onClick={option.onClick}
-                                className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-accent/40 transition-colors"
+                                className="flex w-full items-center gap-4 rounded-xl border border-border bg-card p-3 text-left transition hover:bg-accent"
                             >
-                                <div className={`w-12 h-12 ${option.color} rounded-full flex items-center justify-center`}>
+                                <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-xl", option.color)}>
                                     <div className="text-white">{option.icon}</div>
                                 </div>
-                                <div className="text-left">
-                                    <p className="font-medium text-gray-900">{option.name}</p>
-                                    <p className="text-sm text-gray-500">Share on {option.name}</p>
+                                <div>
+                                    <p className="font-bold text-foreground">{option.name}</p>
+                                    <p className="text-sm text-muted-foreground">Share on {option.name}</p>
                                 </div>
                             </button>
                         ))}
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div className="p-4 text-center border-t border-gray-100">
-                    <p className="text-xs text-gray-400">Share this event with friends and family</p>
+                <div className="border-t border-border p-4 text-center">
+                    <p className="text-xs text-muted-foreground">Share this event with friends and family</p>
                 </div>
             </Dialog.Panel>
         </Dialog>

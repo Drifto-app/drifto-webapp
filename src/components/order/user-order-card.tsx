@@ -8,16 +8,19 @@ import { authApi } from "@/lib/axios";
 import { showTopToast } from "@/components/toast/toast-util";
 import { LoaderSmall } from "@/components/ui/loader";
 import { useRouter } from "next/navigation";
+import { DESKTOP_ROUTES, MOBILE_ROUTES, withPrev } from "@/lib/routes";
 
 interface UserOrderCardProps extends ComponentProps<"div"> {
     orderContent: { [key: string]: any }
     onCancel?: (orderId: string) => void;
+    variant?: "mobile" | "desktop";
 }
 
 export const UserOrderCard = ({
-    orderContent, onCancel, className, ...props
+    orderContent, onCancel, variant = "mobile", className, ...props
 }: UserOrderCardProps) => {
     const router = useRouter();
+    const isDesktop = variant === "desktop";
 
     const eventDetails = orderContent.eventPlaceHolder
 
@@ -30,7 +33,7 @@ export const UserOrderCard = ({
             await authApi.post(`/order/cancel/${orderContent.orderId}`)
             onCancel?.(orderContent.orderId);
             showTopToast("success", "Order canceled successfully.");
-        } catch (error: any) {
+        } catch {
             showTopToast("error", "Error cancelling order");
         } finally {
             setIsCancelLoading(false);
@@ -47,10 +50,23 @@ export const UserOrderCard = ({
             {...props}
         >
             <div
-                className="relative w-full max-h-[30vh] overflow-hidden"
+                className="relative w-full max-h-[30vh] overflow-hidden cursor-pointer"
                 onClick={() => {
                     if (orderContent.orderStatus === "PENDING") {
-                        router.push(`/m/payment/${orderContent.orderId}?prev=${encodeURIComponent(`/?screen=profile`)}`);
+                        const base = isDesktop
+                            ? DESKTOP_ROUTES.payment(orderContent.orderId)
+                            : MOBILE_ROUTES.payment(orderContent.orderId);
+                        const prev = isDesktop ? DESKTOP_ROUTES.bookings : `/?screen=profile`;
+                        router.push(withPrev(base, prev));
+                    } else if (orderContent.orderStatus === "COMPLETED") {
+                        const eventId = orderContent.eventPlaceHolder?.id;
+                        if (!eventId) return;
+
+                        router.push(
+                            isDesktop
+                                ? DESKTOP_ROUTES.bookingDetail(eventId)
+                                : MOBILE_ROUTES.bookingDetail(eventId)
+                        );
                     }
                 }}
             >

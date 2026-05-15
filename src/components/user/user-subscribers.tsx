@@ -1,27 +1,31 @@
 "use client"
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React, {ComponentProps, useCallback, useEffect, useRef, useState} from "react";
 import {cn} from "@/lib/utils";
 import {authApi} from "@/lib/axios";
 import {showTopToast} from "@/components/toast/toast-util";
 import {ChevronDown} from "lucide-react";
 import {Loader} from "@/components/ui/loader";
-import {EventFavouriteCard} from "@/components/profile-display/event-favourite-card";
 import {UserSubscriberCard} from "@/components/user/user-subscriber-card";
 import { UserListSkeleton } from "@/components/ui/page-skeletons";
 
-interface UserSubscribersProps extends ComponentProps<"div"> {}
+interface UserSubscribersProps extends ComponentProps<"div"> {
+    variant?: "mobile" | "desktop";
+}
 
 
 export const UserSubscribers = ({
-    className, ...props
+    variant = "mobile", className, ...props
 }: UserSubscribersProps) => {
+    const isDesktop = variant === "desktop";
 
     const [isSubscribers, setIsSubscribers] = useState<boolean>(true);
     const [totalUsers, setTotalUsers] = useState<number>(0)
 
     const [users, setUsers] = useState<Array<{[key: string]: any}>>([]);
-    const [hasMore, setHasMore] = useState(true);
+    const [, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -101,15 +105,82 @@ export const UserSubscribers = ({
                 )  loadUsers();
             },
             {
-                root: scrollRootRef.current ?? null,
-                rootMargin: "80px",
+                root: isDesktop ? null : scrollRootRef.current ?? null,
+                rootMargin: isDesktop ? "160px" : "80px",
                 threshold: 0,
             }
         );
 
         observer.observe(sentinel);
         return () => observer.disconnect();
-    }, [loadUsers, error, isSubscribers]);
+    }, [loadUsers, error, isSubscribers, isDesktop]);
+
+    if (isDesktop) {
+        return (
+            <div
+                className={cn("w-full space-y-5", className)}
+                {...props}
+            >
+                <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card px-5 py-4 shadow-sm">
+                    <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                            Network
+                        </p>
+                        <h2 className="mt-1 text-2xl font-black">
+                            {isSubscribers ? `Subscribers (${totalUsers})` : `Subscribed (${totalUsers})`}
+                        </h2>
+                    </div>
+                    <FilterDropdown
+                        selectedFilter={isSubscribers}
+                        onFilterChange={setIsSubscribers}
+                        variant="desktop"
+                    />
+                </div>
+
+                {loading && users.length === 0 ? (
+                    <UserListSkeleton count={8} />
+                ) : error && users.length === 0 ? (
+                    <div className="rounded-2xl border border-border bg-card p-10 text-center">
+                        <p className="font-black">Unable to load people</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{error}</p>
+                    </div>
+                ) : users.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+                        <p className="font-black">No people here yet</p>
+                        <p className="mt-1 text-sm text-muted-foreground">Subscribers and subscriptions will appear here.</p>
+                    </div>
+                ) : (
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        {users.map((user) => (
+                            <UserSubscriberCard
+                                key={user.userId}
+                                user={user}
+                                variant="desktop"
+                                onUserChange={(user: {[key: string]: any}) => {
+                                    setUsers(
+                                        (items) => items.map((item) => {
+                                            if(item.userId === user.userId) {
+                                                return user
+                                            }
+                                            return item;
+                                        })
+                                    );
+                                }}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                <div ref={sentinelRef} aria-hidden className="h-8" />
+
+                {loading && users.length > 0 && (
+                    <div className="flex justify-center py-6">
+                        <Loader className="h-8 w-8"/>
+                    </div>
+                )}
+            </div>
+        )
+    }
 
 
     return (
@@ -142,6 +213,7 @@ export const UserSubscribers = ({
                             <UserSubscriberCard
                                 key={user.userId}
                                 user={user}
+                                variant={variant}
                                 onUserChange={(user: {[key: string]: any}) => {
                                     setUsers(
                                         (items) => items.map((item) => {
@@ -177,11 +249,13 @@ const FILTER_OPTIONS = [
 interface FilterDropdownProps {
     selectedFilter: boolean;
     onFilterChange: (filter: boolean) => void;
+    variant?: "mobile" | "desktop";
 }
 
 const FilterDropdown = ({
                             selectedFilter,
                             onFilterChange,
+                            variant = "mobile",
                         }: FilterDropdownProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -206,10 +280,13 @@ const FilterDropdown = ({
 
     return (
         <div className="flex justify-between items-baseline">
-            <div className="relative mb-4" ref={dropdownRef}>
+            <div className={cn("relative", variant === "mobile" && "mb-4")} ref={dropdownRef}>
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center justify-between w-36 py-2 text-left bg-background rounded-lg border-none outline-none"
+                    className={cn(
+                        "flex items-center justify-between w-36 py-2 text-left bg-background rounded-lg border-none outline-none",
+                        variant === "desktop" && "border border-border px-3"
+                    )}
                 >
                     <span className="text-sm font-medium text-muted-foreground">
                         {selectedOption?.label || "Select filter"}

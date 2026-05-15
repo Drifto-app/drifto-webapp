@@ -13,17 +13,20 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children, redirectTo = '/login' }: ProtectedRouteProps) {
     const searchParams = useSearchParams();
     const pathname = usePathname();
+    const queryString = searchParams?.toString();
 
     const { isAuthenticated, isLoading, hasTriedRefresh } = useAuthStore();
     const router = useRouter();
 
     useEffect(() => {
         if (hasTriedRefresh && !isLoading && !isAuthenticated) {
-            const returnUrl = encodeURIComponent(`${pathname}?${searchParams}`);
+            const safePathname = pathname ?? '/';
+            const currentPath = queryString ? `${safePathname}?${queryString}` : safePathname;
+            const returnUrl = encodeURIComponent(currentPath);
 
             router.replace(`${redirectTo}?next=${returnUrl}`);
         }
-    }, [isAuthenticated, isLoading, router, redirectTo, hasTriedRefresh]);
+    }, [isAuthenticated, isLoading, router, redirectTo, hasTriedRefresh, pathname, queryString]);
 
     if (isLoading) {
         return (

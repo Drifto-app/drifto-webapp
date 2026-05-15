@@ -4,12 +4,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoaderSmall } from "@/components/ui/loader";
-import { toast } from "react-toastify";
 import { api } from "@/lib/axios";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { useEffect, useRef, useState } from "react";
-import { GoogleLogin } from "@react-oauth/google";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/store/auth-store";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -18,7 +16,7 @@ import { Autocomplete, useLoadScript } from "@react-google-maps/api";
 import GoogleButton from "@/components/ui/google-button";
 import AppleButton from "@/components/ui/apple-button";
 import { showTopToast } from "@/components/toast/toast-util";
-import { FaArrowLeftLong } from 'react-icons/fa6';
+import { getErrorMessage } from "@/lib/error-message";
 
 interface SignUpFormProps extends React.ComponentProps<"form"> {
     setIsSignUp: (value: boolean) => void;
@@ -71,26 +69,6 @@ export const SignUpForm = ({
     const showPasswordRequirementsMessage = password && !isPasswordValid;
 
     useEffect(() => {
-        if (!emailOtp || isResendVisible) return;
-
-        const timer = setTimeout(() => {
-            setIsResendVisible(true);
-        }, delay);
-        return () => clearTimeout(timer);
-
-    }, [emailOtp, isResendVisible, delay]);
-
-    useEffect(() => {
-        if (!emailOtp) return;
-
-        setIsResendVisible(false)
-
-        if (otpValue.length === 6) {
-            submitOtp();
-        }
-    }, [otpValue, emailOtp]);
-
-    useEffect(() => {
         setUsernameValid(null);
         setUsernameError("");
         if (usernameDebounce.current) clearTimeout(usernameDebounce.current);
@@ -120,7 +98,7 @@ export const SignUpForm = ({
                     setUsernameValid(false);
                     setUsernameError("Username is not available");
                 }
-            } catch (err: any) {
+            } catch {
                 setCheckingUsername(false);
                 setUsernameValid(false);
                 setUsernameError("Unable to validate username");
@@ -131,13 +109,6 @@ export const SignUpForm = ({
             if (usernameDebounce.current) clearTimeout(usernameDebounce.current);
         };
     }, [username]);
-
-    if (loadError) {
-        return <p>Failed to load maps script</p>;
-    }
-    if (!isLoaded) {
-        return <LoaderSmall className="absolute right-2 top-2" />
-    }
 
     const autocompleteOptions = {
         types: ['(cities)'],
@@ -164,14 +135,14 @@ export const SignUpForm = ({
         setIsResendVisible(false);
 
         try {
-            const response = await api.post("/auth/register/email", {
+            await api.post("/auth/register/email", {
                 email,
             })
 
             setLoading(false);
-        } catch (err: any) {
+        } catch (err: unknown) {
             setLoading(false);
-            showTopToast("error", err.response?.data?.description || 'Email Request Failed');
+            showTopToast("error", getErrorMessage(err, 'Email Request Failed'));
         }
     }
 
@@ -184,23 +155,23 @@ export const SignUpForm = ({
         setLoading(true);
 
         try {
-            const response = await api.post("/auth/register/email", {
+            await api.post("/auth/register/email", {
                 email,
             })
 
             setLoading(false);
             setEmailOtp(true);
-        } catch (err: any) {
+        } catch (err: unknown) {
             setLoading(false);
-            showTopToast("error", err.response?.data?.description || 'Email Request Failed');
+            showTopToast("error", getErrorMessage(err, 'Email Request Failed'));
         }
     }
 
-    const submitOtp = async () => {
+    const submitOtp = useCallback(async () => {
         setLoading(true);
 
         try {
-            const response = await api.post("/auth/verify/email", {
+            await api.post("/auth/verify/email", {
                 email, token: otpValue,
             })
 
@@ -208,12 +179,32 @@ export const SignUpForm = ({
             setEmailOtp(false);
             setOtpValue("");
             setIsRegister(true)
-        } catch (err: any) {
+        } catch (err: unknown) {
             setLoading(false);
-            showTopToast("error", err.response?.data?.description || 'Email Request Failed');
+            showTopToast("error", getErrorMessage(err, 'Email Request Failed'));
             setOtpValue("");
         }
-    }
+    }, [email, otpValue])
+
+    useEffect(() => {
+        if (!emailOtp || isResendVisible) return;
+
+        const timer = setTimeout(() => {
+            setIsResendVisible(true);
+        }, delay);
+        return () => clearTimeout(timer);
+
+    }, [emailOtp, isResendVisible, delay]);
+
+    useEffect(() => {
+        if (!emailOtp) return;
+
+        setIsResendVisible(false)
+
+        if (otpValue.length === 6) {
+            submitOtp();
+        }
+    }, [otpValue, emailOtp, submitOtp]);
 
     const handleOtpVerify = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -282,11 +273,18 @@ export const SignUpForm = ({
             setUser(data.data.user)
 
             router.push(nextUrl ?? "/")
-        } catch (err: any) {
+        } catch (err: unknown) {
             setLoading(false);
-            showTopToast("error", err.response?.data?.description || 'Email Request Failed');
+            showTopToast("error", getErrorMessage(err, 'Email Request Failed'));
             setOtpValue("");
         }
+    }
+
+    if (loadError) {
+        return <p>Failed to load maps script</p>;
+    }
+    if (!isLoaded) {
+        return <LoaderSmall className="absolute right-2 top-2" />
     }
 
     if (emailOtp) {
@@ -539,17 +537,17 @@ export const SignUpForm = ({
                         const idToken = credentialResponse.credential;
                         await googleLogin(idToken!);
 
-                        router.push("/");
-                    } catch (err: any) {
-                        showTopToast("error", err.response?.data?.description || 'Google Auth failed');
+                        router.push(nextUrl ?? "/");
+                    } catch (err: unknown) {
+                        showTopToast("error", getErrorMessage(err, 'Google Auth failed'));
                     }
                 }} />
                 <AppleButton onSuccess={async (response) => {
                     try {
                         await appleLogin(response);
-                        router.push("/");
-                    } catch (err: any) {
-                        showTopToast("error", err.response?.data?.description || 'Apple Auth failed');
+                        router.push(nextUrl ?? "/");
+                    } catch (err: unknown) {
+                        showTopToast("error", getErrorMessage(err, 'Apple Auth failed'));
                     }
                 }} />
             </div>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useRef, ComponentProps } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import Image from "next/image";
 import PageHeader from "../page-header/page-header";
 import { Tabs } from "./tabs";
@@ -12,11 +12,12 @@ import { AvatarImage, Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { showTopToast } from "@/components/toast/toast-util";
 import defaultImage from "@/assests/default.jpeg";
-import { FaRegHeart } from 'react-icons/fa';
 import { BiCalendarAlt } from 'react-icons/bi';
 import { PiFireSimpleBold } from 'react-icons/pi';
 import { AddToCalendar } from "@/components/share-button/add-to-calendar";
 import { BookingCardSkeleton, EventCardSkeleton } from "@/components/ui/page-skeletons";
+import { DESKTOP_ROUTES, MOBILE_ROUTES, withPrev } from "@/lib/routes";
+import { cn } from "@/lib/utils";
 
 // Types
 interface BookingItem {
@@ -35,7 +36,10 @@ interface EventItem {
   description: string;
   titleImage: string;
   title: string;
-  coHosts: any[];
+  coHosts: Array<{
+    profileImageUrl?: string;
+    username?: string;
+  }>;
   startTime: string | Date;
 }
 
@@ -121,14 +125,17 @@ const formatDateRange = (startTime: string, endTime: string): string => {
 interface FilterDropdownProps {
   selectedFilter: UserPlanType;
   onFilterChange: (filter: UserPlanType) => void;
+  variant?: "mobile" | "desktop";
 }
 
 function FilterDropdown({
   selectedFilter,
   onFilterChange,
+  variant = "mobile",
 }: FilterDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const isDesktop = variant === "desktop";
 
   const selectedOption = FILTER_OPTIONS.find(
     (option) => option.value === selectedFilter
@@ -149,12 +156,15 @@ function FilterDropdown({
   }, []);
 
   return (
-    <div className="flex justify-between items-baseline ">
-      <p className="text-sm font-medium">Display Plans by</p>
+    <div className={cn("flex items-baseline", isDesktop ? "justify-end gap-3" : "justify-between")}>
+      <p className="text-sm font-medium">{isDesktop ? "Display by" : "Display Plans by"}</p>
       <div className="relative mb-4" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-between w-36 py-2 text-left bg-background rounded-lg border-none outline-none"
+          className={cn(
+            "flex items-center justify-between w-36 py-2 text-left bg-background rounded-lg border-none outline-none",
+            isDesktop && "rounded-full border border-border px-4"
+          )}
         >
           <span className="text-xs font-medium text-muted-foreground">
             {selectedOption?.label || "Select filter"}
@@ -195,28 +205,41 @@ interface BookingCardProps {
   booking: BookingItem;
   isLast?: boolean;
   lastElementRef?: (node: HTMLDivElement) => void;
+  variant?: "mobile" | "desktop";
 }
 
-function BookingCard({ booking, isLast, lastElementRef }: BookingCardProps) {
+function BookingCard({ booking, isLast, lastElementRef, variant = "mobile" }: BookingCardProps) {
   const dateRange = formatDateRange(booking.startTime, booking.stopTime);
   const router = useRouter();
+  const isDesktop = variant === "desktop";
 
   return (
     <div
-      className="w-full flex flex-col"
+      className={cn("w-full flex flex-col", isDesktop && "group cursor-pointer")}
       onClick={() => {
-        router.push(`/m/bookings/${booking.eventId}`);
+        router.push(
+          isDesktop
+            ? DESKTOP_ROUTES.bookingDetail(booking.eventId)
+            : MOBILE_ROUTES.bookingDetail(booking.eventId)
+        );
       }}
       ref={isLast ? lastElementRef : null}
     >
-      <article className=" shadow-xl flex flex-col rounded-lg overflow-hidden">
+      <article
+        className={cn(
+          "flex flex-col overflow-hidden bg-card",
+          isDesktop
+            ? "rounded-2xl border border-border shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            : "rounded-lg shadow-xl"
+        )}
+      >
         <div className="relative">
           <Image
             src={booking.titleImage}
             alt={booking.title}
             width={800}
             height={200}
-            className="w-full h-48 object-cover"
+            className={cn("w-full object-cover", isDesktop ? "h-56" : "h-48")}
             priority={false}
           />
           <div className="absolute bottom-3 right-3">
@@ -232,17 +255,17 @@ function BookingCard({ booking, isLast, lastElementRef }: BookingCardProps) {
           </div>
         </div>
 
-        <div className="p-3 space-y-2">
-          <h3 className="text-lg font-bold first-letter:uppercase line-clamp-2">
+        <div className={cn("space-y-2", isDesktop ? "p-5" : "p-3")}>
+          <h3 className={cn("font-bold first-letter:uppercase line-clamp-2", isDesktop ? "text-xl" : "text-lg")}>
             {booking.title}
           </h3>
 
-          <div className="space-y-1 text-xs text-gray-600 flex flex-col gap-1">
-            <p className="font-normal text-sm">{dateRange}</p>
-            <p className=" flex gap-2 items-center">
+          <div className="space-y-1 text-xs text-muted-foreground flex flex-col gap-1">
+            <p className="font-semibold text-sm text-foreground">{dateRange}</p>
+            <p className="flex gap-2 items-center">
               <Radio /> {booking.eventDisplayStatus || "ACTIVE"}
             </p>
-            <p className=" flex gap-2 items-center">
+            <p className="flex gap-2 items-center">
               <Briefcase size={20} />
               <span>{booking.numberOfTickets} Tickets</span>
             </p>
@@ -256,7 +279,7 @@ function BookingCard({ booking, isLast, lastElementRef }: BookingCardProps) {
           </div>
         </div>
       </article>
-      {booking.numberOfTickets > 1 ? (
+      {!isDesktop && booking.numberOfTickets > 1 ? (
         <div className="flex flex-col items-center gap-1">
           <div className=" w-[95%] h-2 bg-muted rounded-b-xl"></div>
           <div className=" w-[93%] h-2 bg-muted rounded-b-xl"></div>
@@ -278,6 +301,7 @@ interface BookingsListProps {
   selectedFilter: UserPlanType;
   onFilterChange: (filter: UserPlanType) => void;
   handleScreenChange: (value: string) => void;
+  variant?: "mobile" | "desktop";
 }
 
 function BookingsList({
@@ -290,8 +314,10 @@ function BookingsList({
   selectedFilter,
   onFilterChange,
   handleScreenChange,
+  variant = "mobile",
 }: BookingsListProps) {
   const lastElementRef = useInfiniteScroll(loadMore, hasMore, isLoadingMore);
+  const isDesktop = variant === "desktop";
 
   if (error) {
     return (
@@ -312,16 +338,17 @@ function BookingsList({
       <FilterDropdown
         selectedFilter={selectedFilter}
         onFilterChange={onFilterChange}
+        variant={variant}
       />
 
       {isLoading && bookings.length === 0 ? (
-        <div className="space-y-5 py-2">
-          {Array.from({ length: 3 }).map((_, index) => (
+        <div className={cn(isDesktop ? "grid gap-6 md:grid-cols-2 xl:grid-cols-3" : "space-y-5 py-2")}>
+          {Array.from({ length: isDesktop ? 6 : 3 }).map((_, index) => (
             <BookingCardSkeleton key={index} />
           ))}
         </div>
       ) : !bookings.length ? (
-        <div className="flex flex-col items-center gap-4 text-center max-w-md px-4 mt-20">
+        <div className={cn("flex flex-col items-center gap-4 text-center max-w-md px-4", isDesktop ? "mx-auto mt-28" : "mt-20")}>
           <BiCalendarAlt size={40} className="text-blue-800" />
           <span className="flex flex-col gap-2">
             <p className="text-neutral-500 text-sm font-semibold">
@@ -336,13 +363,14 @@ function BookingsList({
           </Button>
         </div>
       ) : (
-        <div className="w-full flex flex-col gap-4 pb-15">
+        <div className={cn("w-full gap-4 pb-15", isDesktop ? "grid md:grid-cols-2 xl:grid-cols-3" : "flex flex-col")}>
           {bookings.map((booking, index) => (
             <BookingCard
               key={booking.eventId}
               booking={booking}
               isLast={index === bookings.length - 1}
               lastElementRef={lastElementRef}
+              variant={variant}
             />
           ))}
           {isLoadingMore && (
@@ -548,6 +576,7 @@ interface EventsContentProps {
   hasMore: boolean;
   loadMore: () => void;
   isLoadingMore: boolean;
+  variant?: "mobile" | "desktop";
 }
 
 function EventsContent({
@@ -556,9 +585,11 @@ function EventsContent({
   hasMore,
   loadMore,
   isLoadingMore,
+  variant = "mobile",
 }: EventsContentProps) {
   const router = useRouter();
   const lastElementRef = useInfiniteScroll(loadMore, hasMore, isLoadingMore);
+  const isDesktop = variant === "desktop";
 
   if (isLoading && events.length === 0) {
     return (
@@ -581,7 +612,9 @@ function EventsContent({
         </span>
         <Button
           onClick={() => router.push(
-            `/m/event-create?prev=${encodeURIComponent("/?screen=plans")}`
+            isDesktop
+              ? withPrev(DESKTOP_ROUTES.createEvent, DESKTOP_ROUTES.bookings)
+              : withPrev(MOBILE_ROUTES.createEvent, "/?screen=plans")
           )}
           className="rounded-full py-5 px-5"
         >
@@ -597,7 +630,7 @@ function EventsContent({
         const isLast = index === events.length - 1;
         return (
           <div key={event.id} ref={isLast ? lastElementRef : null}>
-            <EventsCard event={event} />
+            <EventsCard event={event} variant={variant} />
           </div>
         );
       })}
@@ -612,10 +645,12 @@ function EventsContent({
 
 interface EventsCardProp {
   event: EventItem;
+  variant?: "mobile" | "desktop";
 }
-function EventsCard({ event }: EventsCardProp) {
+function EventsCard({ event, variant = "mobile" }: EventsCardProp) {
+  const isDesktop = variant === "desktop";
   const eventUrl = `${typeof window !== "undefined" ? window.location.origin : ""
-    }/event/${event.id}`;
+    }${DESKTOP_ROUTES.eventDetail(event.id)}`;
   const { isShareDialogOpen, closeShareDialog, handleQuickShare } = useShare({
     title: event.title,
     url: eventUrl,
@@ -640,9 +675,9 @@ function EventsCard({ event }: EventsCardProp) {
           src={event.titleImage}
           onClick={() =>
             router.push(
-              `/m/events/${event.id}?prev=${encodeURIComponent(
-                "/?screen=plans"
-              )}`
+              isDesktop
+                ? withPrev(DESKTOP_ROUTES.eventDetail(event.id), DESKTOP_ROUTES.bookings)
+                : withPrev(MOBILE_ROUTES.eventDetail(event.id), "/?screen=plans")
             )
           }
           className="w-full max-h-96 object-cover rounded-2xl"
@@ -656,15 +691,15 @@ function EventsCard({ event }: EventsCardProp) {
             <span className="flex gap-3 items-center">
               <div className="relative *:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2">
                 {event.coHosts.slice(0, 4).map((cohost, index) => (
-                  <Avatar key={index}>
-                    <AvatarImage
-                      src={cohost.profileImageUrl}
-                      alt={cohost.username}
-                    />
-                    <AvatarFallback>
-                      <Image src={defaultImage} alt={cohost.username} fill />
-                    </AvatarFallback>
-                  </Avatar>
+	                  <Avatar key={index}>
+	                    <AvatarImage
+	                      src={cohost.profileImageUrl}
+	                      alt={cohost.username ?? "Co-host"}
+	                    />
+	                    <AvatarFallback>
+	                      <Image src={defaultImage} alt={cohost.username ?? "Co-host"} fill />
+	                    </AvatarFallback>
+	                  </Avatar>
                 ))}
               </div>
               <p>{event.coHosts.length} hosts</p>
@@ -697,11 +732,13 @@ function EventsCard({ event }: EventsCardProp) {
 
 interface PlanningDisplayProps {
   handleScreenChange: (value: string) => void;
+  variant?: "mobile" | "desktop";
 }
 
 
 // Main Component
-export default function PlanningDisplay({ handleScreenChange }: PlanningDisplayProps) {
+export default function PlanningDisplay({ handleScreenChange, variant = "mobile" }: PlanningDisplayProps) {
+  const isDesktop = variant === "desktop";
   const [activeTab, setActiveTab] = useState<TabType>("bookings");
   const {
     bookings,
@@ -716,8 +753,6 @@ export default function PlanningDisplay({ handleScreenChange }: PlanningDisplayP
   const {
     events,
     isLoading: isEventsLoading,
-    error: isEventsError,
-    refetch,
     hasMore: hasMoreEvents,
     loadMore: loadMoreEvents,
     isLoadingMore: isLoadingMoreEvents,
@@ -737,6 +772,7 @@ export default function PlanningDisplay({ handleScreenChange }: PlanningDisplayP
             selectedFilter={currentFilter}
             onFilterChange={changeFilter}
             handleScreenChange={handleScreenChange}
+            variant={variant}
           />
         );
       case "events":
@@ -747,12 +783,36 @@ export default function PlanningDisplay({ handleScreenChange }: PlanningDisplayP
             hasMore={hasMoreEvents}
             loadMore={loadMoreEvents}
             isLoadingMore={isLoadingMoreEvents}
+            variant={variant}
           />
         );
       default:
         return null;
     }
   };
+
+  if (isDesktop) {
+    return (
+      <div className="w-full">
+        <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
+              Plans
+            </p>
+            <h2 className="mt-1 text-3xl font-black tracking-tight">
+              Bookings and hosted events
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+              Review upcoming bookings, completed plans, and events you manage.
+            </p>
+          </div>
+          <Tabs active={activeTab} onClick={setActiveTab} variant="desktop" />
+        </div>
+
+        {renderTabContent()}
+      </div>
+    );
+  }
 
   return (
     //view hieght subtracted from navbar height

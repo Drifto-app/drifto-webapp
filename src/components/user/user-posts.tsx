@@ -1,5 +1,7 @@
 "use client"
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { cn } from "@/lib/utils";
 import {ComponentProps, useCallback, useEffect, useRef, useState} from "react";
 import {authApi} from "@/lib/axios";
@@ -12,14 +14,16 @@ import { PostFeedSkeleton } from "@/components/ui/page-skeletons";
 interface UserPostsProps extends ComponentProps<"div">{
     user: {[key:string]: any};
     isForUser?: boolean;
+    variant?: "mobile" | "desktop";
 }
 
 export const UserPosts = ({
-    user, isForUser = false, className, ...props
+    user, isForUser = false, variant = "mobile", className, ...props
 }: UserPostsProps) => {
+    const isDesktop = variant === "desktop";
 
     const [posts, setPosts] = useState<Array<{[key: string]: any}>>([]);
-    const [hasMore, setHasMore] = useState(true);
+    const [, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -75,7 +79,7 @@ export const UserPosts = ({
                 loadingRef.current = false;
             }
         },
-        [user]
+        [user, isForUser]
     );
 
     useEffect(() => {
@@ -102,15 +106,60 @@ export const UserPosts = ({
                 )  loadPosts();
             },
             {
-                root: scrollRootRef.current ?? null,
-                rootMargin: "80px",
+                root: isDesktop ? null : scrollRootRef.current ?? null,
+                rootMargin: isDesktop ? "160px" : "80px",
                 threshold: 0,
             }
         );
 
         observer.observe(sentinel);
         return () => observer.disconnect();
-    }, [loadPosts, error]);
+    }, [loadPosts, error, isDesktop]);
+
+    if (isDesktop) {
+        return (
+            <div
+                className={cn("w-full space-y-5", className)}
+                {...props}
+            >
+                {loading && posts.length === 0 ? (
+                    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                        <PostFeedSkeleton />
+                    </div>
+                ) : error && posts.length === 0 ? (
+                    <div className="rounded-2xl border border-border bg-card p-10 text-center">
+                        <p className="font-black">Unable to load posts</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{error}</p>
+                    </div>
+                ) : posts.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+                        <p className="font-black">No posts yet</p>
+                        <p className="mt-1 text-sm text-muted-foreground">Posts from this profile will appear here.</p>
+                    </div>
+                ) : (
+                    <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                        {posts.map((post) => (
+                            <PostCard
+                                key={post.id}
+                                postContent={post}
+                                isForUser={isForUser}
+                                variant="desktop"
+                                onDelete={(postId) => {setPosts((post) => post.filter(p => p.id !== postId))}}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                <div ref={sentinelRef} aria-hidden className="h-8" />
+
+                {loading && posts.length > 0 && (
+                    <div className="flex justify-center py-6">
+                        <Loader className="h-8 w-8"/>
+                    </div>
+                )}
+            </div>
+        )
+    }
 
     return (
         <div
@@ -131,6 +180,7 @@ export const UserPosts = ({
                             key={post.id}
                             postContent={post}
                             isForUser={isForUser}
+                            variant={variant}
                             onDelete={(postId) => {setPosts((post) => post.filter(p => p.id !== postId))}}
                         />
                     ))}

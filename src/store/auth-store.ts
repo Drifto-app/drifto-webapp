@@ -2,6 +2,7 @@ import { persist } from "zustand/middleware";
 import { create } from "zustand";
 import { api, authApi } from "@/lib/axios";
 import { showTopToast } from "@/components/toast/toast-util";
+import { ApiStatusError, isInvalidAuthStatus } from "@/lib/auth-status";
 
 interface LocationPublic {
     city: string | null;
@@ -163,11 +164,11 @@ export const useAuthStore = create<AuthStore>()(
             refreshAccessToken: async (): Promise<boolean> => {
                 try {
                     const { refreshToken, user } = get();
-                    if (!refreshToken) return false;
+                    if (!refreshToken || !user?.id) return false;
 
                     const response = await api.post('/auth/refresh/token', {
                         refreshToken,
-                        userId: user!.id,
+                        userId: user.id,
                     });
 
                     set({
@@ -177,8 +178,16 @@ export const useAuthStore = create<AuthStore>()(
                         isAuthenticated: true,
                     });
                     return true;
-                } catch (error) {
-                    get().clearAuth();
+                } catch (error: unknown) {
+                    const response = (error as ApiStatusError).response;
+
+                    if (
+                        isInvalidAuthStatus(response?.status) ||
+                        isInvalidAuthStatus(response?.data?.status)
+                    ) {
+                        get().clearAuth();
+                    }
+
                     return false;
                 } finally {
                     set({ isLoading: false, hasTriedRefresh: true });

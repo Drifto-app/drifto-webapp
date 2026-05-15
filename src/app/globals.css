@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "tailwindcss/utilities";
@@ -32,6 +33,7 @@ body {
 }
 
 @theme inline {
+  --font-sans: var(--font-plus-jakarta-sans);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -70,6 +72,10 @@ body {
 }
 
 :root {
+  --font-plus-jakarta-sans: "Plus Jakarta Sans", Arial, Helvetica, sans-serif;
+  --desktop-gutter: clamp(1.5rem, 2vw, 2rem);
+  --desktop-sidebar-width: clamp(15rem, 17vw, 19rem);
+  --desktop-aside-width: clamp(22rem, 24vw, 28rem);
   --radius: 0.625rem;
   --home-search-border-color: #ff0f7b;
   --background: oklch(1 0 0);
@@ -156,6 +162,30 @@ html {
   .pac-container {
     z-index: 99999999999 !important;
     pointer-events: auto !important;
+  }
+}
+
+@layer components {
+  .desktop-page-header-inner {
+    width: 100%;
+    max-width: none;
+    padding-inline: var(--desktop-gutter);
+  }
+
+  .desktop-page-container {
+    width: 100%;
+    max-width: none;
+    padding-inline: var(--desktop-gutter);
+  }
+
+  @media (min-width: 1024px) {
+    .desktop-two-column-page {
+      grid-template-columns: minmax(0, 1fr) var(--desktop-aside-width);
+    }
+
+    .desktop-thread-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(26rem, 40vw);
+    }
   }
 }
 

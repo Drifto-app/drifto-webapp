@@ -1,7 +1,11 @@
-import { authApi } from "@/lib/axios";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { authApi } from '@/lib/axios';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { DESKTOP_ROUTES } from '@/lib/routes';
+import { Button } from '@/components/ui/button';
+import { Bell, WalletCards, UserRound } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type NotificationType = {
   id: string;
@@ -20,14 +24,14 @@ type NotificationType = {
 // Constants
 const NOTIFICATION_API_CONFIG = {
   pageSize: 10,
-  sortBy: "createdAt",
+  sortBy: 'createdAt',
 };
 
 // Custom hook for infinite scroll
 function useInfiniteScroll(
   callback: () => void,
   hasMore: boolean,
-  isLoading: boolean
+  isLoading: boolean,
 ) {
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -42,7 +46,7 @@ function useInfiniteScroll(
       });
       if (node) observer.current.observe(node);
     },
-    [isLoading, hasMore, callback]
+    [isLoading, hasMore, callback],
   );
 
   return lastElementRef;
@@ -67,7 +71,7 @@ function useNotifications() {
         }
         setError(null);
 
-        const response = await authApi.get("/notification", {
+        const response = await authApi.get('/notification', {
           params: {
             ...NOTIFICATION_API_CONFIG,
             pageNumber: page,
@@ -77,7 +81,7 @@ function useNotifications() {
         const notificationsData = response.data.data.data;
 
         if (!Array.isArray(notificationsData)) {
-          throw new Error("Invalid response format");
+          throw new Error('Invalid response format');
         }
 
         if (reset || page === 1) {
@@ -88,19 +92,19 @@ function useNotifications() {
 
         // Check if there are more pages
         setHasMore(
-          notificationsData.length === NOTIFICATION_API_CONFIG.pageSize
+          notificationsData.length === NOTIFICATION_API_CONFIG.pageSize,
         );
         setCurrentPage(page);
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : "Failed to load notifications";
+          err instanceof Error ? err.message : 'Failed to load notifications';
         setError(errorMessage);
       } finally {
         setIsLoading(false);
         setIsLoadingMore(false);
       }
     },
-    []
+    [],
   );
 
   const loadMore = useCallback(() => {
@@ -130,7 +134,14 @@ function useNotifications() {
   };
 }
 
-function NotificationsDisplay() {
+interface NotificationsDisplayProps {
+  variant?: 'mobile' | 'desktop';
+}
+
+function NotificationsDisplay({
+  variant = 'mobile',
+}: NotificationsDisplayProps) {
+  const isDesktop = variant === 'desktop';
   const {
     notifications,
     isLoading,
@@ -144,6 +155,16 @@ function NotificationsDisplay() {
   const lastElementRef = useInfiniteScroll(loadMore, hasMore, isLoadingMore);
 
   if (isLoading && notifications.length === 0) {
+    if (isDesktop) {
+      return (
+        <div className="grid gap-3">
+          {[1, 2, 3, 4].map((i) => (
+            <NotificationSkeleton key={i} variant="desktop" />
+          ))}
+        </div>
+      );
+    }
+
     return (
       <div className="px-2 mt-2 space-y-3">
         {[1, 2, 3, 4].map((i) => (
@@ -154,6 +175,20 @@ function NotificationsDisplay() {
   }
 
   if (error) {
+    if (isDesktop) {
+      return (
+        <div className="rounded-2xl border border-dashed border-border bg-background p-10 text-center">
+          <p className="mb-4 text-red-600">{error}</p>
+          <Button
+            onClick={refetch}
+            className="rounded-full bg-blue-800 hover:bg-blue-800"
+          >
+            Retry
+          </Button>
+        </div>
+      );
+    }
+
     return (
       <div className="px-2 mt-2">
         <div className="p-6 text-center">
@@ -170,6 +205,18 @@ function NotificationsDisplay() {
   }
 
   if (notifications.length === 0) {
+    if (isDesktop) {
+      return (
+        <div className="flex min-h-80 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-background p-10 text-center">
+          <Bell size={42} className="text-blue-800" />
+          <p className="mt-4 text-lg font-black">No notifications yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Event, booking, payout, and social updates will appear here.
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div className="px-2 mt-2">
         <div className="p-6 text-center text-gray-500">
@@ -179,13 +226,35 @@ function NotificationsDisplay() {
     );
   }
 
-  return (
+  return isDesktop ? (
+    <div className="grid gap-3">
+      {notifications.map((notification, index) => {
+        const isLast = index === notifications.length - 1;
+        return (
+          <div key={notification.id} ref={isLast ? lastElementRef : null}>
+            <NotificationComponent
+              notification={notification}
+              variant={variant}
+            />
+          </div>
+        );
+      })}
+      {isLoadingMore && (
+        <div className="flex justify-center py-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-foreground" />
+        </div>
+      )}
+    </div>
+  ) : (
     <div className="px-2 mt-2 mb-20">
       {notifications.map((notification, index) => {
         const isLast = index === notifications.length - 1;
         return (
           <div key={notification.id} ref={isLast ? lastElementRef : null}>
-            <NotificationComponent notification={notification} />
+            <NotificationComponent
+              notification={notification}
+              variant={variant}
+            />
           </div>
         );
       })}
@@ -198,7 +267,24 @@ function NotificationsDisplay() {
   );
 }
 
-function NotificationSkeleton() {
+function NotificationSkeleton({
+  variant = 'mobile',
+}: {
+  variant?: 'mobile' | 'desktop';
+}) {
+  if (variant === 'desktop') {
+    return (
+      <div className="flex items-center gap-4 rounded-2xl border border-border bg-background p-4">
+        <div className="h-12 w-12 animate-pulse rounded-xl bg-muted" />
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 h-4 w-48 animate-pulse rounded bg-muted" />
+          <div className="h-3 w-3/4 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="h-3 w-16 animate-pulse rounded bg-muted" />
+      </div>
+    );
+  }
+
   return (
     <div className="p-3 border-b border-b-neutral-400 flex gap-4 items-center">
       <div className="bg-muted p-2 rounded-2xl w-12 h-12 animate-pulse"></div>
@@ -213,8 +299,10 @@ function NotificationSkeleton() {
 
 function NotificationComponent({
   notification,
+  variant = 'mobile',
 }: {
   notification: NotificationType;
+  variant?: 'mobile' | 'desktop';
 }) {
   const router = useRouter();
 
@@ -230,12 +318,12 @@ function NotificationComponent({
     if (isToday) {
       // Format as time (e.g. 9:45 AM)
       let hours = date.getHours();
-      let minutes = date.getMinutes();
+      const minutes = date.getMinutes();
 
-      const ampm = hours >= 12 ? "PM" : "AM";
+      const ampm = hours >= 12 ? 'PM' : 'AM';
       hours = hours % 12 || 12;
 
-      const formattedMinutes = minutes.toString().padStart(2, "0");
+      const formattedMinutes = minutes.toString().padStart(2, '0');
       return `${hours}:${formattedMinutes} ${ampm}`;
     }
 
@@ -243,46 +331,105 @@ function NotificationComponent({
 
     if (yearDiff === 0) {
       // Same year, not today → return e.g. "28 Jan"
-      return date.toLocaleDateString("en-US", {
-        day: "2-digit",
-        month: "short",
+      return date.toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: 'short',
       });
     } else if (yearDiff === 1) {
-      return "Last year";
+      return 'Last year';
     } else {
       return `${yearDiff} years ago`;
     }
   }
 
   const handleNotificationClick = () => {
+    const isDesktop = variant === 'desktop';
+    const prev = '/?screen=updates';
+
     switch (notification.notificationType?.toUpperCase()) {
-      case "CO_HOST_INVITATION":
-      case "CO_HOST_ACCEPTANCE":
-      case "CO_HOST_REMOVAL":
-      case "CO_HOST_REJECTION":
+      case 'CO_HOST_INVITATION':
+      case 'CO_HOST_ACCEPTANCE':
+      case 'CO_HOST_REMOVAL':
+      case 'CO_HOST_REJECTION':
+        if (!notification.relatedUserId) return;
         router.push(
-          `/m/user/${notification.relatedUserId}?prev=/?screen=updates`
+          `${isDesktop ? DESKTOP_ROUTES.userDetail(notification.relatedUserId) : `/m/user/${notification.relatedUserId}`}?prev=${encodeURIComponent(prev)}`,
         );
         break;
-      case "PAYMENT_PROCESSED_SUCCESSFULLY":
-      case "EVENT_EARNINGS_PAID":
-      case "WITHDRAWAL_SUCCESSFUL":
-      case "WITHDRAWAL_FAILED":
-      case "SUCCESSFUL_REFUND":
-      case "FAILED_REFUND":
-        router.push("/m/wallet?prev=/?screen=updates");
+      case 'PAYMENT_PROCESSED_SUCCESSFULLY':
+      case 'EVENT_EARNINGS_PAID':
+      case 'WITHDRAWAL_SUCCESSFUL':
+      case 'WITHDRAWAL_FAILED':
+      case 'SUCCESSFUL_REFUND':
+      case 'FAILED_REFUND':
+        router.push(
+          `${isDesktop ? DESKTOP_ROUTES.wallet : '/m/wallet'}?prev=${encodeURIComponent(prev)}`,
+        );
         break;
-      case "NEW_EVENT_ORDER":
-      case "NEW_SUBSCRIBER":
-      case "NEW_POST_COMMENT":
-      case "NEW_EVENT_COMMENT":
-      case "NEW_EVENT_REACTION":
-      case "NEW_POST_REACTION":
-      case "NEW_CHAT_MESSAGE":
+      case 'NEW_EVENT_ORDER':
+      case 'NEW_SUBSCRIBER':
+      case 'NEW_POST_COMMENT':
+      case 'NEW_EVENT_COMMENT':
+      case 'NEW_EVENT_REACTION':
+      case 'NEW_POST_REACTION':
+      case 'NEW_CHAT_MESSAGE':
       default:
         return;
     }
   };
+
+  const isDesktop = variant === 'desktop';
+  const notificationIcon = (() => {
+    const type = notification.notificationType?.toUpperCase();
+    if (
+      type === 'PAYMENT_PROCESSED_SUCCESSFULLY' ||
+      type === 'EVENT_EARNINGS_PAID' ||
+      type === 'WITHDRAWAL_SUCCESSFUL' ||
+      type === 'WITHDRAWAL_FAILED' ||
+      type === 'SUCCESSFUL_REFUND' ||
+      type === 'FAILED_REFUND'
+    ) {
+      return <WalletCards size={20} />;
+    }
+    if (
+      type === 'CO_HOST_INVITATION' ||
+      type === 'CO_HOST_ACCEPTANCE' ||
+      type === 'CO_HOST_REMOVAL' ||
+      type === 'CO_HOST_REJECTION'
+    ) {
+      return <UserRound size={20} />;
+    }
+    return <Bell size={20} />;
+  })();
+
+  if (isDesktop) {
+    return (
+      <article
+        className={cn(
+          'group flex cursor-pointer items-start gap-4 rounded-2xl border border-border bg-background p-4 transition hover:-translate-y-0.5 hover:border-blue-800/40 hover:bg-accent hover:shadow-sm',
+          !notification.read && 'border-blue-800/30 bg-blue-800/5',
+        )}
+        onClick={handleNotificationClick}
+      >
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-800/10 text-blue-800 dark:bg-blue-400/10 dark:text-blue-300">
+          {notificationIcon}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-4">
+            <h3 className="line-clamp-1 font-black text-foreground">
+              {notification.title}
+            </h3>
+            <span className="shrink-0 text-xs font-semibold text-muted-foreground">
+              {formatTime(notification.createdAt)}
+            </span>
+          </div>
+          <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
+            {notification.message}
+          </p>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <div

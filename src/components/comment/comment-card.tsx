@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as React from "react";
 import {
     FaRegHeart,
@@ -18,17 +20,21 @@ import {
     DrawerContent,
     DrawerHeader,
     DrawerTitle,
-    DrawerTrigger,
 } from "@/components/ui/drawer";
 import { SlOptionsVertical } from "react-icons/sl";
 import { MdDeleteOutline } from "react-icons/md";
-import { ComponentProps, FC, memo, useCallback, useMemo, useState } from "react";
+import { ComponentProps, useCallback, useState } from "react";
 import { useAuthStore } from '@/store/auth-store';
 import { ReportDrawer } from "@/components/report/report-drawer";
 import { Linkify } from "@/lib/linkify";
-
-type AnyRecord = Record<string, any>;
-
+import { DESKTOP_ROUTES } from "@/lib/routes";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface CommentCardProps extends ComponentProps<"div"> {
     comment: { [key: string]: any };
@@ -36,16 +42,18 @@ interface CommentCardProps extends ComponentProps<"div"> {
     disabled?: boolean;
     onDelete?: (commentId: string) => void;
     isForUser?: boolean;
+    variant?: "mobile" | "desktop";
 }
 
 export const CommentCard = ({
-    comment, currentPathUrl, onDelete, disabled = false, isForUser, className, ...props
+    comment, currentPathUrl, onDelete, disabled = false, isForUser, variant = "mobile", className, ...props
 }: CommentCardProps) => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
 
     const isDisabled = Boolean(disabled);
+    const isDesktop = variant === "desktop";
 
     const { isAuthenticated } = useAuthStore();
 
@@ -97,22 +105,26 @@ export const CommentCard = ({
         } finally {
             setIsLikedLoading(false);
         }
-    }, [isDisabled, isLikedLoading, isLiked, comment.id]);
+    }, [isLikedLoading, isLiked, comment.id]);
 
     const goToReplies = useCallback(() => {
         if (isDisabled) return;
         router.push(
-            `/m/comment/${comment.id}` +
+            `${isDesktop ? DESKTOP_ROUTES.commentDetail(comment.id) : `/m/comment/${comment.id}`}` +
             `?prev=${encodeURIComponent(currentPathUrl)}` +
             `&type=COMMENT_REPLY`
         );
-    }, [isDisabled, router, comment.id, currentPathUrl]);
+    }, [isDisabled, isDesktop, router, comment.id, currentPathUrl]);
+    const reactionPath =
+        `${isDesktop ? DESKTOP_ROUTES.reactionDetail(comment.id) : `/m/reaction/${comment.id}`}` +
+        `?prev=${encodeURIComponent(currentPathUrl)}&type=COMMENT_REPLY`;
 
     return (
         <>
             <div
                 className={cn(
-                    "flex flex-col gap-2 py-5 px-6 border border-border rounded-lg bg-background",
+                    "flex flex-col gap-2 border border-border bg-background",
+                    isDesktop ? "rounded-2xl px-5 py-4" : "rounded-lg px-6 py-5",
                     className
                 )}
                 {...props}
@@ -122,19 +134,62 @@ export const CommentCard = ({
                     <UserSinglePlaceholder
                         user={comment.userPlaceHolder}
                         prev={`${pathname}?${searchParams}`}
+                        variant={variant}
                     />
 
                     <span className="inline-flex items-center justify-center">
                         <p className="text-sm text-neutral-500">{new Date(comment.createdAt).toLocaleDateString()}</p>
-                        <button
-                            type="button"
-                            aria-label="More options"
-                            className={cn("bg-none pl-5 transition-opacity", isDisabled && "pointer-events-none opacity-50")}
-                            disabled={disabled}
-                            onClick={() => setDrawerOpen(true)}
-                        >
-                            <SlOptionsVertical className="text-neutral-500" />
-                        </button>
+                        {isDesktop ? (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button
+                                        type="button"
+                                        aria-label="Comment actions"
+                                        className={cn("bg-none pl-5 transition-opacity", isDisabled && "pointer-events-none opacity-50")}
+                                        disabled={disabled}
+                                    >
+                                        <SlOptionsVertical className="text-neutral-500" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" sideOffset={10} className="w-48 rounded-xl p-2">
+                                    <DropdownMenuLabel className="px-3 text-xs font-black uppercase tracking-[0.16em] text-muted-foreground">
+                                        Action
+                                    </DropdownMenuLabel>
+                                    {isForUser ? (
+                                        <DropdownMenuItem
+                                            variant="destructive"
+                                            className="rounded-lg px-3 py-2.5 font-semibold"
+                                            disabled={isDeleteLoading}
+                                            onSelect={(event) => {
+                                                event.preventDefault();
+                                                void handleDelete();
+                                            }}
+                                        >
+                                            <MdDeleteOutline size={16} />
+                                            {isDeleteLoading ? "Deleting..." : "Delete"}
+                                        </DropdownMenuItem>
+                                    ) : (
+                                        <DropdownMenuItem
+                                            className="rounded-lg px-3 py-2.5 font-semibold"
+                                            onSelect={() => setIsReportDrawerOpen(true)}
+                                        >
+                                            <FaFlag />
+                                            Report
+                                        </DropdownMenuItem>
+                                    )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ) : (
+                            <button
+                                type="button"
+                                aria-label="More options"
+                                className={cn("bg-none pl-5 transition-opacity", isDisabled && "pointer-events-none opacity-50")}
+                                disabled={disabled}
+                                onClick={() => setDrawerOpen(true)}
+                            >
+                                <SlOptionsVertical className="text-neutral-500" />
+                            </button>
+                        )}
 
                     </span>
                 </div>
@@ -147,7 +202,15 @@ export const CommentCard = ({
                     {/* Likes */}
                     {isAuthenticated &&
                         <div className="flex items-center gap-2">
-                            <span className="text-sm">{totalReactions}</span>
+                            <button
+                                type="button"
+                                className="text-sm"
+                                onClick={() => {
+                                    if (!isDisabled) router.push(reactionPath);
+                                }}
+                            >
+                                {totalReactions}
+                            </button>
                             <button
                                 type="button"
                                 onClick={handleReaction}
@@ -196,47 +259,49 @@ export const CommentCard = ({
                     </button>
                 </div>
             </div>
-            <Drawer
-                open={!isDisabled && drawerOpen}
-                onOpenChange={(open) => {
-                    if (!isDisabled) setDrawerOpen(open);
-                }}
-            >
-                <DrawerContent className="z-9999">
-                    <div className="w-full px-4 pb-4">
-                        <DrawerHeader>
-                            <DrawerTitle>Action</DrawerTitle>
-                        </DrawerHeader>
+            {!isDesktop && (
+                <Drawer
+                    open={!isDisabled && drawerOpen}
+                    onOpenChange={(open) => {
+                        if (!isDisabled) setDrawerOpen(open);
+                    }}
+                >
+                    <DrawerContent className="z-9999">
+                        <div className="w-full px-4 pb-4">
+                            <DrawerHeader>
+                                <DrawerTitle>Action</DrawerTitle>
+                            </DrawerHeader>
 
-                        {isForUser ? (
-                            <button
-                                type="button"
-                                className="flex gap-2 items-center py-4 text-red-600"
-                                onClick={handleDelete}
-                                disabled={isDeleteLoading}
-                                aria-busy={isDeleteLoading}
-                            >
-                                <MdDeleteOutline size={16} />
-                                <span className="font-semibold">
-                                    {isDeleteLoading ? "Deleting..." : "Delete"}
-                                </span>
-                            </button>
-                        ) : (
-                            <button
-                                type="button"
-                                className="flex gap-2 items-center py-4"
-                                onClick={() => {
-                                    closeDrawer();
-                                    setIsReportDrawerOpen(true);
-                                }}
-                            >
-                                <FaFlag />
-                                <span className="font-semibold">Report</span>
-                            </button>
-                        )}
-                    </div>
-                </DrawerContent>
-            </Drawer>
+                            {isForUser ? (
+                                <button
+                                    type="button"
+                                    className="flex gap-2 items-center py-4 text-red-600"
+                                    onClick={handleDelete}
+                                    disabled={isDeleteLoading}
+                                    aria-busy={isDeleteLoading}
+                                >
+                                    <MdDeleteOutline size={16} />
+                                    <span className="font-semibold">
+                                        {isDeleteLoading ? "Deleting..." : "Delete"}
+                                    </span>
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    className="flex gap-2 items-center py-4"
+                                    onClick={() => {
+                                        closeDrawer();
+                                        setIsReportDrawerOpen(true);
+                                    }}
+                                >
+                                    <FaFlag />
+                                    <span className="font-semibold">Report</span>
+                                </button>
+                            )}
+                        </div>
+                    </DrawerContent>
+                </Drawer>
+            )}
 
             <ReportDrawer
                 isOpen={isReportDrawerOpen}

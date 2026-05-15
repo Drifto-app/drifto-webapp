@@ -1,4 +1,12 @@
-import { ComponentProps, useCallback, useEffect, useRef, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import {
+  ComponentProps,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { cn } from '@/lib/utils';
 import { FaArrowLeft } from 'react-icons/fa';
 import * as React from 'react';
@@ -13,27 +21,35 @@ import { Loader, LoaderSmall } from '@/components/ui/loader';
 import { Button } from '@/components/ui/button';
 import { BiSolidError } from 'react-icons/bi';
 import { PostDetailPageSkeleton } from '@/components/ui/page-skeletons';
+import { DESKTOP_ROUTES } from '@/lib/routes';
+import { ArrowLeft, MessageSquareText } from 'lucide-react';
 
-
-interface SinglePostContentProps extends ComponentProps<"div"> {
+interface SinglePostContentProps extends ComponentProps<'div'> {
   prev: string | null;
   currentPathUrl: string;
   postId: string;
+  variant?: 'mobile' | 'desktop';
 }
 
 export const SinglePostContent = ({
-  prev, currentPathUrl, postId, className, ...props
+  prev,
+  currentPathUrl,
+  postId,
+  variant = 'mobile',
+  className,
+  ...props
 }: SinglePostContentProps) => {
   const router = useRouter();
+  const isDesktop = variant === 'desktop';
 
-  const [post, setPost] = useState<{[key: string]: any}>({});
+  const [post, setPost] = useState<{ [key: string]: any }>({});
   const [comments, setComments] = useState<any[]>([]);
-  const [hasMore, setHasMore] = useState(true);
+  const [, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [comment, setComment] = useState<string>("");
+  const [comment, setComment] = useState<string>('');
   const [submitCommentLoading, setSubmitCommentLoading] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,116 +60,125 @@ export const SinglePostContent = ({
   const pageRef = useRef(1);
 
   const handleBackClick = () => {
-    router.push(prev != null ? prev : `/?screen=${encodeURIComponent("posts")}`);
-  }
+    router.push(
+      prev != null ? prev : `/?screen=${encodeURIComponent('posts')}`,
+    );
+  };
 
-  const loadCommentsAndPost = useCallback(async (resetData = false) => {
-    if (loadingRef.current || !hasMoreRef.current) return;
+  const loadCommentsAndPost = useCallback(
+    async (resetData = false) => {
+      if (loadingRef.current || !hasMoreRef.current) return;
 
-    loadingRef.current = true;
-    setLoading(true);
-
-    if (resetData) {
-      setInitialLoading(true);
-    }
-    setError(null);
-
-    try {
-      if(resetData) {
-        const response = await authApi.get(`/post/${postId}`);
-        setPost(response?.data.data);
-      }
-
-      const currentPage = resetData ? 1 : pageRef.current;
-
-      const params: {[key: string]: string | number} = {
-        pageSize: 10,
-        pageNumber: currentPage,
-        commentType: "POST"
-      };
-
-      const response = await authApi.get(`/comment/entity/${postId}`, {
-        params
-      });
-
-      const newComments = response.data.data.data;
+      loadingRef.current = true;
+      setLoading(true);
 
       if (resetData) {
-        setComments(newComments);
-        pageRef.current = 2;
-      } else {
-        setComments((prev) => [...prev, ...newComments]);
-        pageRef.current = currentPage + 1;
+        setInitialLoading(true);
       }
+      setError(null);
 
-      const isLast = response.data.data.isLast;
-      setHasMore(!isLast);
-      hasMoreRef.current = !isLast;
+      try {
+        if (resetData) {
+          const response = await authApi.get(`/post/${postId}`);
+          setPost(response?.data.data);
+        }
 
-    } catch (err: any) {
-      showTopToast("error", err.message || "Error loading comments");
-      setError(err.message);
-    } finally {
-      setLoading(false);
-      setInitialLoading(false);
-      loadingRef.current = false;
-    }
-  }, [postId]);
+        const currentPage = resetData ? 1 : pageRef.current;
 
-  const handleCommentSubmit =   async (e: React.FormEvent) => {
-    e.preventDefault()
+        const params: { [key: string]: string | number } = {
+          pageSize: 10,
+          pageNumber: currentPage,
+          commentType: 'POST',
+        };
+
+        const response = await authApi.get(`/comment/entity/${postId}`, {
+          params,
+        });
+
+        const newComments = response.data.data.data;
+
+        if (resetData) {
+          setComments(newComments);
+          pageRef.current = 2;
+        } else {
+          setComments((prev) => [...prev, ...newComments]);
+          pageRef.current = currentPage + 1;
+        }
+
+        const isLast = response.data.data.isLast;
+        setHasMore(!isLast);
+        hasMoreRef.current = !isLast;
+      } catch (err: any) {
+        showTopToast('error', err.message || 'Error loading comments');
+        setError(err.message);
+      } finally {
+        setLoading(false);
+        setInitialLoading(false);
+        loadingRef.current = false;
+      }
+    },
+    [postId],
+  );
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     setSubmitCommentLoading(true);
 
-    if(comment == null || comment == ""){
-      showTopToast("error", "Comment must specify a comment");
+    if (comment == null || comment == '') {
+      showTopToast('error', 'Comment must specify a comment');
+      setSubmitCommentLoading(false);
       return;
     }
 
-    const params: {[key: string]: string} = {
+    const params: { [key: string]: string } = {
       comment,
-      commentType: "POST",
-      postId
-    }
+      commentType: 'POST',
+      postId,
+    };
 
     try {
-      const response = await authApi.post("/comment", params)
+      const response = await authApi.post('/comment', params);
 
-      setComments([response.data.data, ...comments])
-      setComment("")
+      setComments([response.data.data, ...comments]);
+      setComment('');
     } catch (err: any) {
       setError(err.response?.data?.description || 'Commenting failed');
-      showTopToast("error", err.response?.data?.description || 'Commenting failed');
+      showTopToast(
+        'error',
+        err.response?.data?.description || 'Commenting failed',
+      );
     } finally {
       setSubmitCommentLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (!window.visualViewport || !inputRef.current) return;
 
     const onResize = () => {
-      const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+      const viewportHeight =
+        window.visualViewport?.height ?? window.innerHeight;
       const offset = window.innerHeight - viewportHeight;
       setKeyboardOffset(offset > 100 ? offset : 0);
     };
 
     const onFocus = () => {
-      window.visualViewport?.addEventListener("resize", onResize);
+      window.visualViewport?.addEventListener('resize', onResize);
     };
     const onBlur = () => {
-      window.visualViewport?.removeEventListener("resize", onResize);
+      window.visualViewport?.removeEventListener('resize', onResize);
       setKeyboardOffset(0);
     };
 
     const inp = inputRef.current;
-    inp.addEventListener("focus", onFocus);
-    inp.addEventListener("blur", onBlur);
+    inp.addEventListener('focus', onFocus);
+    inp.addEventListener('blur', onBlur);
 
     return () => {
-      inp.removeEventListener("focus", onFocus);
-      inp.removeEventListener("blur", onBlur);
-      window.visualViewport?.removeEventListener("resize", onResize);
+      inp.removeEventListener('focus', onFocus);
+      inp.removeEventListener('blur', onBlur);
+      window.visualViewport?.removeEventListener('resize', onResize);
     };
   }, []);
 
@@ -172,7 +197,7 @@ export const SinglePostContent = ({
     const onScroll = () => {
       if (
         window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 200 &&
+          document.body.offsetHeight - 200 &&
         !loadingRef.current &&
         hasMoreRef.current &&
         !error
@@ -181,21 +206,177 @@ export const SinglePostContent = ({
       }
     };
 
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, [loadCommentsAndPost, error]);
 
+  if (isDesktop) {
+    return (
+      <main
+        className={cn('min-h-screen bg-background text-foreground', className)}
+        {...props}
+      >
+        <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur">
+          <div className="desktop-page-header-inner flex h-20 items-center justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
+                onClick={handleBackClick}
+              >
+                <ArrowLeft size={20} />
+              </Button>
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
+                  Social thread
+                </p>
+                <h1 className="truncate text-xl font-black">Post detail</h1>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              className="rounded-full"
+              onClick={() => router.push(DESKTOP_ROUTES.posts)}
+            >
+              Social feed
+            </Button>
+          </div>
+        </header>
 
+        <div className="desktop-page-container desktop-thread-grid grid gap-8 py-8">
+          {initialLoading ? (
+            <div className="xl:col-span-2">
+              <PostDetailPageSkeleton />
+            </div>
+          ) : error && comments.length === 0 ? (
+            <div className="xl:col-span-2 flex min-h-[520px] flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-card">
+              <BiSolidError size={40} className="text-red-600" />
+              <h2 className="font-black">Unable to load comments</h2>
+              <Button
+                className="rounded-full"
+                onClick={() => loadCommentsAndPost(true)}
+              >
+                Try again
+              </Button>
+            </div>
+          ) : (
+            <>
+              <section className="min-w-0">
+                <PostCard
+                  postContent={post}
+                  disabled={true}
+                  variant="desktop"
+                />
+              </section>
+
+              <aside className="min-w-0 rounded-2xl border border-border bg-card">
+                <div className="border-b border-border p-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                    Comments
+                  </p>
+                  <h2 className="mt-1 text-2xl font-black">
+                    {comments.length} loaded
+                  </h2>
+                </div>
+
+                <form
+                  onSubmit={handleCommentSubmit}
+                  className="border-b border-border p-4"
+                >
+                  <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-border bg-background p-2 pl-4 transition focus-within:border-blue-800 focus-within:ring-2 focus-within:ring-blue-800/10">
+                    <Input
+                      ref={inputRef}
+                      type="text"
+                      name="comments"
+                      className="h-11 min-w-0 flex-1 border-none bg-transparent px-0 shadow-none focus-visible:ring-0"
+                      placeholder="Add a comment..."
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                    />
+                    <Button
+                      type="submit"
+                      size="icon"
+                      className="h-10 w-10 shrink-0 rounded-full"
+                      disabled={comment.length === 0 || submitCommentLoading}
+                    >
+                      {!submitCommentLoading ? (
+                        <IoSend size={18} />
+                      ) : (
+                        <LoaderSmall />
+                      )}
+                    </Button>
+                  </div>
+                </form>
+
+                <div className="grid max-h-[calc(100vh-250px)] gap-3 overflow-y-auto p-4">
+                  {comments.map((c) => (
+                    <CommentCard
+                      key={c.id}
+                      comment={c}
+                      currentPathUrl={currentPathUrl}
+                      variant="desktop"
+                      isForUser={c.isMine}
+                      onDelete={(commentId: string) =>
+                        setComments((comments) =>
+                          comments.filter((c) => c.id !== commentId),
+                        )
+                      }
+                    />
+                  ))}
+
+                  {loading && !initialLoading && (
+                    <div className="flex justify-center py-4">
+                      <Loader className="h-8 w-8" />
+                    </div>
+                  )}
+
+                  {!loading && !initialLoading && comments.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <MessageSquareText size={40} className="text-blue-800" />
+                      <p className="mt-3 font-black">No comments yet</p>
+                      <p className="text-sm text-muted-foreground">
+                        Start the conversation.
+                      </p>
+                    </div>
+                  )}
+
+                  {error && comments.length > 0 && (
+                    <div className="flex flex-col items-center justify-center py-4">
+                      <p className="text-sm text-orange-700">
+                        Failed to load more comments
+                      </p>
+                      <Button
+                        onClick={() => loadCommentsAndPost(false)}
+                        size="sm"
+                        variant="outline"
+                        className="mt-2 rounded-full border-orange-300 text-orange-700 hover:bg-orange-50"
+                      >
+                        Try again
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </aside>
+            </>
+          )}
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <div className={cn(
-      "w-full min-h-[100dvh] flex flex-col pb-20",
-      className
-    )} {...props}>
-      <div className={cn(
-      "w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center",
-      className
-      )} {...props}>
+    <div
+      className={cn('w-full min-h-[100dvh] flex flex-col pb-20', className)}
+      {...props}
+    >
+      <div
+        className={cn(
+          'w-full border-b-1 border-border flex flex-col gap-3 h-20 justify-center',
+          className,
+        )}
+        {...props}
+      >
         <div className="flex flex-row items-center px-8">
           <FaArrowLeft
             size={20}
@@ -207,91 +388,102 @@ export const SinglePostContent = ({
           </p>
         </div>
       </div>
-      {initialLoading
-        ? <PostDetailPageSkeleton />
-        : error && comments.length === 0
-          ? ( <div className="w-full h-screen flex flex-col gap-3 items-center justify-center">
-            <BiSolidError size={40} className="text-red-600"/>
-            <h2>Unable to load comments</h2>
-          </div>)
-          : (
-            <div>
-              <div className="w-full pt-2">
-                <PostCard postContent={post} disabled={true} />
-               </div>
-              <div className="w-full flex flex-col gap-6 px-4 py-4">
-                {comments.map((c) => (
-                  <CommentCard
-                    key={c.id}
-                    comment={c}
-                    currentPathUrl={currentPathUrl}
-                    isForUser={c.isMine}
-                    onDelete={(commentId: string) => setComments(comments => comments.filter((c) => c.id !== commentId))}
-                  />
-                ))}
-              </div>
+      {initialLoading ? (
+        <PostDetailPageSkeleton />
+      ) : error && comments.length === 0 ? (
+        <div className="w-full h-screen flex flex-col gap-3 items-center justify-center">
+          <BiSolidError size={40} className="text-red-600" />
+          <h2>Unable to load comments</h2>
+        </div>
+      ) : (
+        <div>
+          <div className="w-full pt-2">
+            <PostCard postContent={post} disabled={true} />
+          </div>
+          <div className="w-full flex flex-col gap-6 px-4 py-4">
+            {comments.map((c) => (
+              <CommentCard
+                key={c.id}
+                comment={c}
+                currentPathUrl={currentPathUrl}
+                isForUser={c.isMine}
+                onDelete={(commentId: string) =>
+                  setComments((comments) =>
+                    comments.filter((c) => c.id !== commentId),
+                  )
+                }
+              />
+            ))}
+          </div>
 
-              <form
-                onSubmit={handleCommentSubmit}
-                className="fixed inset-x-0 z-60 border-t bg-background border-border safe-area-inset-bottom flex flex-row"
-                style={{
-                  bottom: keyboardOffset,
-                  transition: "bottom 0.2s ease",
-                }}
+          <form
+            onSubmit={handleCommentSubmit}
+            className="fixed inset-x-0 z-60 border-t bg-background border-border safe-area-inset-bottom flex flex-row"
+            style={{
+              bottom: keyboardOffset,
+              transition: 'bottom 0.2s ease',
+            }}
+          >
+            <Input
+              ref={inputRef}
+              type="text"
+              name="comments"
+              className="min-h-16 outline-none w-full px-6 border-none placeholder:text-sm"
+              placeholder="Add a comment…"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+            <div className="flex items-center py-0 px-3">
+              <button
+                className={cn(
+                  'p-3 rounded-full',
+                  comment.length === 0 ? 'bg-muted' : 'bg-blue-700',
+                )}
+                type="submit"
+                disabled={comment.length === 0 || submitCommentLoading}
               >
-                <Input
-                  ref={inputRef}
-                  type="text"
-                  name="comments"
-                  className="min-h-16 outline-none w-full px-6 border-none placeholder:text-sm"
-                  placeholder="Add a comment…"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                />
-                <div className="flex items-center py-0 px-3">
-                  <button className={cn(
-                    "p-3 rounded-full",
-                    comment.length === 0 ? "bg-muted" : "bg-blue-700"
-                  )} type="submit" disabled={comment.length === 0 || submitCommentLoading}>
-                    {
-                      !submitCommentLoading
-                        ? <IoSend size={20} className="text-white" />
-                        : <LoaderSmall />
-                    }
-                  </button>
-                </div>
-              </form>
+                {!submitCommentLoading ? (
+                  <IoSend size={20} className="text-white" />
+                ) : (
+                  <LoaderSmall />
+                )}
+              </button>
+            </div>
+          </form>
 
-              {loading && !initialLoading && (
-                <div className="flex justify-center py-4">
-                  <Loader className="h-8 w-8"/>
-                </div>
-              )}
-
-              {!loading && !initialLoading && comments.length === 0 && (
-                <div className="w-full flex flex-col items-center justify-center py-8">
-                  <IoChatbubbleEllipsesOutline size={40} className="text-blue-800"/>
-                  <p className="text-gray-500 font-semibold">No comments...yet</p>
-                </div>
-              )}
-
-              {error && comments.length > 0 && (
-                <div className="flex flex-col items-center justify-center py-4 pt-4 pb-15 w-full">
-                  <p className="text-orange-700 text-sm mb-2">
-                    Failed to load more comments
-                  </p>
-                  <Button
-                    onClick={() => loadCommentsAndPost(false)}
-                    size="sm"
-                    variant="outline"
-                    className="border-orange-300 text-orange-700 hover:bg-orange-50"
-                  >
-                    Try Again
-                  </Button>
-                </div>
-              )}
+          {loading && !initialLoading && (
+            <div className="flex justify-center py-4">
+              <Loader className="h-8 w-8" />
             </div>
           )}
+
+          {!loading && !initialLoading && comments.length === 0 && (
+            <div className="w-full flex flex-col items-center justify-center py-8">
+              <IoChatbubbleEllipsesOutline
+                size={40}
+                className="text-blue-800"
+              />
+              <p className="text-gray-500 font-semibold">No comments...yet</p>
+            </div>
+          )}
+
+          {error && comments.length > 0 && (
+            <div className="flex flex-col items-center justify-center py-4 pt-4 pb-15 w-full">
+              <p className="text-orange-700 text-sm mb-2">
+                Failed to load more comments
+              </p>
+              <Button
+                onClick={() => loadCommentsAndPost(false)}
+                size="sm"
+                variant="outline"
+                className="border-orange-300 text-orange-700 hover:bg-orange-50"
+              >
+                Try Again
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};

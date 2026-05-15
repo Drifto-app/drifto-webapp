@@ -3,8 +3,6 @@
 import * as React from "react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { HiOutlineGlobe } from "react-icons/hi";
-import { IoGameControllerOutline, IoMusicalNotes } from "react-icons/io5";
 import { MdOutlineMovie, MdOutlineSportsBasketball, MdSpa } from "react-icons/md";
 import { GiCrafting, GiMountainClimbing, GiPaintBrush, GiPalmTree, GiWeightLiftingUp } from "react-icons/gi";
 import {
@@ -53,7 +51,12 @@ const eventItems: EventItem[] = [
     { value: "wellness", icon: <MdSpa size={25} />, label: "Wellness" },
 ];
 
-const tabColors: { [key: string]: any } = {
+interface TabColor {
+    active: string;
+    inactive: string;
+}
+
+const tabColors: Record<string, TabColor> = {
     'Explore': { active: '#1976D2', inactive: '#1976D2' },
     'Games': { active: '#00796B', inactive: '#00796B' },
     'Music': { active: '#F57C00', inactive: '#F57C00' },
@@ -82,10 +85,11 @@ const tabColors: { [key: string]: any } = {
 };
 
 export function Tabs({
-    active, onClick
+    active, onClick, variant = "mobile"
 }: {
     active: string | null;
     onClick?: (v: string | null) => void;
+    variant?: "mobile" | "desktop";
 }) {
     const [animatingTab, setAnimatingTab] = useState<string | null>(null);
 
@@ -118,7 +122,14 @@ export function Tabs({
     return (
         <>
             <style>{bounceScaleAnimation}</style>
-            <ul className="flex flex-row flex-nowrap w-full gap-1 overflow-x-auto px-4 pt-2 no-scrollbar">
+            <ul
+                className={cn(
+                    "flex w-full flex-row flex-nowrap overflow-x-auto no-scrollbar",
+                    variant === "desktop"
+                        ? "gap-2 rounded-2xl border border-border bg-card p-2 shadow-sm"
+                        : "gap-1 px-4 pt-2"
+                )}
+            >
                 {eventItems.map((item) => {
                     const colors = tabColors[item.label] || { active: '#000', inactive: '#666' };
                     const isActive = active === item.value;
@@ -130,14 +141,20 @@ export function Tabs({
                             <div
                                 onClick={() => handleTabClick(item.value)}
                                 className={cn(
-                                    "flex flex-col items-center border-b-3 cursor-pointer px-4 gap-1",
-                                    "transition-all duration-200 ease-out",
+                                    "flex cursor-pointer items-center transition-all duration-200 ease-out",
+                                    variant === "desktop"
+                                        ? "h-11 flex-row gap-2 rounded-full border px-4"
+                                        : "flex-col gap-1 border-b-3 px-4",
                                     isActive
-                                        ? "pb-2 border-b-neutral-800 dark:border-b-blue-500 opacity-100"
-                                        : "pb-0 opacity-60 border-transparent"
+                                        ? variant === "desktop"
+                                            ? "border-blue-800 bg-blue-800 text-white opacity-100 shadow-sm"
+                                            : "pb-2 border-b-neutral-800 opacity-100 dark:border-b-blue-500"
+                                        : variant === "desktop"
+                                            ? "border-transparent bg-background text-muted-foreground opacity-100 hover:bg-accent hover:text-foreground"
+                                            : "pb-0 opacity-60 border-transparent"
                                 )}
                                 style={{
-                                    color: isActive ? colors.active : colors.inactive
+                                    color: variant === "desktop" && isActive ? undefined : isActive ? colors.active : colors.inactive
                                 }}
                             >
                                 <span
@@ -151,10 +168,15 @@ export function Tabs({
                                 </span>
                                 <span
                                     className={cn(
-                                        "mt-1 whitespace-nowrap transition-colors",
+                                        "whitespace-nowrap transition-colors",
+                                        variant === "desktop" ? "text-sm font-bold" : "mt-1",
                                         isActive
-                                            ? "text-sm font-bold text-foreground dark:text-white"
-                                            : "text-[14px] text-muted-foreground dark:text-neutral-400",
+                                            ? variant === "desktop"
+                                                ? "text-current"
+                                                : "text-sm font-bold text-foreground dark:text-white"
+                                            : variant === "desktop"
+                                                ? "text-current"
+                                                : "text-[14px] text-muted-foreground dark:text-neutral-400",
                                     )}
                                 >
                                     {item.label}

@@ -9,11 +9,13 @@ import { OrderCardSkeleton } from "@/components/ui/page-skeletons";
 
 interface UserOrdersProps extends ComponentProps<"div"> {
     user: {[key: string]: any};
+    variant?: "mobile" | "desktop";
 }
 
 export const UserOrders = ({
-    user, className, ...props
+    user, variant = "mobile", className, ...props
 }: UserOrdersProps) => {
+    const isDesktop = variant === "desktop";
 
     const [orders, setOrders] = useState<Array<{[key: string]: any}>>([]);
     const [hasMore, setHasMore] = useState(true);
@@ -104,6 +106,60 @@ export const UserOrders = ({
         return () => observer.disconnect();
     }, [loadOrders, error]);
 
+    const handleCancel = (orderId: string) => setOrders(
+        (orders) => orders.map((order) => {
+            if (order.orderId === orderId) {
+                const newOrder = { ...order };
+                newOrder.orderStatus = "CANCELLED";
+                return newOrder;
+            }
+            return order;
+        })
+    );
+
+    if (isDesktop) {
+        return (
+            <div
+                className={cn("w-full flex flex-col gap-6", className)}
+                {...props}
+            >
+                {loading && orders.length === 0 ? (
+                    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        {Array.from({ length: 6 }).map((_, index) => (
+                            <OrderCardSkeleton key={index} />
+                        ))}
+                    </div>
+                ) : orders.length === 0 ? (
+                    <div className="rounded-3xl border border-dashed border-border bg-card p-16 text-center">
+                        <p className="text-lg font-semibold">No bookings yet</p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            Your purchased and pending tickets will appear here.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        {orders.map((order) => (
+                            <UserOrderCard
+                                key={order.orderId}
+                                orderContent={order}
+                                onCancel={handleCancel}
+                                variant="desktop"
+                            />
+                        ))}
+                    </div>
+                )}
+
+                <div ref={sentinelRef} aria-hidden className="h-1" />
+
+                {loading && orders.length > 0 && (
+                    <div className="flex justify-center py-4">
+                        <Loader className="h-8 w-8" />
+                    </div>
+                )}
+            </div>
+        );
+    }
+
     return (
         <div
             className={cn(
@@ -126,19 +182,7 @@ export const UserOrders = ({
                         <UserOrderCard
                             key={order.orderId}
                             orderContent={order}
-                            onCancel={
-                                (orderId: string) => setOrders(
-                                    (orders) => orders.map((order) => {
-                                        if(order.orderId === orderId){
-                                            const newOrder = {...order};
-                                            newOrder.orderStatus = "CANCELLED"
-                                            return newOrder;
-                                        }
-
-                                        return order;
-                                    })
-                                )
-                            }
+                            onCancel={handleCancel}
                         />
                     ))}
                 </div>

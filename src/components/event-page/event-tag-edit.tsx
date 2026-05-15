@@ -6,7 +6,6 @@ import {
     Dialog,
     DialogClose,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -14,7 +13,8 @@ import {
 } from "../ui/dialog";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
-import {eventTagsActions, useEventTags} from "@/store/event-tag-store";
+import {useEventTags} from "@/store/event-tag-store";
+import { cn } from "@/lib/utils";
 
 interface EventTagDialogProps  {
     currentEventTags: string[]
@@ -34,11 +34,11 @@ export const EventTagDialog= ({
         <>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
-                  <div className=" w-full py-3 px-4 bg-background rounded-md text-wrap flex flex-row justify-between items-center cursor-pointer hover:bg-muted transition-colors border-1 border-border">
-                            <span className="text-sm w-[85%]">
+                  <div className="w-full rounded-md border border-border bg-background px-4 py-3 text-wrap flex flex-row justify-between items-center cursor-pointer text-foreground transition-colors hover:bg-muted dark:border-neutral-700 dark:bg-neutral-950 dark:hover:bg-neutral-900">
+                            <span className="text-sm w-[85%] text-foreground">
                             {selectedTagsText}
                         </span>
-                      <CiEdit size={22} />
+                      <CiEdit size={22} className="text-muted-foreground" />
                   </div>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
@@ -52,7 +52,10 @@ export const EventTagDialog= ({
                               <Button
                                   variant="outline"
                                   key={index}
-                                  className={`px-2 py-2 text-sm rounded-full ${isSelected ? "border-blue-600" : ""}`}
+                                  className={cn(
+                                      "rounded-full px-2 py-2 text-sm border-border bg-background text-foreground hover:bg-muted dark:border-neutral-700 dark:bg-neutral-950 dark:hover:bg-neutral-900",
+                                      isSelected && "border-blue-600 bg-blue-800/10 text-blue-800 hover:bg-blue-800/15 dark:border-blue-400 dark:bg-blue-400/10 dark:text-blue-300 dark:hover:bg-blue-400/15",
+                                  )}
                                   onClick={() => isSelected ? onTagRemove(tag.name) : onTagAdd(tag.name)}
                               >
                                   {tag.name}

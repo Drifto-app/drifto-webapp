@@ -1,5 +1,7 @@
 "use client"
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { cn, MAX_IMAGE_SIZE, MAX_VIDEO_SIZE, uploadMedia } from "@/lib/utils";
 import { ChangeEvent, ComponentProps, useState, useRef, useEffect, useCallback } from "react";
 import { FaArrowLeft, FaPlay } from "react-icons/fa";
@@ -11,7 +13,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { HiOutlineRectangleStack } from "react-icons/hi2";
 import { Card, CardContent } from "@/components/ui/card";
-import { X, Hash } from "lucide-react";
+import { ArrowLeft, Hash, ImagePlus, Send, X } from "lucide-react";
 import { LoaderSmall } from "@/components/ui/loader";
 import { showTopToast } from "@/components/toast/toast-util";
 import { authApi } from "@/lib/axios";
@@ -21,6 +23,7 @@ import defaultImage from "@/assests/default.jpeg";
 
 interface CreatePostContentProps extends ComponentProps<"div"> {
     prev: string | null,
+    variant?: "mobile" | "desktop";
 }
 
 type MediaFileType = { url: string, type: "VIDEO" | "IMAGE" };
@@ -38,9 +41,10 @@ interface MentionState {
 }
 
 export const CreatePostContent = ({
-    prev, className, ...props
+    prev, variant = "mobile", className, ...props
 }: CreatePostContentProps) => {
     const router = useRouter();
+    const isDesktop = variant === "desktop";
     const { user } = useAuthStore();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const mentionDropdownRef = useRef<HTMLDivElement>(null);
@@ -165,7 +169,7 @@ export const CreatePostContent = ({
                 return { results, hasMore };
             }
             return { results: [], hasMore: false };
-        } catch (error: any) {
+        } catch {
             showTopToast("error", `Load ${type} mention error`)
             return { results: [], hasMore: false };
         }
@@ -397,11 +401,304 @@ export const CreatePostContent = ({
         try {
             await authApi.post("/post", param)
             router.push("/?screen=posts")
-        } catch (error: any) {
+        } catch {
             showTopToast("error", "Error creating post");
         } finally {
             setIsPostLoading(false);
         }
+    }
+
+    const mentionDropdown = mentionState.isActive && (
+        <div
+            ref={mentionDropdownRef}
+            className="absolute left-0 right-0 top-full z-20 mt-2 max-h-72 overflow-y-auto rounded-2xl border border-border bg-background shadow-lg"
+            onScroll={handleDropdownScroll}
+        >
+            {mentionState.loading && mentionState.results.length === 0 && (
+                <div className="flex w-full items-center justify-center p-4">
+                    <LoaderSmall />
+                </div>
+            )}
+
+            {mentionState.results.length === 0 && !mentionState.loading && (
+                <div className="p-4 text-center text-sm text-muted-foreground">
+                    No {mentionState.type === 'user' ? 'users' : 'events'} found
+                </div>
+            )}
+
+            {mentionState.results.map((result) => (
+                <button
+                    key={result.id}
+                    type="button"
+                    className="flex w-full items-center gap-3 p-3 text-left transition hover:bg-accent"
+                    onClick={() => selectMention(result)}
+                >
+                    {mentionState.type === 'user' ? (
+                        <>
+                            <span className="relative h-10 w-10 overflow-hidden rounded-full bg-muted">
+                                <Image
+                                    src={result.profileImage || defaultImage}
+                                    alt={result.username}
+                                    fill
+                                    className="object-cover"
+                                />
+                            </span>
+                            <span className="min-w-0">
+                                <span className="flex items-center gap-1">
+                                    <span className="truncate text-sm font-black">{result.username}</span>
+                                    <UserVerificationBadge user={result} />
+                                </span>
+                                <span className="text-xs text-muted-foreground">Drifto user</span>
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-800/10 text-blue-800 dark:bg-blue-400/10 dark:text-blue-300">
+                                <Hash size={17} />
+                            </span>
+                            <span className="min-w-0">
+                                <span className="line-clamp-1 text-sm font-black">{result.title}</span>
+                                <span className="text-xs text-muted-foreground">Event</span>
+                            </span>
+                        </>
+                    )}
+                </button>
+            ))}
+
+            {mentionState.loading && mentionState.results.length > 0 && (
+                <div className="flex justify-center p-3">
+                    <LoaderSmall />
+                </div>
+            )}
+        </div>
+    );
+
+    if (isDesktop) {
+        const canPost = Boolean(postText.trim() || mediaFiles?.length);
+
+        return (
+            <>
+                <main className={cn("min-h-screen bg-background text-foreground", className)} {...props}>
+                    <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur">
+                        <div className="desktop-page-header-inner flex h-20 items-center justify-between gap-4">
+                            <div className="flex min-w-0 items-center gap-4">
+                                <Button variant="ghost" size="icon" className="rounded-full" onClick={handleBackClick}>
+                                    <ArrowLeft size={20} />
+                                </Button>
+                                <div className="min-w-0">
+                                    <p className="text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
+                                        Social
+                                    </p>
+                                    <h1 className="truncate text-xl font-black">Create post</h1>
+                                </div>
+                            </div>
+                            <Button
+                                className="rounded-full"
+                                disabled={!canPost || isUploading || isPostLoading}
+                                onClick={handlePostSubmit}
+                            >
+                                {isPostLoading ? <LoaderSmall /> : <Send size={17} />}
+                                Post
+                            </Button>
+                        </div>
+                    </header>
+
+                    <div className="desktop-page-container grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_clamp(20rem,22vw,24rem)]">
+                        <section className="rounded-2xl border border-border bg-card p-6">
+                            <div className="flex gap-4">
+                                <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-muted">
+                                    <Image
+                                        src={user?.profileImage || defaultImage}
+                                        alt={user?.username || "User"}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                    <p className="font-black">{user?.username ?? "You"}</p>
+                                    <p className="text-sm text-muted-foreground">Use @ for users and # for events.</p>
+                                </div>
+                            </div>
+
+                            <div className="relative mt-6">
+                                <textarea
+                                    ref={textareaRef}
+                                    id="desktop-post-text"
+                                    placeholder="Share an update, story, or event moment..."
+                                    value={postText}
+                                    onChange={handleTextareaChange}
+                                    rows={10}
+                                    className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-4 text-base leading-7 outline-none transition placeholder:text-muted-foreground focus:border-blue-700"
+                                />
+                                {mentionDropdown}
+                            </div>
+
+                            {(tagEvents.length > 0 || tagUsers.length > 0) && (
+                                <div className="mt-5 flex flex-wrap gap-2">
+                                    {tagEvents.map((item, index) => (
+                                        <span
+                                            key={`event-${index}`}
+                                            className="inline-flex items-center gap-1 rounded-full bg-blue-800/10 px-3 py-1 text-sm font-bold text-blue-800 dark:bg-blue-400/10 dark:text-blue-300"
+                                        >
+                                            {item.name}
+                                            <button type="button" onClick={() => handleRemoveTagEvent(item)} className="rounded-full p-0.5 hover:bg-blue-800/10">
+                                                <X size={14} />
+                                            </button>
+                                        </span>
+                                    ))}
+                                    {tagUsers.map((item, index) => (
+                                        <span
+                                            key={`user-${index}`}
+                                            className="inline-flex items-center gap-1 rounded-full bg-blue-800/10 px-3 py-1 text-sm font-bold text-blue-800 dark:bg-blue-400/10 dark:text-blue-300"
+                                        >
+                                            {item.name}
+                                            <button type="button" onClick={() => handleRemoveTagUser(item)} className="rounded-full p-0.5 hover:bg-blue-800/10">
+                                                <X size={14} />
+                                            </button>
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="mt-6">
+                                <div className="mb-3 flex items-center justify-between">
+                                    <p className="text-sm font-black">Media</p>
+                                    <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border border-border px-4 text-sm font-bold transition hover:bg-accent">
+                                        {isUploading ? <LoaderSmall /> : <ImagePlus size={17} />}
+                                        Add media
+                                        <input
+                                            type="file"
+                                            multiple
+                                            className="hidden"
+                                            disabled={isUploading}
+                                            onChange={handleFileSelect}
+                                        />
+                                    </label>
+                                </div>
+
+                                {mediaFiles?.length ? (
+                                    <div className="overflow-x-auto no-scrollbar">
+                                        <div className="flex gap-3">
+                                            {mediaFiles.map((file, idx) => (
+                                                <div key={file.url} className="relative w-48 flex-none">
+                                                    <Card
+                                                        className="overflow-hidden p-0"
+                                                        onClick={() => openModal(file)}
+                                                    >
+                                                        <CardContent className="p-0">
+                                                            <AspectRatio ratio={4 / 3}>
+                                                                {file.type === "IMAGE" ? (
+                                                                    <Image
+                                                                        src={file.url}
+                                                                        alt={`Media ${idx + 1}`}
+                                                                        fill
+                                                                        className="object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <video
+                                                                        className="h-full w-full object-cover"
+                                                                        src={file.url}
+                                                                        controls={false}
+                                                                        muted
+                                                                        playsInline
+                                                                    />
+                                                                )}
+                                                                {file.type === "VIDEO" && (
+                                                                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                                                        <div className="rounded-full bg-black/50 p-3">
+                                                                            <FaPlay className="text-white" />
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </AspectRatio>
+                                                        </CardContent>
+                                                    </Card>
+                                                    <button
+                                                        className="absolute right-2 top-2 rounded-full bg-neutral-950/70 p-1 text-white"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleFileRemove(file.url);
+                                                        }}
+                                                        aria-label="Remove media"
+                                                    >
+                                                        <X size={18} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <label className="flex h-52 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-background text-center transition hover:bg-accent">
+                                        {isUploading ? <LoaderSmall /> : <ImagePlus className="text-muted-foreground" size={34} />}
+                                        <span className="mt-3 font-black">Add images or videos</span>
+                                        <span className="mt-1 text-sm text-muted-foreground">Media is optional, but it helps posts stand out.</span>
+                                        <input
+                                            type="file"
+                                            multiple
+                                            className="hidden"
+                                            disabled={isUploading}
+                                            onChange={handleFileSelect}
+                                        />
+                                    </label>
+                                )}
+                            </div>
+                        </section>
+
+                        <aside className="h-fit rounded-2xl border border-border bg-card p-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                                Composer guide
+                            </p>
+                            <h2 className="mt-2 text-xl font-black">Make the post easy to discover.</h2>
+                            <div className="mt-5 grid gap-3 text-sm">
+                                <div className="rounded-xl border border-border bg-background p-4">
+                                    <p className="font-black">@ users</p>
+                                    <p className="mt-1 text-muted-foreground">Mention people involved in the update.</p>
+                                </div>
+                                <div className="rounded-xl border border-border bg-background p-4">
+                                    <p className="font-black"># events</p>
+                                    <p className="mt-1 text-muted-foreground">Attach posts to events guests can inspect.</p>
+                                </div>
+                                <div className="rounded-xl border border-border bg-background p-4">
+                                    <p className="font-black">Media</p>
+                                    <p className="mt-1 text-muted-foreground">Use responsive images or short videos for context.</p>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </main>
+
+                <Dialog
+                    open={modalOpen}
+                    onClose={closeModal}
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
+                >
+                    <button className="absolute right-4 top-4 cursor-pointer text-white" onClick={closeModal}>
+                        <X size={30} />
+                    </button>
+
+                    <Dialog.Panel className="max-h-[95vh] w-full max-w-5xl overflow-hidden text-foreground">
+                        {!activeMediaFile ? null : activeMediaFile.type === "IMAGE" ? (
+                            <Image
+                                src={activeMediaFile.url}
+                                alt="Post media"
+                                width={1200}
+                                height={800}
+                                className="h-auto max-h-[92vh] w-full object-contain"
+                            />
+                        ) : (
+                            <video
+                                src={activeMediaFile.url}
+                                className="max-h-[92vh] w-full object-contain"
+                                controls
+                                playsInline
+                                autoPlay
+                                preload="metadata"
+                            />
+                        )}
+                    </Dialog.Panel>
+                </Dialog>
+            </>
+        );
     }
 
     return (
